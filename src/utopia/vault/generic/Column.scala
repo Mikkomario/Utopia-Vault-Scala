@@ -13,5 +13,15 @@ class Column(propertyName: String, val columnName: String, dataType: DataType, v
         val isPrimary: Boolean, val usesAutoIncrement: Boolean, defaultValue: Option[Value] = None) 
         extends PropertyDeclaration(propertyName, dataType, defaultValue)
 {
+    // COMPUTED PROPERTIES    ------------------
     
+    override def properties = super.properties ++ Vector(columnName, notNull, isPrimary, usesAutoIncrement)
+    
+    override def toString = s"$columnName $dataType ${if (notNull) "NOT NULL " else ""} ${
+            if (isPrimary) "PRIMARY KEY " else ""} ${if (usesAutoIncrement) "AUTO_INCREMENT " else ""}";
+            
+    /**
+     * Whether a value is required in this column when data is inserted to the database
+     */
+    def isRequiredInInsert = notNull && !defaultValue.exists { _.isDefined } && !usesAutoIncrement
 }
