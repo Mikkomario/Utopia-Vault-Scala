@@ -6,9 +6,11 @@ package utopia.vault.database
  * @param connectionTarget
  * The new MariaDB / MySQL server to be used. Should not include 
  * the name of the database. For example: "jdbc:mysql://localhost:3306/"
- * @param driver The driver used when connecting to the server. Eg. "org.gjt.mm.mysql.Driver."
+ * @param driver The driver used when connecting to the server. Eg. "org.gjt.mm.mysql.Driver.". 
+ * The mariaDB driver is used by default if nothing else is provided
  * @author Mikko Hilpinen
  * @since 16.4.2017
  */
 case class ConnectionSettings(val connectionTarget: String, val user: String, 
-        val password: String, val driver: Option[String] = None)
+        val password: String, val defaultDBName: Option[String] = None, 
+        val driver: Option[String] = None)

@@ -1,6 +1,7 @@
 package utopia.vault.database
 
 import utopia.flow.generic.EnvironmentNotSetupException
+import java.sql.DriverManager
 
 object Connection
 {
@@ -9,6 +10,9 @@ object Connection
      * any database connections
      */
     var settings: Option[ConnectionSettings] = None
+    
+    // If an external driver is used in database operations, it is stored here after instantiation
+    private var driver: Option[Any] = None
 }
 
 /**
@@ -17,25 +21,36 @@ object Connection
  * @author Mikko Hilpinen
  * @since 16.4.2017
  */
-class Connection(initialDBName: String = "default")
+class Connection(initialDBName: Option[String] = None)
 {
     // ATTRIBUTES    -----------------
     
     private var _dbName = initialDBName
     /**
-     * The name of the database the connection is used for
+     * The name of the database the connection is used for. This is either defined by<br>
+     * a) specifying the database name upon connection creation<br>
+     * b) specified after the connection has been instantiated by assigning a new value<br>
+     * c) the default option specified in the connection settings
      */
-    def dbName = _dbName
+    def dbName = _dbName.orElse(Connection.settings.flatMap { _.defaultDBName })
     def dbName_=(databaseName: String) = 
     {
-        if (_dbName != databaseName)
+        if (!dbName.exists { _ == databaseName })
         {
-            _dbName = databaseName
+            _dbName = Some(databaseName)
             // Perform database switch if necessary
         }
     }
     
     private var _connection: Option[java.sql.Connection] = None
+    
+    
+    // COMPUTED PROPERTIES    -------
+    
+    /**
+     * Whether the connection to the database has already been established
+     */
+    def isOpen = _connection.exists { !_.isClosed() }
     
     
     // OTHER METHODS    -------------
@@ -47,7 +62,8 @@ class Connection(initialDBName: String = "default")
     @throws(classOf[NoConnectionException])
     def open()
     {
-        if (!_connection.exists { !_.isClosed() })
+        // Only opens a new connection if there is no open connection available
+        if (!isOpen)
         {
             // Connection settings must be specified
             if (Connection.settings.isEmpty)
@@ -56,13 +72,25 @@ class Connection(initialDBName: String = "default")
                         "Connection settings must be specified before a connection can be established")
             }
             
+            // Database name must be specified at this point
+            if (dbName.isEmpty)
+            {
+                throw NoConnectionException("Database name hasn't been specified")
+            }
+            
             try
             {
                 // Sets up the driver
-                // TODO: Should these driver instances be reused?
-                Connection.settings.get.driver.foreach { Class.forName(_).newInstance() }
+                if (Connection.settings.get.driver.isDefined && Connection.driver.isEmpty)
+                {
+                    Connection.driver = Some(
+                            Class.forName(Connection.settings.get.driver.get).newInstance())
+                }
                 
-                // TODO: Continue by instantiating the connection
+                // Instantiates the connection
+                _connection = Some(DriverManager.getConnection(
+                        Connection.settings.get.connectionTarget + dbName.get, 
+                        Connection.settings.get.user, Connection.settings.get.password))
             }
             catch 
             {
