@@ -2,6 +2,8 @@ package utopia.vault.database
 
 import utopia.flow.generic.EnvironmentNotSetupException
 import java.sql.DriverManager
+import java.sql.Statement
+import java.sql.SQLException
 
 object Connection
 {
@@ -43,6 +45,7 @@ class Connection(initialDBName: Option[String] = None)
     }
     
     private var _connection: Option[java.sql.Connection] = None
+    private def connection = { open(); _connection.get }
     
     
     // COMPUTED PROPERTIES    -------
@@ -110,6 +113,21 @@ class Connection(initialDBName: Option[String] = None)
         catch 
         {
             case _: Exception => // Exceptions here are ignored
+        }
+    }
+    
+    @throws(classOf[SQLException])
+    def executeSimple(sql: String) = 
+    {
+        var statement: Option[Statement] = None
+        try
+        {
+            statement = Some(connection.createStatement())
+            statement.foreach { _.executeUpdate(sql) }
+        }
+        finally
+        {
+            statement.foreach { _.close() }
         }
     }
 }
