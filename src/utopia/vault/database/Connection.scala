@@ -4,6 +4,8 @@ import utopia.flow.generic.EnvironmentNotSetupException
 import java.sql.DriverManager
 import java.sql.Statement
 import java.sql.SQLException
+import utopia.flow.datastructure.immutable.Value
+import java.sql.PreparedStatement
 
 object Connection
 {
@@ -116,6 +118,8 @@ class Connection(initialDBName: Option[String] = None)
         }
     }
     
+    @throws(classOf[EnvironmentNotSetupException])
+    @throws(classOf[NoConnectionException])
     @throws(classOf[SQLException])
     def executeSimple(sql: String) = 
     {
@@ -124,6 +128,28 @@ class Connection(initialDBName: Option[String] = None)
         {
             statement = Some(connection.createStatement())
             statement.foreach { _.executeUpdate(sql) }
+        }
+        finally
+        {
+            statement.foreach { _.close() }
+        }
+    }
+    
+    def execute(sql: String, values: Iterable[Value], returnGeneratedKeys: Boolean = false) = 
+    {
+        var statement: Option[PreparedStatement] = None
+        try
+        {
+            // Creates the statement
+            statement = Some(connection.prepareStatement(sql, 
+                    if (returnGeneratedKeys) Statement.RETURN_GENERATED_KEYS 
+                    else Statement.NO_GENERATED_KEYS));
+            
+            // Inserts provided values
+            for ( i <- 0 until values.size )
+            {
+                // TODO: Convert values and insert them
+            }
         }
         finally
         {
