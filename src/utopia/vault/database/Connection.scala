@@ -6,9 +6,15 @@ import java.sql.Statement
 import java.sql.SQLException
 import utopia.flow.datastructure.immutable.Value
 import java.sql.PreparedStatement
+import utopia.flow.parse.ValueConverterManager
 
 object Connection
 {
+    /**
+     * The converter that converts values to sql compatible format
+     */
+    val sqlValueConverter = new ValueConverterManager(Vector(BasicSqlValueConverter))
+    
     /**
      * The settings used for establishing new connections. Must be specified before opening 
      * any database connections
@@ -135,7 +141,7 @@ class Connection(initialDBName: Option[String] = None)
         }
     }
     
-    def execute(sql: String, values: Iterable[Value], returnGeneratedKeys: Boolean = false) = 
+    def execute(sql: String, values: Vector[Value], returnGeneratedKeys: Boolean = false) = 
     {
         var statement: Option[PreparedStatement] = None
         try
@@ -148,7 +154,16 @@ class Connection(initialDBName: Option[String] = None)
             // Inserts provided values
             for ( i <- 0 until values.size )
             {
-                // TODO: Convert values and insert them
+                val conversionResult = Connection.sqlValueConverter(values(i))
+                if (conversionResult.isDefined)
+                {
+                    statement.get.setObject(i + 1, conversionResult.get._1, conversionResult.get._2)
+                }
+                else
+                {
+                    // TODO: How to get the correct data type for the null value?
+                    // statement.get.setNull(i + 1)
+                }
             }
         }
         finally
