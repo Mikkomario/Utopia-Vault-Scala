@@ -31,13 +31,7 @@ class Result(val rows: Vector[Row], val generatedKeys: Vector[Int])
     
     /**
      * Retrieves row data concerning a certain table
-     * @param tableName The name of the table whose data is returned
-     */
-    def rowsForTable(tableName: String) = rows.map { _(tableName) }
-    
-    /**
-     * Retrieves row data concerning a certain table
      * @param table The table whose data is returned
      */
-    def rowsForTable(table: Table): Vector[Model[Constant]] = rowsForTable(table.name)
+    def rowsForTable(table: Table) = rows.map { _(table) }
 }

@@ -12,7 +12,7 @@ import utopia.vault.generic.Table
  * @param columnData Column data contains models generated on retrieved columns. There's a separate
  * model for each table. The table's name is used as a key in this map.
  */
-class Row(val columnData: Map[String, Model[Constant]])
+class Row(val columnData: Map[Table, Model[Constant]])
 {
     // COMPUTED PROPERTIES    -----------------
     
@@ -31,14 +31,8 @@ class Row(val columnData: Map[String, Model[Constant]])
     // OPERATORS    ---------------------------
     
     /**
-     * Finds column data for a table with the provided name
-     * @param tableName The name of the table whose data is requested
-     */
-    def apply(tableName: String) = columnData.getOrElse(tableName, new Model(Vector()))
-    
-    /**
      * Finds column data for a table
      * @param table The table whose data is requested
      */
-    def apply(table: Table): Model[Constant] = apply(table.name)
+    def apply(table: Table) = columnData.getOrElse(table, new Model(Vector()))
 }

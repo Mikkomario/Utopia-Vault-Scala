@@ -194,10 +194,19 @@ class Connection(initialDBName: Option[String] = None)
         val indicesForTables = Vector.range(1, meta.getColumnCount + 1).groupBy { 
                 index => tables.find { _.name == meta.getTableName(index) } }
         // Maps each index to a column in a targeted table, flattening the map as well
+        // Resulting map: Table -> (Column, sqlType, index)
         val columnIndices = indicesForTables.flatMap { case (tableOption, indices) => 
                 tableOption.map { table => (table, indices.flatMap { 
-                index => (table.columnWithColumnName( meta.getColumnName(index) ).map { (_, index) }) }) } }
+                index => (table.columnWithColumnName( meta.getColumnName(index) ).map { 
+                (_, meta.getColumnType(index), index) }) }) } }
         
-        
+        // Parses the rows from the resultSet
+        val rowBuffer = Vector.newBuilder[Row]
+        while (resultSet.next())
+        {
+            // TODO: Parse object + type into a value and assign to row
+            // Repeat for all columns
+            
+        }
     }
 }
