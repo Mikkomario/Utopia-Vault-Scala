@@ -53,4 +53,12 @@ class Table(val name: String, val databaseName: String, val columns: Vector[Colu
      * Finds columns matching the provided property names
      */
     def apply(propertyName: String, others: String*): Vector[Column] = apply(others :+ propertyName)
+    
+    
+    // OTHER METHODS    ------------------------
+    
+    /**
+     * Finds a column with the specified column name
+     */
+    def columnWithColumnName(columnName: String) = columns.find { _.columnName == columnName }
 }

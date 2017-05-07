@@ -7,6 +7,9 @@ import java.sql.SQLException
 import utopia.flow.datastructure.immutable.Value
 import java.sql.PreparedStatement
 import utopia.flow.parse.ValueConverterManager
+import java.sql.Types
+import java.sql.ResultSet
+import utopia.vault.generic.Table
 
 object Connection
 {
@@ -14,6 +17,10 @@ object Connection
      * The converter that converts values to sql compatible format
      */
     val sqlValueConverter = new ValueConverterManager(Vector(BasicSqlValueConverter))
+    /**
+     * The generator that converts sql data (object + type) into a value
+     */
+    val sqlValueGenerator = new SqlValueGeneratorManager(Vector(BasicSqlValueGenerator))
     
     /**
      * The settings used for establishing new connections. Must be specified before opening 
@@ -141,9 +148,11 @@ class Connection(initialDBName: Option[String] = None)
         }
     }
     
-    def execute(sql: String, values: Vector[Value], returnGeneratedKeys: Boolean = false) = 
+    def execute(sql: String, values: Vector[Value], selectedTables: Vector[Table] = Vector(), 
+            returnGeneratedKeys: Boolean = false) = 
     {
         var statement: Option[PreparedStatement] = None
+        var results: Option[ResultSet] = None
         try
         {
             // Creates the statement
@@ -162,13 +171,24 @@ class Connection(initialDBName: Option[String] = None)
                 else
                 {
                     // TODO: How to get the correct data type for the null value?
-                    // statement.get.setNull(i + 1)
+                    // May possibly need to add a helper class for this
+                    statement.get.setNull(i + 1, Types.NULL)
                 }
             }
+            
+            // Executes the statement and retrieves the result
+            results = Some(statement.get.executeQuery())
         }
         finally
         {
+            results.foreach { _.close() }
             statement.foreach { _.close() }
         }
+    }
+    
+    private def rowsFromResult(resultSet: ResultSet, tables: Iterable[Table]) = 
+    {
+        val meta = resultSet.getMetaData()
+        
     }
 }
