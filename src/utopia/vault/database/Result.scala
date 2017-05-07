@@ -11,7 +11,7 @@ import utopia.flow.datastructure.immutable.Constant
  * @author Mikko Hilpinen
  * @since 25.4.2017
  */
-class Result(val rows: Vector[Row], val generatedKeys: Vector[Int])
+class Result(val rows: Vector[Row], val generatedKeys: Vector[Int] = Vector())
 {
     // COMPUTED PROPERTIES    ------------
     

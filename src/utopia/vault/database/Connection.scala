@@ -10,6 +10,8 @@ import utopia.flow.parse.ValueConverterManager
 import java.sql.Types
 import java.sql.ResultSet
 import utopia.vault.generic.Table
+import utopia.flow.datastructure.immutable.Model
+import utopia.flow.datastructure.immutable.Constant
 
 object Connection
 {
@@ -118,6 +120,9 @@ class Connection(initialDBName: Option[String] = None)
         }
     }
     
+    /**
+     * Closes this database connection. This should be called before the connection is discarded
+     */
     def close()
     {
         try
@@ -131,6 +136,9 @@ class Connection(initialDBName: Option[String] = None)
         }
     }
     
+    /**
+     * Executes a simple sql string. Does not retrieve any values from the query.
+     */
     @throws(classOf[EnvironmentNotSetupException])
     @throws(classOf[NoConnectionException])
     @throws(classOf[SQLException])
@@ -148,6 +156,20 @@ class Connection(initialDBName: Option[String] = None)
         }
     }
     
+    /**
+     * Executes an sql query and returns the results. The provided values are injected to the 
+     * query separately.
+     * @param sql The sql string. Places for values are marked with '?'. There should always be 
+     * exactly same number of these markers as there are values in the 'values' parameter
+     * @param values The values that are injected to the query
+     * @param selectedTables The tables for which resulting rows are parsed. If empty, the rows 
+     * are not parsed at all.
+     * @param returnGeneratedKeys Whether the resulting Result object should contain any keys 
+     * generated during the query
+     * @return The results of the query, containing the read rows and keys. If 'selectedTables' 
+     * parameter was empty, no rows are included. If 'returnGeneratedKeys' parameter was false, 
+     * no keys are included
+     */
     def execute(sql: String, values: Vector[Value], selectedTables: Vector[Table] = Vector(), 
             returnGeneratedKeys: Boolean = false) = 
     {
@@ -178,6 +200,11 @@ class Connection(initialDBName: Option[String] = None)
             
             // Executes the statement and retrieves the result
             results = Some(statement.get.executeQuery())
+            
+            // Parses data out of the result
+            // May skip some data in case it is not requested
+            new Result(if (selectedTables.isEmpty) Vector() else rowsFromResult(results.get, selectedTables), 
+                    if (returnGeneratedKeys) generatedKeysFromResult(statement.get) else Vector())
         }
         finally
         {
@@ -204,9 +231,27 @@ class Connection(initialDBName: Option[String] = None)
         val rowBuffer = Vector.newBuilder[Row]
         while (resultSet.next())
         {
-            // TODO: Parse object + type into a value and assign to row
-            // Repeat for all columns
-            
+            // Reads the object data from each row, parses them into constants and creates a model 
+            // The models are mapped to each table separately
+            // NB: view.force is added in order to create a concrete map
+            rowBuffer += new Row(columnIndices.mapValues { data => 
+                new Model(data.map { case (column, sqlType, index) => new Constant(column.name, 
+                Connection.sqlValueGenerator(resultSet.getObject(index), sqlType)) }) }.view.force)
         }
+        
+        rowBuffer.result()
+    }
+    
+    private def generatedKeysFromResult(statement: Statement) = 
+    {
+        val results = statement.getGeneratedKeys()
+        val keyBuffer = Vector.newBuilder[Int]
+        
+        while (results.next())
+        {
+            keyBuffer += results.getInt(1)
+        }
+        
+        keyBuffer.result()
     }
 }
