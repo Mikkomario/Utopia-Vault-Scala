@@ -190,5 +190,14 @@ class Connection(initialDBName: Option[String] = None)
     {
         val meta = resultSet.getMetaData()
         
+        // Sorts the column indices for targeted tables
+        val indicesForTables = Vector.range(1, meta.getColumnCount + 1).groupBy { 
+                index => tables.find { _.name == meta.getTableName(index) } }
+        // Maps each index to a column in a targeted table, flattening the map as well
+        val columnIndices = indicesForTables.flatMap { case (tableOption, indices) => 
+                tableOption.map { table => (table, indices.flatMap { 
+                index => (table.columnWithColumnName( meta.getColumnName(index) ).map { (_, index) }) }) } }
+        
+        
     }
 }
