@@ -37,7 +37,7 @@ object BasicSqlValueConverter extends ValueConverter[Tuple2[Any, Int]]
             case LongType => (value.longOr(), Types.BIGINT)
             case IntType => (value.intOr(), Types.INTEGER)
             case BooleanType => (value.booleanOr(), Types.BOOLEAN)
-            case InstantType => (value.instantOr(), Types.TIMESTAMP)
+            case InstantType => (Timestamp.from(value.instantOr()), Types.TIMESTAMP)
             case _ => (value.stringOr(), Types.VARCHAR)
         }
     }

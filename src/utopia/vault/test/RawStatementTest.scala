@@ -10,6 +10,7 @@ import utopia.flow.generic.InstantType
 import utopia.flow.generic.DataType
 import utopia.vault.database.Connection
 import utopia.vault.database.ConnectionSettings
+import java.time.Instant
 
 /**
  * This test runs some raw statements using the sql client and checks the results
@@ -52,6 +53,23 @@ object RawStatementTest extends App
         results.foreach { row => println(row.toJSON) }
         
         assert(results.size == 3)
+        
+        // Tries to insert null values
+        connection.execute(s"INSERT INTO ${table.name} (name, age) VALUES (?, ?)", 
+                Vector(Value.of("Test"), Value.empty(IntType)));
+        
+        // Also tries inserting a time value
+        val creationTime = Value of Instant.now()
+        val latestIndex = connection.execute(s"INSERT INTO ${table.name} (name, created) VALUES (?, ?)", 
+                Vector(Value.of("Test2"), creationTime), Vector(), true).generatedKeys.head;
+        
+        // Checks that the time value was preserved
+        val lastResult = connection.execute(s"SELECT created FROM ${table.name} WHERE row_id = ?", 
+                Vector(Value of latestIndex), Vector(table), false).rows.head.toModel;
+        
+        println(lastResult.toJSON)
+        println(s"Previously ${creationTime.longOr()} (${creationTime.dataType}), now ${lastResult("created").longOr()} (${lastResult("created").dataType})")
+        assert(lastResult("created").longOr() == creationTime.longOr())
         
         println("Success!")
     }
