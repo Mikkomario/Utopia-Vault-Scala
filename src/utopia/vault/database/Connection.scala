@@ -25,10 +25,9 @@ object Connection
     val sqlValueGenerator = new SqlValueGeneratorManager(Vector(BasicSqlValueGenerator))
     
     /**
-     * The settings used for establishing new connections. Must be specified before opening 
-     * any database connections
+     * The settings used for establishing new connections
      */
-    var settings: Option[ConnectionSettings] = None
+    var settings = ConnectionSettings()
     
     // If an external driver is used in database operations, it is stored here after instantiation
     private var driver: Option[Any] = None
@@ -51,13 +50,18 @@ class Connection(initialDBName: Option[String] = None)
      * b) specified after the connection has been instantiated by assigning a new value<br>
      * c) the default option specified in the connection settings
      */
-    def dbName = _dbName.orElse(Connection.settings.flatMap { _.defaultDBName })
+    def dbName = _dbName.orElse(Connection.settings.defaultDBName)
     def dbName_=(databaseName: String) = 
     {
         if (!dbName.exists { _ == databaseName })
         {
+            // Performs a database change, if necessary
+            if (!_dbName.exists { _ == databaseName })
+            {
+                executeSimple(s"USE $databaseName")
+            }
+            
             _dbName = Some(databaseName)
-            // Perform database switch if necessary
         }
     }
     
@@ -84,14 +88,7 @@ class Connection(initialDBName: Option[String] = None)
     {
         // Only opens a new connection if there is no open connection available
         if (!isOpen)
-        {
-            // Connection settings must be specified
-            if (Connection.settings.isEmpty)
-            {
-                throw EnvironmentNotSetupException(
-                        "Connection settings must be specified before a connection can be established")
-            }
-            
+        {   
             // Database name must be specified at this point
             if (dbName.isEmpty)
             {
@@ -101,21 +98,21 @@ class Connection(initialDBName: Option[String] = None)
             try
             {
                 // Sets up the driver
-                if (Connection.settings.get.driver.isDefined && Connection.driver.isEmpty)
+                if (Connection.settings.driver.isDefined && Connection.driver.isEmpty)
                 {
                     Connection.driver = Some(
-                            Class.forName(Connection.settings.get.driver.get).newInstance())
+                            Class.forName(Connection.settings.driver.get).newInstance())
                 }
                 
                 // Instantiates the connection
                 _connection = Some(DriverManager.getConnection(
-                        Connection.settings.get.connectionTarget + dbName.get, 
-                        Connection.settings.get.user, Connection.settings.get.password))
+                        Connection.settings.connectionTarget + dbName.get, 
+                        Connection.settings.user, Connection.settings.password))
             }
             catch 
             {
                 case e: Exception => throw NoConnectionException(
-                        s"Failed to open a database connection with settings ${Connection.settings.get} and database $dbName", e)
+                        s"Failed to open a database connection with settings ${Connection.settings} and database '$dbName'", e)
             }
         }
     }

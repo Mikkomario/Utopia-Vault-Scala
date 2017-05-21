@@ -9,8 +9,8 @@ import utopia.flow.datastructure.immutable.Value
  * @author Mikko Hilpinen
  * @since 8.3.2017
  */
-class Column(propertyName: String, val columnName: String, dataType: DataType, val notNull: Boolean, 
-        val isPrimary: Boolean, val usesAutoIncrement: Boolean, defaultValue: Option[Value] = None) 
+class Column(propertyName: String, val columnName: String, dataType: DataType, val notNull: Boolean = false, 
+        val isPrimary: Boolean = false, val usesAutoIncrement: Boolean = false, defaultValue: Option[Value] = None) 
         extends PropertyDeclaration(propertyName, dataType, defaultValue)
 {
     // COMPUTED PROPERTIES    ------------------
