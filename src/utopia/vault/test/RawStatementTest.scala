@@ -11,6 +11,7 @@ import utopia.flow.generic.DataType
 import utopia.vault.database.Connection
 import utopia.vault.database.ConnectionSettings
 import java.time.Instant
+import utopia.flow.generic.VectorType
 
 /**
  * This test runs some raw statements using the sql client and checks the results
@@ -70,6 +71,10 @@ object RawStatementTest extends App
         println(lastResult.toJSON)
         println(s"Previously ${creationTime.longOr()} (${creationTime.dataType}), now ${lastResult("created").longOr()} (${lastResult("created").dataType})")
         assert(lastResult("created").longOr() == creationTime.longOr())
+        
+        // Tests a bit more tricky version where data types may not be correct
+        connection.execute(s"INSERT INTO ${table.name} (name) VALUES (?)", Vector(Value.of(32)))
+        connection.execute(s"INSERT INTO ${table.name} (name, created) VALUES (?, ?)", Vector(Value.of("Null Test"), Value.empty(VectorType)))
         
         println("Success!")
     }
