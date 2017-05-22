@@ -57,9 +57,9 @@ class Connection(initialDBName: Option[String] = None)
         if (!dbName.exists { _ == databaseName })
         {
             // Performs a database change, if necessary
-            if (!_dbName.exists { _ == databaseName })
+            if (isOpen && !_dbName.exists { _ == databaseName })
             {
-                executeSimple(s"USE $databaseName")
+                execute(s"USE $databaseName")
             }
             
             _dbName = Some(databaseName)
@@ -76,6 +76,83 @@ class Connection(initialDBName: Option[String] = None)
      * Whether the connection to the database has already been established
      */
     def isOpen = _connection.exists { !_.isClosed() }
+    
+    
+    // OPERATORS    -----------------
+    
+    /**
+     * Executes an sql statement and returns the results. The provided statement instance provides 
+     * the exact parameters for the operation
+     */
+    def apply(statement: SqlSegment): Result = 
+    {
+        // Changes database if necessary
+        statement.databaseName.foreach { dbName = _ }
+        apply(statement.sql, statement.values, statement.selectedTables, statement.generatesKeys)
+    }
+    
+    /**
+     * Executes an sql query and returns the results. The provided values are injected to the 
+     * query separately.
+     * @param sql The sql string. Places for values are marked with '?'. There should always be 
+     * exactly same number of these markers as there are values in the 'values' parameter
+     * @param values The values that are injected to the query
+     * @param selectedTables The tables for which resulting rows are parsed. If empty, the rows 
+     * are not parsed at all.
+     * @param returnGeneratedKeys Whether the resulting Result object should contain any keys 
+     * generated during the query
+     * @return The results of the query, containing the read rows and keys. If 'selectedTables' 
+     * parameter was empty, no rows are included. If 'returnGeneratedKeys' parameter was false, 
+     * no keys are included
+     */
+    def apply(sql: String, values: Vector[Value], selectedTables: Set[Table] = HashSet(), 
+            returnGeneratedKeys: Boolean = false) = 
+    {
+        // Empty statements are not executed
+        if (sql.isEmpty())
+        {
+            new Result(Vector())
+        }
+        else 
+        {
+            var statement: Option[PreparedStatement] = None
+            var results: Option[ResultSet] = None
+            try
+            {
+                // Creates the statement
+                statement = Some(connection.prepareStatement(sql, 
+                        if (returnGeneratedKeys) Statement.RETURN_GENERATED_KEYS 
+                        else Statement.NO_GENERATED_KEYS));
+                
+                // Inserts provided values
+                for ( i <- 0 until values.size )
+                {
+                    val conversionResult = Connection.sqlValueConverter(values(i))
+                    if (conversionResult.isDefined)
+                    {
+                        statement.get.setObject(i + 1, conversionResult.get._1, conversionResult.get._2)
+                    }
+                    else
+                    {
+                        statement.get.setNull(i + 1, Types.NULL)
+                    }
+                }
+                
+                // Executes the statement and retrieves the result
+                results = Some(statement.get.executeQuery())
+                
+                // Parses data out of the result
+                // May skip some data in case it is not requested
+                new Result(if (selectedTables.isEmpty) Vector() else rowsFromResult(results.get, selectedTables), 
+                        if (returnGeneratedKeys) generatedKeysFromResult(statement.get) else Vector())
+            }
+            finally
+            {
+                results.foreach { _.close() }
+                statement.foreach { _.close() }
+            }
+        }
+    }
     
     
     // OTHER METHODS    -------------
@@ -140,7 +217,7 @@ class Connection(initialDBName: Option[String] = None)
     @throws(classOf[EnvironmentNotSetupException])
     @throws(classOf[NoConnectionException])
     @throws(classOf[SQLException])
-    def executeSimple(sql: String) = 
+    def execute(sql: String) = 
     {
         // Empty statements are not executed
         if (!sql.isEmpty())
@@ -153,80 +230,6 @@ class Connection(initialDBName: Option[String] = None)
             }
             finally
             {
-                statement.foreach { _.close() }
-            }
-        }
-    }
-    
-    /**
-     * Executes an sql statement and returns the results. The provided statement instance provides 
-     * the exact parameters for the operation
-     */
-    def execute(statement: SqlSegment): Result = 
-    {
-        // Changes database if necessary
-        statement.databaseName.foreach { dbName = _ }
-        execute(statement.sql, statement.values, statement.selectedTables, statement.generatesKeys)
-    }
-    
-    /**
-     * Executes an sql query and returns the results. The provided values are injected to the 
-     * query separately.
-     * @param sql The sql string. Places for values are marked with '?'. There should always be 
-     * exactly same number of these markers as there are values in the 'values' parameter
-     * @param values The values that are injected to the query
-     * @param selectedTables The tables for which resulting rows are parsed. If empty, the rows 
-     * are not parsed at all.
-     * @param returnGeneratedKeys Whether the resulting Result object should contain any keys 
-     * generated during the query
-     * @return The results of the query, containing the read rows and keys. If 'selectedTables' 
-     * parameter was empty, no rows are included. If 'returnGeneratedKeys' parameter was false, 
-     * no keys are included
-     */
-    def execute(sql: String, values: Vector[Value], selectedTables: Set[Table] = HashSet(), 
-            returnGeneratedKeys: Boolean = false) = 
-    {
-        // Empty statements are not executed
-        if (sql.isEmpty())
-        {
-            new Result(Vector())
-        }
-        else 
-        {
-            var statement: Option[PreparedStatement] = None
-            var results: Option[ResultSet] = None
-            try
-            {
-                // Creates the statement
-                statement = Some(connection.prepareStatement(sql, 
-                        if (returnGeneratedKeys) Statement.RETURN_GENERATED_KEYS 
-                        else Statement.NO_GENERATED_KEYS));
-                
-                // Inserts provided values
-                for ( i <- 0 until values.size )
-                {
-                    val conversionResult = Connection.sqlValueConverter(values(i))
-                    if (conversionResult.isDefined)
-                    {
-                        statement.get.setObject(i + 1, conversionResult.get._1, conversionResult.get._2)
-                    }
-                    else
-                    {
-                        statement.get.setNull(i + 1, Types.NULL)
-                    }
-                }
-                
-                // Executes the statement and retrieves the result
-                results = Some(statement.get.executeQuery())
-                
-                // Parses data out of the result
-                // May skip some data in case it is not requested
-                new Result(if (selectedTables.isEmpty) Vector() else rowsFromResult(results.get, selectedTables), 
-                        if (returnGeneratedKeys) generatedKeysFromResult(statement.get) else Vector())
-            }
-            finally
-            {
-                results.foreach { _.close() }
                 statement.foreach { _.close() }
             }
         }

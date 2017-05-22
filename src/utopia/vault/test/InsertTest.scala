@@ -24,7 +24,7 @@ object InsertTest extends App
     try
     {
         // Removes any existing data
-        connection.executeSimple(s"DELETE FROM ${table.name}")
+        connection.execute(s"DELETE FROM ${table.name}")
         
         // Inserts some simple cases
         val arttu = Model(Vector(("name", Value of "Arttu"), ("age", Value of 18)))
@@ -32,17 +32,17 @@ object InsertTest extends App
         
         val insert1 = Insert(table, Vector(arttu, belinda))
         println(insert1.description)
-        assert(connection.execute(insert1).generatedKeys.size == 2)
+        assert(connection(insert1).generatedKeys.size == 2)
         
         // Inserts cases where all values are not provided
         val cecilia = Model(Vector(("name", Value of "Cecilia"), ("age", Value of 25)))
         val daavid = Model(Vector(("name", Value of "Daavid")))
         
-        assert(connection.execute(Insert(table, Vector(cecilia, daavid))).generatedKeys.size == 2)
+        assert(connection(Insert(table, Vector(cecilia, daavid))).generatedKeys.size == 2)
         
         // Inserts a row that would include a row id
         val elias = Model(Vector(("name", Value of "Elias"), ("rowId", Value of 22)))
-        assert(connection.execute(Insert(table, elias)).generatedKeys.size == 1)
+        assert(connection(Insert(table, elias)).generatedKeys.size == 1)
         
         println("Success!")
     }

@@ -31,11 +31,11 @@ object RawStatementTest extends App
     try
     {
         // Makes sure the table is empty
-        connection.executeSimple(s"DELETE FROM ${table.name}")
+        connection.execute(s"DELETE FROM ${table.name}")
         
         def insert(name: String, age: Int, isAdmin: Boolean = false) = 
         {
-            assert(!connection.execute(s"INSERT INTO ${table.name} (name, age, is_admin) VALUES (?, ?, ?)", 
+            assert(!connection(s"INSERT INTO ${table.name} (name, age, is_admin) VALUES (?, ?, ?)", 
                     Vector(Value.of(name), Value.of(age), Value.of(isAdmin)), HashSet(), 
                     true).generatedKeys.isEmpty)
         }
@@ -46,22 +46,22 @@ object RawStatementTest extends App
         insert("Cecilia", 23)
         
         // Reads person data from the database
-        val results = connection.execute(s"SELECT * FROM ${table.name}", Vector(), HashSet(table)).rowModels
+        val results = connection(s"SELECT * FROM ${table.name}", Vector(), HashSet(table)).rowModels
         results.foreach { row => println(row.toJSON) }
         
         assert(results.size == 3)
         
         // Tries to insert null values
-        connection.execute(s"INSERT INTO ${table.name} (name, age) VALUES (?, ?)", 
+        connection(s"INSERT INTO ${table.name} (name, age) VALUES (?, ?)", 
                 Vector(Value.of("Test"), Value.empty(IntType)));
         
         // Also tries inserting a time value
         val creationTime = Value of Instant.now()
-        val latestIndex = connection.execute(s"INSERT INTO ${table.name} (name, created) VALUES (?, ?)", 
+        val latestIndex = connection(s"INSERT INTO ${table.name} (name, created) VALUES (?, ?)", 
                 Vector(Value.of("Test2"), creationTime), HashSet(), true).generatedKeys.head;
         
         // Checks that the time value was preserved
-        val lastResult = connection.execute(s"SELECT created FROM ${table.name} WHERE row_id = ?", 
+        val lastResult = connection(s"SELECT created FROM ${table.name} WHERE row_id = ?", 
                 Vector(Value of latestIndex), HashSet(table), false).rows.head.toModel;
         
         println(lastResult.toJSON)
@@ -69,8 +69,8 @@ object RawStatementTest extends App
         assert(lastResult("created").longOr() == creationTime.longOr())
         
         // Tests a bit more tricky version where data types may not be correct
-        connection.execute(s"INSERT INTO ${table.name} (name) VALUES (?)", Vector(Value.of(32)))
-        connection.execute(s"INSERT INTO ${table.name} (name, created) VALUES (?, ?)", Vector(Value.of("Null Test"), Value.empty(VectorType)))
+        connection(s"INSERT INTO ${table.name} (name) VALUES (?)", Vector(Value.of(32)))
+        connection(s"INSERT INTO ${table.name} (name, created) VALUES (?, ?)", Vector(Value.of("Null Test"), Value.empty(VectorType)))
         
         println("Success!")
     }
