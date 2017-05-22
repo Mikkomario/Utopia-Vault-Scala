@@ -105,7 +105,7 @@ class Connection(initialDBName: Option[String] = None)
      * parameter was empty, no rows are included. If 'returnGeneratedKeys' parameter was false, 
      * no keys are included
      */
-    def apply(sql: String, values: Vector[Value], selectedTables: Set[Table] = HashSet(), 
+    def apply(sql: String, values: Seq[Value], selectedTables: Set[Table] = HashSet(), 
             returnGeneratedKeys: Boolean = false) = 
     {
         // Empty statements are not executed

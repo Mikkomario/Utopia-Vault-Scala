@@ -21,7 +21,7 @@ object SqlSegment
  * @param values The values that will be inserted to this segment when it is used. Each '?' in the sql will 
  * be replaced with a single value. Empty values will be interpreted as NULL.
  */
-case class SqlSegment(val sql: String, val values: Vector[Value] = Vector(), 
+case class SqlSegment(val sql: String, val values: Seq[Value] = Vector(), 
         val databaseName: Option[String] = None, val selectedTables: Set[Table] = HashSet(), 
         val generatesKeys: Boolean = false)
 {
