@@ -35,11 +35,12 @@ object Insert
         else 
         {
             val columnNames = insertedPropertyNames.map { table(_).get.columnName }.reduce(_ + ", " + _)
-            val valueSql = " (?" + ", ?" * (insertedPropertyNames.size - 1) + ")"
+            val singleValueSql = "(?" + ", ?" * (insertedPropertyNames.size - 1) + ")"
+            val valuesSql = singleValueSql + (", " + singleValueSql) * (rows.size - 1)
             
             val values = rows.flatMap { model => insertedPropertyNames.map { model(_) } }
             
-            SqlSegment(s"INSERT INTO ${table.name} ($columnNames) VALUES$valueSql", values, 
+            SqlSegment(s"INSERT INTO ${table.name} ($columnNames) VALUES $valuesSql", values, 
                     Some(table.databaseName), HashSet(), table.usesAutoIncrement)
         }
     }

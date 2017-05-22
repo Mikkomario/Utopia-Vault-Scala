@@ -25,6 +25,16 @@ case class SqlSegment(val sql: String, val values: Vector[Value] = Vector(),
         val databaseName: Option[String] = None, val selectedTables: Set[Table] = HashSet(), 
         val generatesKeys: Boolean = false)
 {
+    // COMPUTED PROPERTIES    -----------
+    
+    override def toString = sql
+    
+    /**
+     * A textual description of the seqment. Contains the sql string as well as the included values
+     */
+    def description = s"sql: $toString\nvalues: ${values.map { _.description }.reduce(_ + ", " + _)}"
+    
+    
     // OPERATORS    ---------------------
     
     /**

@@ -24,12 +24,7 @@ object RawStatementTest extends App
     DataType.setup()
     
     // Creates the test table first
-    val table = new Table("person", "vault_test", Vector(
-            new Column("rowId", "row_id", IntType, true, true, true), 
-            new Column("name", "name", StringType, true), 
-            new Column("age", "age", IntType), 
-            new Column("isAdmin", "is_admin", BooleanType, true, false, false, Some(Value of false)), 
-            new Column("created", "created", InstantType, true)))
+    val table = TestTables.person
     
     // Uses a single connection throughout the test
     val connection = new Connection(Some(table.databaseName))
