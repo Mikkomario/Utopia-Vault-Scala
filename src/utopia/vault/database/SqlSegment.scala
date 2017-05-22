@@ -43,5 +43,18 @@ case class SqlSegment(val sql: String, val values: Vector[Value] = Vector(),
      */
     def +(other: SqlSegment) = SqlSegment(sql + " " + other.sql, values ++ other.values, 
             databaseName orElse other.databaseName, selectedTables ++ other.selectedTables, 
-            generatesKeys || other.generatesKeys)
+            generatesKeys || other.generatesKeys);
+    
+    /**
+     * Appends this sql segment with an sql string. 
+     * The new string will be added to the end of this segment. Adds a whitespace character 
+     * between the two sql segments.
+     */
+    def +(sql: String) = copy(sql = this.sql + " " + sql)
+    
+    /**
+     * Prepends this sql segment with an sql string. The new string will be added to the beginning 
+     * of this segment. A whitespace character is added between the two segments.
+     */
+    def prepend(sql: String) = copy(sql = sql + " " + this.sql)
 }
