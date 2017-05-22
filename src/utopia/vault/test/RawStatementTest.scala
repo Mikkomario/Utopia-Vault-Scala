@@ -12,6 +12,7 @@ import utopia.vault.database.Connection
 import utopia.vault.database.ConnectionSettings
 import java.time.Instant
 import utopia.flow.generic.VectorType
+import scala.collection.immutable.HashSet
 
 /**
  * This test runs some raw statements using the sql client and checks the results
@@ -40,7 +41,7 @@ object RawStatementTest extends App
         def insert(name: String, age: Int, isAdmin: Boolean = false) = 
         {
             assert(!connection.execute(s"INSERT INTO ${table.name} (name, age, is_admin) VALUES (?, ?, ?)", 
-                    Vector(Value.of(name), Value.of(age), Value.of(isAdmin)), Vector(), 
+                    Vector(Value.of(name), Value.of(age), Value.of(isAdmin)), HashSet(), 
                     true).generatedKeys.isEmpty)
         }
         
@@ -50,7 +51,7 @@ object RawStatementTest extends App
         insert("Cecilia", 23)
         
         // Reads person data from the database
-        val results = connection.execute(s"SELECT * FROM ${table.name}", Vector(), Vector(table)).rowModels
+        val results = connection.execute(s"SELECT * FROM ${table.name}", Vector(), HashSet(table)).rowModels
         results.foreach { row => println(row.toJSON) }
         
         assert(results.size == 3)
@@ -62,11 +63,11 @@ object RawStatementTest extends App
         // Also tries inserting a time value
         val creationTime = Value of Instant.now()
         val latestIndex = connection.execute(s"INSERT INTO ${table.name} (name, created) VALUES (?, ?)", 
-                Vector(Value.of("Test2"), creationTime), Vector(), true).generatedKeys.head;
+                Vector(Value.of("Test2"), creationTime), HashSet(), true).generatedKeys.head;
         
         // Checks that the time value was preserved
         val lastResult = connection.execute(s"SELECT created FROM ${table.name} WHERE row_id = ?", 
-                Vector(Value of latestIndex), Vector(table), false).rows.head.toModel;
+                Vector(Value of latestIndex), HashSet(table), false).rows.head.toModel;
         
         println(lastResult.toJSON)
         println(s"Previously ${creationTime.longOr()} (${creationTime.dataType}), now ${lastResult("created").longOr()} (${lastResult("created").dataType})")

@@ -12,6 +12,7 @@ import java.sql.ResultSet
 import utopia.vault.generic.Table
 import utopia.flow.datastructure.immutable.Model
 import utopia.flow.datastructure.immutable.Constant
+import scala.collection.immutable.HashSet
 
 object Connection
 {
@@ -154,6 +155,17 @@ class Connection(initialDBName: Option[String] = None)
     }
     
     /**
+     * Executes an sql statement and returns the results. The provided statement instance provides 
+     * the exact parameters for the operation
+     */
+    def execute(statement: SqlSegment): Result = 
+    {
+        // Changes database if necessary
+        statement.databaseName.foreach { dbName = _ }
+        execute(statement.sql, statement.values, statement.selectedTables, statement.generatesKeys)
+    }
+    
+    /**
      * Executes an sql query and returns the results. The provided values are injected to the 
      * query separately.
      * @param sql The sql string. Places for values are marked with '?'. There should always be 
@@ -167,7 +179,7 @@ class Connection(initialDBName: Option[String] = None)
      * parameter was empty, no rows are included. If 'returnGeneratedKeys' parameter was false, 
      * no keys are included
      */
-    def execute(sql: String, values: Vector[Value], selectedTables: Vector[Table] = Vector(), 
+    def execute(sql: String, values: Vector[Value], selectedTables: Set[Table] = HashSet(), 
             returnGeneratedKeys: Boolean = false) = 
     {
         var statement: Option[PreparedStatement] = None
