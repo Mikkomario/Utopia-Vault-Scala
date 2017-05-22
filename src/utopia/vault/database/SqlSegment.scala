@@ -4,6 +4,14 @@ import utopia.flow.datastructure.immutable.Value
 import utopia.vault.generic.Table
 import scala.collection.immutable.HashSet
 
+object SqlSegment
+{
+    /**
+     * An empty sql segment. Some functions may return this in case of no-op
+     */
+    val empty = SqlSegment("")    
+}
+
 /**
  * Sql Segments can be combined to form sql statements. Some may contain value assignments too.
  * @author Mikko Hilpinen

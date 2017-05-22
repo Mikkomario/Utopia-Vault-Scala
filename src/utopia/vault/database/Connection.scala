@@ -142,15 +142,19 @@ class Connection(initialDBName: Option[String] = None)
     @throws(classOf[SQLException])
     def executeSimple(sql: String) = 
     {
-        var statement: Option[Statement] = None
-        try
+        // Empty statements are not executed
+        if (!sql.isEmpty())
         {
-            statement = Some(connection.createStatement())
-            statement.foreach { _.executeUpdate(sql) }
-        }
-        finally
-        {
-            statement.foreach { _.close() }
+            var statement: Option[Statement] = None
+            try
+            {
+                statement = Some(connection.createStatement())
+                statement.foreach { _.executeUpdate(sql) }
+            }
+            finally
+            {
+                statement.foreach { _.close() }
+            }
         }
     }
     
@@ -182,43 +186,49 @@ class Connection(initialDBName: Option[String] = None)
     def execute(sql: String, values: Vector[Value], selectedTables: Set[Table] = HashSet(), 
             returnGeneratedKeys: Boolean = false) = 
     {
-        var statement: Option[PreparedStatement] = None
-        var results: Option[ResultSet] = None
-        try
+        // Empty statements are not executed
+        if (sql.isEmpty())
         {
-            // Creates the statement
-            statement = Some(connection.prepareStatement(sql, 
-                    if (returnGeneratedKeys) Statement.RETURN_GENERATED_KEYS 
-                    else Statement.NO_GENERATED_KEYS));
-            
-            // Inserts provided values
-            for ( i <- 0 until values.size )
-            {
-                val conversionResult = Connection.sqlValueConverter(values(i))
-                if (conversionResult.isDefined)
-                {
-                    statement.get.setObject(i + 1, conversionResult.get._1, conversionResult.get._2)
-                }
-                else
-                {
-                    // TODO: How to get the correct data type for the null value?
-                    // May possibly need to add a helper class for this
-                    statement.get.setNull(i + 1, Types.NULL)
-                }
-            }
-            
-            // Executes the statement and retrieves the result
-            results = Some(statement.get.executeQuery())
-            
-            // Parses data out of the result
-            // May skip some data in case it is not requested
-            new Result(if (selectedTables.isEmpty) Vector() else rowsFromResult(results.get, selectedTables), 
-                    if (returnGeneratedKeys) generatedKeysFromResult(statement.get) else Vector())
+            new Result(Vector())
         }
-        finally
+        else 
         {
-            results.foreach { _.close() }
-            statement.foreach { _.close() }
+            var statement: Option[PreparedStatement] = None
+            var results: Option[ResultSet] = None
+            try
+            {
+                // Creates the statement
+                statement = Some(connection.prepareStatement(sql, 
+                        if (returnGeneratedKeys) Statement.RETURN_GENERATED_KEYS 
+                        else Statement.NO_GENERATED_KEYS));
+                
+                // Inserts provided values
+                for ( i <- 0 until values.size )
+                {
+                    val conversionResult = Connection.sqlValueConverter(values(i))
+                    if (conversionResult.isDefined)
+                    {
+                        statement.get.setObject(i + 1, conversionResult.get._1, conversionResult.get._2)
+                    }
+                    else
+                    {
+                        statement.get.setNull(i + 1, Types.NULL)
+                    }
+                }
+                
+                // Executes the statement and retrieves the result
+                results = Some(statement.get.executeQuery())
+                
+                // Parses data out of the result
+                // May skip some data in case it is not requested
+                new Result(if (selectedTables.isEmpty) Vector() else rowsFromResult(results.get, selectedTables), 
+                        if (returnGeneratedKeys) generatedKeysFromResult(statement.get) else Vector())
+            }
+            finally
+            {
+                results.foreach { _.close() }
+                statement.foreach { _.close() }
+            }
         }
     }
     
