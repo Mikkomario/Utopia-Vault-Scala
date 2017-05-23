@@ -1,5 +1,14 @@
 package utopia.vault.database
 
+object Where
+{
+    /**
+     * This is an alternative way of converting a condition into a where clause. Does the 
+     * same as condition.toWhereClause
+     */
+    def apply(condition: Condition) = condition.toWhereClause
+}
+
 /**
  * Conditions can be combined with each other logically and converted to sql where clauses. 
  * A where clause is often used after a join or a basic operation.

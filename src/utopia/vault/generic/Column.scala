@@ -51,13 +51,72 @@ class Column(propertyName: String, val columnName: String, val tableName: String
      * Creates an equality condition between a column and a specified value. This condition can 
      * be then used in a sql statement. Calling this with an empty value is same as calling isNull
      */
-    def ==(value: Value) = if (value.isEmpty) isNull else Condition(
-            SqlSegment(columnNameWithTable + " <=> ?", Vector(value)));
+    def <=>(value: Value) = if (value.isEmpty) isNull else makeCondition("<=>", value)
+    
+    /**
+     * Creates an equality condition between two columns. This condition can then be used in an 
+     * sql statement
+     */
+    def <=>(other: Column) = makeCondition("<=>", other)
     
     /**
      * Creates a not equals condition between a column and a specified value. This condition can 
      * be used in a sql statement. Calling this with an empty value is same as calling isNotNull
      */
-    def !=(value: Value) = if (value.isEmpty) isNotNull else Condition(
-            SqlSegment(columnNameWithTable + " <> ?", Vector(value)));
+    def <>(value: Value) = if (value.isEmpty) isNotNull else makeCondition("<>", value)
+    
+    /**
+     * Creates a not equals condition between two columns. This condition can then be used in an 
+     * sql statement
+     */
+    def <>(other: Column) = makeCondition("<>", other)
+    
+    /**
+     * Creates a larger than condition
+     */
+    def >(value: Value) = makeCondition(">", value)
+    
+    /**
+     * Creates a larger than condition
+     */
+    def >(other: Column) = makeCondition(">", other)
+    
+    /**
+     * Creates a larger than or equals condition
+     */
+    def >=(value: Value) = makeCondition(">=", value)
+    
+    /**
+     * Creates a larger than or equals condition
+     */
+    def >=(other: Column) = makeCondition(">=", other)
+    
+    /**
+     * Creates a smaller than condition
+     */
+    def <(value: Value) = makeCondition("<", value)
+    
+    /**
+     * Creates a smaller than condition
+     */
+    def <(other: Column) = makeCondition("<", other)
+    
+    /**
+     * Creates a smaller than or equals condition
+     */
+    def <=(value: Value) = makeCondition("<=", value)
+    
+    /**
+     * Creates a smaller than or equals condition
+     */
+    def <=(other: Column) = makeCondition("<=", other)
+    
+    
+    // OTHER METHODS    ---------------------
+    
+    private def makeCondition(operator: String, value: Value) = Condition(
+            SqlSegment(s"$columnNameWithTable $operator ?", Vector(value)));
+    
+    private def makeCondition(operator: String, other: Column) = Condition(
+            SqlSegment(s"$columnNameWithTable $operator ${ other.columnNameWithTable }"));
 }
