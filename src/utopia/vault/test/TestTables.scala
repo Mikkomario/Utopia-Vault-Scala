@@ -14,9 +14,9 @@ import utopia.flow.datastructure.immutable.Value
 object TestTables
 {
     val person = new Table("person", "vault_test", Vector(
-            new Column("rowId", "row_id", IntType, true, true, true), 
-            new Column("name", "name", StringType, true), 
-            new Column("age", "age", IntType), 
-            new Column("isAdmin", "is_admin", BooleanType, true, false, false, Some(Value of false)), 
-            new Column("created", "created", InstantType, true)))
+            new Column("rowId", "row_id", "person", IntType, true, None, true, true), 
+            new Column("name", "name", "person", StringType, true), 
+            new Column("age", "age", "person", IntType), 
+            new Column("isAdmin", "is_admin", "person", BooleanType, true, Some(Value of false)), 
+            new Column("created", "created", "person", InstantType, true)))
 }

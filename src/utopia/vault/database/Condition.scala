@@ -58,6 +58,11 @@ case class Condition(private val segment: SqlSegment)
     def ||(first: Condition, second: Condition, more: Condition*): Condition = 
             this || (Vector(first, second) ++ more);
     
+    /**
+     * Applies a logical NOT operator on this condition, reversing any logical outcome
+     */
+    def unary_! = Condition(segment.copy(sql = s"NOT (${ segment.sql })"))
+    
     
     // OTHER METHODS    ---------------------
     
