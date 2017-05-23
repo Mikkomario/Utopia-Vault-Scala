@@ -52,4 +52,12 @@ object Insert
      * used
      */
     def apply(table: Table, row: Model[Property]): SqlSegment = apply(table, Vector(row))
+    
+    /**
+     * Creates a new statement that inserts multiple rows into an sql database. This statement is
+     * generally not combined with other statements and targets a single table only
+     * @param table the table into which the rows are inserted
+     */
+    def apply(table: Table, first: Model[Property], second: Model[Property], 
+            more: Model[Property]*): SqlSegment = apply(table, Vector(first, second) ++ more);
 }

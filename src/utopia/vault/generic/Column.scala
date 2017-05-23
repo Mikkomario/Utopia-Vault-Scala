@@ -32,7 +32,7 @@ class Column(propertyName: String, val columnName: String, val tableName: String
     /**
      * The name of the column, including the table name for disambiguity
      */
-    def columnNameWithTable = columnName + "." + tableName
+    def columnNameWithTable = tableName + "." + columnName
     
     /**
      * Creates a condition that checks whether the column value in the database is null
