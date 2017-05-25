@@ -55,8 +55,8 @@ trait ConditionElement
      * Creates a between condition that returns true when this element value is between the two 
      * provided values (inclusive)
      */
-    def isBetween(min: ConditionElement, max: ConditionElement) = toSqlSegment + "BETWEEN" + 
-            min.toSqlSegment + "AND" + max.toSqlSegment;
+    def isBetween(min: ConditionElement, max: ConditionElement) = Condition(toSqlSegment + "BETWEEN" + 
+            min.toSqlSegment + "AND" + max.toSqlSegment);
     
     /**
      * Creates an in condition that returns true if one of the provided element values matches 
@@ -67,7 +67,7 @@ trait ConditionElement
         val rangeSegment = SqlSegment.combine(elements.map { _.toSqlSegment }, { _ + ", " + _ })
         val inSegment = rangeSegment.copy(sql = "(" + rangeSegment.sql + ")")
         
-        toSqlSegment + "IN" + inSegment
+        Condition(toSqlSegment + "IN" + inSegment)
     }
     
     private def makeCondition(operator: String, other: ConditionElement) = Condition(

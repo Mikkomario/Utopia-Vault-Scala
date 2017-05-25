@@ -5,6 +5,7 @@ import utopia.flow.generic.DataType
 import utopia.flow.datastructure.immutable.Value
 import utopia.vault.database.SqlSegment
 import utopia.vault.database.Condition
+import utopia.vault.database.ConditionElement
 
 // TODO: Possibly remove the non-null feature
 /**
@@ -15,14 +16,16 @@ import utopia.vault.database.Condition
 class Column(propertyName: String, val columnName: String, val tableName: String, 
         dataType: DataType, val notNull: Boolean = false, defaultValue: Option[Value] = None, 
         val isPrimary: Boolean = false, val usesAutoIncrement: Boolean = false) 
-        extends PropertyDeclaration(propertyName, dataType, defaultValue)
+        extends PropertyDeclaration(propertyName, dataType, defaultValue) with ConditionElement
 {
     // COMPUTED PROPERTIES    ------------------
     
     override def properties = super.properties ++ Vector(columnName, notNull, isPrimary, usesAutoIncrement)
     
     override def toString = s"$columnName $dataType ${if (notNull) "NOT NULL " else ""} ${
-            if (isPrimary) "PRIMARY KEY " else ""} ${if (usesAutoIncrement) "AUTO_INCREMENT " else ""}";
+            if (isPrimary) "PRIMARY KEY " else ""} ${if (usesAutoIncrement) "AUTO_INCREMENT " else ""}"
+    
+    override def toSqlSegment = SqlSegment(columnNameWithTable)
             
     /**
      * Whether a value is required in this column when data is inserted to the database
@@ -54,69 +57,14 @@ class Column(propertyName: String, val columnName: String, val tableName: String
     def <=>(value: Value) = if (value.isEmpty) isNull else makeCondition("<=>", value)
     
     /**
-     * Creates an equality condition between two columns. This condition can then be used in an 
-     * sql statement
-     */
-    def <=>(other: Column) = makeCondition("<=>", other)
-    
-    /**
      * Creates a not equals condition between a column and a specified value. This condition can 
      * be used in a sql statement. Calling this with an empty value is same as calling isNotNull
      */
     def <>(value: Value) = if (value.isEmpty) isNotNull else makeCondition("<>", value)
-    
-    /**
-     * Creates a not equals condition between two columns. This condition can then be used in an 
-     * sql statement
-     */
-    def <>(other: Column) = makeCondition("<>", other)
-    
-    /**
-     * Creates a larger than condition
-     */
-    def >(value: Value) = makeCondition(">", value)
-    
-    /**
-     * Creates a larger than condition
-     */
-    def >(other: Column) = makeCondition(">", other)
-    
-    /**
-     * Creates a larger than or equals condition
-     */
-    def >=(value: Value) = makeCondition(">=", value)
-    
-    /**
-     * Creates a larger than or equals condition
-     */
-    def >=(other: Column) = makeCondition(">=", other)
-    
-    /**
-     * Creates a smaller than condition
-     */
-    def <(value: Value) = makeCondition("<", value)
-    
-    /**
-     * Creates a smaller than condition
-     */
-    def <(other: Column) = makeCondition("<", other)
-    
-    /**
-     * Creates a smaller than or equals condition
-     */
-    def <=(value: Value) = makeCondition("<=", value)
-    
-    /**
-     * Creates a smaller than or equals condition
-     */
-    def <=(other: Column) = makeCondition("<=", other)
-    
+       
     
     // OTHER METHODS    ---------------------
     
     private def makeCondition(operator: String, value: Value) = Condition(
             SqlSegment(s"$columnNameWithTable $operator ?", Vector(value)));
-    
-    private def makeCondition(operator: String, other: Column) = Condition(
-            SqlSegment(s"$columnNameWithTable $operator ${ other.columnNameWithTable }"));
 }

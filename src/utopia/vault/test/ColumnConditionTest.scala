@@ -10,6 +10,8 @@ import utopia.vault.database.Condition
 import utopia.vault.database.SelectAll
 import utopia.vault.database.Where
 
+import utopia.vault.database.Extensions._
+
 /**
  * This test makes sure basic column-generated conditions are working properly. RawStatement-, 
  * Insert- and SimpleStatement tests should succeed before attempting this one
@@ -47,7 +49,7 @@ object ColumnConditionTest extends App
         assert(countRows(ageColumn < Value.of(31)) == 1)
         assert(countRows(ageColumn <= Value.of(31)) == 2)
         assert(countRows(ageColumn <=> Value.of(31)) == 1)
-        println(countRows(ageColumn <> Value.of(31)) == 2)
+        assert(countRows(ageColumn <> Value.of(31)) == 2)
         
         assert(countRows(ageColumn.isNull) == 1)
         assert(countRows(ageColumn <=> Value.empty()) == 1)
@@ -57,6 +59,9 @@ object ColumnConditionTest extends App
         assert(countRows(isAdminColumn <=> Value.of(true) || (ageColumn < Value.of(5))) == 2)
         assert(countRows(ageColumn > Value.of(5) && (ageColumn < Value.of(32))) == 1)
         assert(countRows(!ageColumn.isNull) == 3)
+        
+        assert(countRows(ageColumn.in(Vector(Value.of(31), Value.of(32)))) == 2)
+        assert(countRows(ageColumn.isBetween(Value of 1, Value of 31)) == 2)
         
         println("Success!")
     }
