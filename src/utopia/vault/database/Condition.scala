@@ -89,15 +89,9 @@ case class Condition(private val segment: SqlSegment)
         }
         else 
         {
-            val otherSegments = others.map { _.segment }
-            val allSegments = segment +: otherSegments
-            
-            val sql = "(" + (otherSegments.foldLeft(segment.sql){ _ + separator + _.sql }) + ")"
-            val databaseName = allSegments.flatMap { _.databaseName }.headOption
-            
-            Condition(SqlSegment(sql, allSegments.flatMap { _.values }, databaseName, 
-                    allSegments.flatMap { _.selectedTables }.toSet, 
-                    allSegments.exists { _.generatesKeys }))
+            val noParentheses = SqlSegment.combine(segment +: others.map { _.segment }, 
+                    { _ + separator + _ });
+            Condition(noParentheses.copy(sql = "(" + noParentheses.sql + ")"))
         }
     }
 }

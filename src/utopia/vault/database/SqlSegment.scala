@@ -9,7 +9,22 @@ object SqlSegment
     /**
      * An empty sql segment. Some functions may return this in case of no-op
      */
-    val empty = SqlSegment("")    
+    val empty = SqlSegment("")
+    
+    /**
+     * Combines a number of sql segments together, forming a single longer sql segment
+     * @param segments the segments that are combined
+     * @param sqlReduce the reduce function used for appending the sql strings together. By default 
+     * just adds a whitespace between the strings
+     */
+    def combine(segments: Seq[SqlSegment], sqlReduce: (String, String) => String = { _ + " " + _ }) = 
+    {
+        val sql = segments.view.map { _.sql }.reduceLeft(sqlReduce)
+        val databaseName = segments.view.flatMap { _.databaseName }.headOption
+        
+        SqlSegment(sql, segments.flatMap { _.values }, databaseName, 
+                segments.flatMap { _.selectedTables }.toSet, segments.exists { _.generatesKeys })
+    }
 }
 
 /**
