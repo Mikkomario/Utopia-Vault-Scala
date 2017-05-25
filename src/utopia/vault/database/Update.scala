@@ -4,6 +4,8 @@ import utopia.vault.generic.Table
 import utopia.flow.datastructure.template.Model
 import utopia.flow.datastructure.template.Property
 import scala.collection.immutable.HashSet
+import utopia.flow.datastructure.immutable.Value
+import utopia.flow.datastructure.immutable
 
 /**
  * This object is used for generating update statements that modify database row contents
@@ -14,6 +16,9 @@ object Update
 {
     // OPERATORS    ----------------------
     
+    /**
+     * Creates an update segment that changes multiple values in a table
+     */
     def apply(table: Table, set: Model[Property]) = 
     {
         val valueSet = set.attributeMap.flatMap { case (name, property) => table(name).map { (_, property.value) } }
@@ -30,4 +35,10 @@ object Update
                     HashSet(table))
         }
     }
+    
+    /**
+     * Creates an update segment that changes the value of a single column in the table
+     */
+    def apply(table: Table, key: String, value: Value): SqlSegment = apply(table, 
+            immutable.Model(Vector((key, value))));
 }
