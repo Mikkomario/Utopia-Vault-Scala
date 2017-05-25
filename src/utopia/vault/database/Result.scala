@@ -3,6 +3,7 @@ package utopia.vault.database
 import utopia.vault.generic.Table
 import utopia.flow.datastructure.immutable.Model
 import utopia.flow.datastructure.immutable.Constant
+import utopia.flow.util.Equatable
 
 /**
  * A result is generated based on the data retrieved from a executed database query. 
@@ -11,9 +12,11 @@ import utopia.flow.datastructure.immutable.Constant
  * @author Mikko Hilpinen
  * @since 25.4.2017
  */
-class Result(val rows: Vector[Row], val generatedKeys: Vector[Int] = Vector())
+class Result(val rows: Vector[Row], val generatedKeys: Vector[Int] = Vector()) extends Equatable
 {
     // COMPUTED PROPERTIES    ------------
+    
+    override def properties = rows ++ generatedKeys
     
     /**
      * The row data in model format. This should be used when no joins were present in the query and

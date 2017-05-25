@@ -3,6 +3,7 @@ package utopia.vault.database
 import utopia.flow.datastructure.immutable.Model
 import utopia.flow.datastructure.immutable.Constant
 import utopia.vault.generic.Table
+import utopia.flow.util.Equatable
 
 /**
  * A row represents a single row in a query result set. A row can contain columns from multiple
@@ -12,9 +13,11 @@ import utopia.vault.generic.Table
  * @param columnData Column data contains models generated on retrieved columns. There's a separate
  * model for each table. The table's name is used as a key in this map.
  */
-class Row(val columnData: Map[Table, Model[Constant]])
+class Row(val columnData: Map[Table, Model[Constant]]) extends Equatable
 {
     // COMPUTED PROPERTIES    -----------------
+    
+    override def properties = columnData
     
     /**
      * Whether this row is empty and contains no column value data at all
