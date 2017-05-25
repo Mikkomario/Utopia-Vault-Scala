@@ -17,5 +17,5 @@ object SelectAll
      * a limit
      */
     def apply(table: Table) = SqlSegment(s"SELECT * FROM ${ table.name }", Vector(), 
-            Some(table.databaseName), HashSet(table));
+            Some(table.databaseName), HashSet(table), true);
 }

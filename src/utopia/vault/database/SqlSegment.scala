@@ -23,7 +23,8 @@ object SqlSegment
         val databaseName = segments.view.flatMap { _.databaseName }.headOption
         
         SqlSegment(sql, segments.flatMap { _.values }, databaseName, 
-                segments.flatMap { _.selectedTables }.toSet, segments.exists { _.generatesKeys })
+                segments.flatMap { _.targetTables }.toSet, segments.exists { _.isSelect }, 
+                segments.exists { _.generatesKeys })
     }
 }
 
@@ -37,8 +38,8 @@ object SqlSegment
  * be replaced with a single value. Empty values will be interpreted as NULL.
  */
 case class SqlSegment(val sql: String, val values: Seq[Value] = Vector(), 
-        val databaseName: Option[String] = None, val selectedTables: Set[Table] = HashSet(), 
-        val generatesKeys: Boolean = false)
+        val databaseName: Option[String] = None, val targetTables: Set[Table] = HashSet(), 
+        val isSelect: Boolean = false, val generatesKeys: Boolean = false)
 {
     // COMPUTED PROPERTIES    -----------
     
@@ -57,8 +58,8 @@ case class SqlSegment(val sql: String, val values: Seq[Value] = Vector(),
      * added between the two sql segments.
      */
     def +(other: SqlSegment) = SqlSegment(sql + " " + other.sql, values ++ other.values, 
-            databaseName orElse other.databaseName, selectedTables ++ other.selectedTables, 
-            generatesKeys || other.generatesKeys);
+            databaseName orElse other.databaseName, targetTables ++ other.targetTables, 
+            isSelect || other.isSelect, generatesKeys || other.generatesKeys);
     
     /**
      * Appends this sql segment with an sql string. 

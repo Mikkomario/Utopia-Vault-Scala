@@ -41,7 +41,7 @@ object Insert
             val values = rows.flatMap { model => insertedPropertyNames.map { model(_) } }
             
             SqlSegment(s"INSERT INTO ${table.name} ($columnNames) VALUES $valuesSql", values, 
-                    Some(table.databaseName), HashSet(), table.usesAutoIncrement)
+                    Some(table.databaseName), HashSet(), false, table.usesAutoIncrement)
         }
     }
     

@@ -17,7 +17,7 @@ object Delete
      */
     def apply(tables: Seq[Table]) = if (tables.isEmpty) SqlSegment.empty else SqlSegment(
             s"DELETE ${ tables.tail.foldLeft(tables.head.name) {_ + ", " + _.name } } FROM ${ 
-            tables.head.name }", Vector(), Some(tables.head.databaseName));
+            tables.head.name }", Vector(), Some(tables.head.databaseName), tables.toSet);
     
     /**
      * Creates an sql segment that deletes rows from a single table. This segment is often followed 

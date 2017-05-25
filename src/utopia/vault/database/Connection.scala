@@ -86,9 +86,11 @@ class Connection(initialDBName: Option[String] = None)
      */
     def apply(statement: SqlSegment): Result = 
     {
+        val selectedTables: Set[Table] = if (statement.isSelect) statement.targetTables else HashSet()
+        
         // Changes database if necessary
         statement.databaseName.foreach { dbName = _ }
-        apply(statement.sql, statement.values, statement.selectedTables, statement.generatesKeys)
+        apply(statement.sql, statement.values, selectedTables, statement.generatesKeys)
     }
     
     /**
