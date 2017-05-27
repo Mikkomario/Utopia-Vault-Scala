@@ -9,6 +9,7 @@ import utopia.flow.datastructure.immutable.Value
 import utopia.vault.database.Insert
 import utopia.vault.database.Select
 import utopia.vault.database.Update
+import utopia.vault.database.Limit
 
 /**
  * This test tests basic uses cases for very simple statements delete and select all.
@@ -35,6 +36,7 @@ object SimpleStatementTest extends App
         
         assert(countRows == 3)
         assert(connection(Select.nothing(table)).rows.size == 3)
+        assert(connection(Select.nothing(table) + Limit(1)).rows.size == 1)
         
         val result = connection(SelectAll(table))
         assert(result.rows.head.toModel("name") == Value.of("SimpleStatementTest"))
