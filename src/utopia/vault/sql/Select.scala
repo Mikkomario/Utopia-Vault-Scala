@@ -1,7 +1,7 @@
-package utopia.vault.database
+package utopia.vault.sql
 
-import utopia.vault.generic.Table
-import utopia.vault.generic.Column
+import utopia.vault.model.Table
+import utopia.vault.model.Column
 import scala.collection.immutable.HashSet
 
 /**

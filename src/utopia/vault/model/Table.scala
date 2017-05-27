@@ -1,4 +1,4 @@
-package utopia.vault.generic
+package utopia.vault.model
 
 import utopia.flow.util.Equatable
 import utopia.flow.datastructure.immutable.ModelDeclaration

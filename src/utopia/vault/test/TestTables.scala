@@ -1,7 +1,7 @@
 package utopia.vault.test
 
-import utopia.vault.generic.Table
-import utopia.vault.generic.Column
+import utopia.vault.model.Table
+import utopia.vault.model.Column
 import utopia.flow.generic.IntType
 import utopia.flow.generic.StringType
 import utopia.flow.generic.BooleanType

@@ -1,8 +1,7 @@
-package utopia.vault.database
+package utopia.vault.model
 
 import utopia.flow.datastructure.immutable.Model
 import utopia.flow.datastructure.immutable.Constant
-import utopia.vault.generic.Table
 import utopia.flow.util.Equatable
 
 /**

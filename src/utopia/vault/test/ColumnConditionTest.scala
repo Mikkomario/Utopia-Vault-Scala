@@ -2,15 +2,15 @@ package utopia.vault.test
 
 import utopia.flow.generic.DataType
 import utopia.vault.database.Connection
-import utopia.vault.database.Delete
+import utopia.vault.sql.Delete
 import utopia.flow.datastructure.immutable.Value
 import utopia.flow.datastructure.immutable.Model
-import utopia.vault.database.Insert
-import utopia.vault.database.Condition
-import utopia.vault.database.SelectAll
-import utopia.vault.database.Where
+import utopia.vault.sql.Insert
+import utopia.vault.sql.Condition
+import utopia.vault.sql.SelectAll
+import utopia.vault.sql.Where
 
-import utopia.vault.database.Extensions._
+import utopia.vault.sql.Extensions._
 
 /**
  * This test makes sure basic column-generated conditions are working properly. RawStatement-, 

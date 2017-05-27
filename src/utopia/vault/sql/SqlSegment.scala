@@ -1,8 +1,9 @@
-package utopia.vault.database
+package utopia.vault.sql
 
 import utopia.flow.datastructure.immutable.Value
-import utopia.vault.generic.Table
+import utopia.vault.model.Table
 import scala.collection.immutable.HashSet
+import scala.Vector
 
 object SqlSegment
 {

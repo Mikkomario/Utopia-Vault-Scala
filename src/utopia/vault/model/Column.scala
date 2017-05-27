@@ -1,11 +1,11 @@
-package utopia.vault.generic
+package utopia.vault.model
 
 import utopia.flow.datastructure.immutable.PropertyDeclaration
 import utopia.flow.generic.DataType
 import utopia.flow.datastructure.immutable.Value
-import utopia.vault.database.SqlSegment
-import utopia.vault.database.Condition
-import utopia.vault.database.ConditionElement
+import utopia.vault.sql.SqlSegment
+import utopia.vault.sql.ConditionElement
+import utopia.vault.sql.Condition
 
 // TODO: Possibly remove the non-null feature
 /**

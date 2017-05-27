@@ -1,6 +1,6 @@
-package utopia.vault.database
+package utopia.vault.sql
 
-import utopia.vault.generic.Table
+import utopia.vault.model.Table
 import scala.collection.immutable.HashSet
 
 /**

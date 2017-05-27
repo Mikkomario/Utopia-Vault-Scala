@@ -9,10 +9,13 @@ import java.sql.PreparedStatement
 import utopia.flow.parse.ValueConverterManager
 import java.sql.Types
 import java.sql.ResultSet
-import utopia.vault.generic.Table
+import utopia.vault.model.Table
 import utopia.flow.datastructure.immutable.Model
 import utopia.flow.datastructure.immutable.Constant
 import scala.collection.immutable.HashSet
+import utopia.vault.sql.SqlSegment
+import utopia.vault.model.Result
+import utopia.vault.model.Row
 
 object Connection
 {

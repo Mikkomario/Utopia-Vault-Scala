@@ -2,7 +2,7 @@ package utopia.vault.test
 
 import utopia.flow.generic.DataType
 import utopia.vault.database.Connection
-import utopia.vault.database.Insert
+import utopia.vault.sql.Insert
 import utopia.flow.datastructure.immutable.Model
 import utopia.flow.datastructure.immutable.Constant
 import utopia.flow.datastructure.immutable.Value

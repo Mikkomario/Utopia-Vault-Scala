@@ -1,6 +1,6 @@
-package utopia.vault.database
+package utopia.vault.sql
 
-import utopia.vault.generic.Table
+import utopia.vault.model.Table
 
 /**
  * This object is used for creating sql statements which delete contents from the database. 

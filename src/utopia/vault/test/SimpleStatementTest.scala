@@ -2,18 +2,18 @@ package utopia.vault.test
 
 import utopia.flow.generic.DataType
 import utopia.vault.database.Connection
-import utopia.vault.database.SelectAll
-import utopia.vault.database.Delete
+import utopia.vault.sql.SelectAll
+import utopia.vault.sql.Delete
 import utopia.flow.datastructure.immutable.Model
 import utopia.flow.datastructure.immutable.Value
-import utopia.vault.database.Insert
-import utopia.vault.database.Select
-import utopia.vault.database.Update
-import utopia.vault.database.Limit
-import utopia.vault.database.OrderBy
+import utopia.vault.sql.Insert
+import utopia.vault.sql.Select
+import utopia.vault.sql.Limit
+import utopia.vault.sql.Update
+import utopia.vault.sql.OrderBy
 
 /**
- * This test tests basic uses cases for very simple statements delete and select all.
+ * sqlt tests basic uses cases for very simple statements delete and select all.
  * @author Mikko Hilpinen
  * @since 22.5.2017
  */

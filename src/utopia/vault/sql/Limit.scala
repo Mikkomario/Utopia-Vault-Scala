@@ -1,4 +1,4 @@
-package utopia.vault.database
+package utopia.vault.sql
 
 import utopia.flow.datastructure.immutable.Value
 
