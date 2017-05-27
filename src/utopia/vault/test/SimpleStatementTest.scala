@@ -10,6 +10,7 @@ import utopia.vault.database.Insert
 import utopia.vault.database.Select
 import utopia.vault.database.Update
 import utopia.vault.database.Limit
+import utopia.vault.database.OrderBy
 
 /**
  * This test tests basic uses cases for very simple statements delete and select all.
@@ -45,6 +46,10 @@ object SimpleStatementTest extends App
         
         connection(Update(table, "age", Value of 22))
         assert(connection(Select(table, "age")).rows.head.toModel("age") == Value.of(22))
+        
+        connection(Insert(table, Model(Vector(("name", Value of "Last"), ("age", Value of 2)))))
+        assert(connection(SelectAll(table) + OrderBy(table("age").get) + Limit(1)
+                ).rows.head.toModel("name") == Value.of("Last"));
         
         connection(Delete(table))
         assert(countRows == 0)
