@@ -15,6 +15,8 @@ import scala.collection.immutable.HashSet
  */
 object Join
 {
+    // TODO: Make this a class and not an object. It doesn't need to be an sql segment, just convertible to one
+    
     // TODO: Create a target segment trait that allows one to join more targets
     // I guess it would need rightMost table reference or something - or just use the ones on the 
     // segment. Join and table can then implement this
