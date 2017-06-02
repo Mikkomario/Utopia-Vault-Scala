@@ -11,17 +11,20 @@ import utopia.vault.model.Table
 object Delete
 {
     /**
-     * Creates an sql segment that deletes rows from possibly multiple tables. 
-     * If multiple tables are provided, this segment must be followed with a join clause.
-     * @param tables The tables from which rows are deleted
+     * Creates an sql segment that deletes rows from possibly multiple tables. All of the deleted 
+     * tables must be included in the provided target.
+     * @param target The target for the delete operation, may be a single table or join, but must 
+     * contain all deleted tables.
+     * @param deletedTables The tables from which rows are deleted
      */
-    def apply(tables: Seq[Table]) = if (tables.isEmpty) SqlSegment.empty else SqlSegment(
-            s"DELETE ${ tables.tail.foldLeft(tables.head.name) {_ + ", " + _.name } } FROM ${ 
-            tables.head.name }", Vector(), Some(tables.head.databaseName), tables.toSet);
+    def apply(target: SqlTarget, deletedTables: Seq[Table]) = 
+            if (deletedTables.isEmpty) SqlSegment.empty else SqlSegment(
+            s"DELETE ${ deletedTables.tail.foldLeft(deletedTables.head.name) {_ + ", " + _.name } } FROM") + 
+            target.toSqlSegment;
     
     /**
      * Creates an sql segment that deletes rows from a single table. This segment is often followed 
      * by a where clause and possibly a limit as well.
      */
-    def apply(table: Table): SqlSegment = apply(Vector(table))
+    def apply(target: SqlTarget): SqlSegment = apply(target, target.toSqlSegment.targetTables.toSeq)
 }

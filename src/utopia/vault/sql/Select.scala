@@ -17,21 +17,21 @@ object Select
     /**
      * Creates an sql segment that selects a number of columns from a table
      */
-    def apply(table: Table, columns: Seq[Column]) = SqlSegment(s"SELECT ${ 
+    def apply(target: SqlTarget, columns: Seq[Column]) = SqlSegment(s"SELECT ${ 
             if (columns.isEmpty) "NULL" else columns.view.map { 
-            _.columnNameWithTable }.reduceLeft { _ + ", " + _ } } FROM ${ table.name }", Vector(), 
-            Some(table.databaseName), HashSet(table), true);
+            _.columnNameWithTable }.reduceLeft { _ + ", " + _ } } FROM", Vector(), None, HashSet(), 
+            true) + target.toSqlSegment;
     
     /**
      * Creates an sql segment that selects a single column from a table
      */
-    def apply(table: Table, column: Column): SqlSegment = apply(table, Vector(column))
+    def apply(target: SqlTarget, column: Column): SqlSegment = apply(target, Vector(column))
     
     /**
      * Creates an sql segment that selects a number of columns from a table
      */
-    def apply(table: Table, first: Column, second: Column, more: Column*): SqlSegment = 
-            apply(table, Vector(first, second) ++ more);
+    def apply(target: SqlTarget, first: Column, second: Column, more: Column*): SqlSegment = 
+            apply(target, Vector(first, second) ++ more);
     
     /**
      * Creates an sql segment that selects a column with a matching property name from a table
@@ -55,5 +55,5 @@ object Select
     /**
      * Creates an sql segment that selects nothing from a table
      */
-    def nothing(table: Table) = apply(table, Vector())
+    def nothing(target: SqlTarget) = apply(target, Vector())
 }
