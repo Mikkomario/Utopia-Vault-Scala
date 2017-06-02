@@ -2,6 +2,9 @@ package utopia.vault.model
 
 import utopia.flow.util.Equatable
 import utopia.flow.datastructure.immutable.ModelDeclaration
+import utopia.vault.sql.SqlTarget
+import utopia.vault.sql.SqlSegment
+import scala.collection.immutable.HashSet
 
 /**
  * A table represents a table in the database. Each table has a set of columns, one of which is 
@@ -9,7 +12,7 @@ import utopia.flow.datastructure.immutable.ModelDeclaration
  * @author Mikko Hilpinen
  * @since 9.3.2017
  */
-class Table(val name: String, val databaseName: String, val columns: Vector[Column]) extends Equatable
+class Table(val name: String, val databaseName: String, val columns: Vector[Column]) extends Equatable with SqlTarget
 {
     // ATTRIBUTES    ---------------------------
     
@@ -24,6 +27,8 @@ class Table(val name: String, val databaseName: String, val columns: Vector[Colu
     override def toString = name
     
     override def properties: Vector[Any] = Vector(name, databaseName, columns)
+    
+    override def toSqlSegment = SqlSegment(name, Vector(), Some(databaseName), HashSet(this))
     
     /**
      * The primary column for this table. Not all tables do have primary columns though.
@@ -61,4 +66,16 @@ class Table(val name: String, val databaseName: String, val columns: Vector[Colu
      * Finds a column with the specified column name
      */
     def columnWithColumnName(columnName: String) = columns.find { _.columnName == columnName }
+    
+    /**
+     * Checks whether this table contains a matching column
+     */
+    def contains(column: Column) = columns.contains(column)
+    
+    /**
+     * Joins a new table, creating a new sql target.
+     * @param propertyName the name of a property matching a column in this table, which makes a 
+     * reference to another table
+     */
+    def joinFrom(propertyName: String): SqlTarget = apply(propertyName).map { joinFrom(_) }.getOrElse(this)
 }

@@ -100,6 +100,23 @@ object References
     }
     
     /**
+     * Finds all references between the two tables. The results contain pairings of left side 
+     * columns matched with right side columns. The references may go either way
+     */
+    def between(left: Table, right: Table) = 
+    {
+       checkIsSetup(left.databaseName)
+       val sameOrderMatches = referenceData(left.databaseName).filter { case(sourceTable, _, targetTable, _) => 
+               sourceTable == left && targetTable == right}.map { case (_, leftColumn, _, rightColumn) => 
+               (leftColumn, rightColumn) }
+       val oppositeOrderMatches = referenceData(left.databaseName).filter { case(sourceTable, _, targetTable, _) => 
+               sourceTable == right && targetTable == left }.map { case (_, rightColumn, _, leftColumn) => 
+               (leftColumn, rightColumn)}
+               
+       sameOrderMatches ++ oppositeOrderMatches
+    }
+    
+    /**
      * Finds all tables referenced from a certain table
      */
     def tablesReferencedFrom(table: Table) = from(table).map { case (_, targetTable, _) => targetTable }
