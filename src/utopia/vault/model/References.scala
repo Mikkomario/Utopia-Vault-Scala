@@ -31,6 +31,33 @@ object References
             referenceData += Tuple2(databaseName, references);
     
     /**
+     * Sets up reference data for a single database. Each pair should contain 4 elements: 
+     * 1) referencing table, 2) name of the referencing property, 3) referenced table, 
+     * 4) name of the referenced property.
+     */
+    def setup(firstSet: Tuple4[Table, String, Table, String], 
+            more: Tuple4[Table, String, Table, String]*): Unit = 
+    {
+        // Converts the tuple data into a reference set
+        val references = (HashSet(firstSet) ++ more).flatMap { case (table1, name1, table2, name2) => 
+        {
+            val column1 = table1(name1)
+            val column2 = table2(name2)
+            
+            if (column1.isEmpty || column2.isEmpty)
+            {
+                None
+            }
+            else
+            {
+                Some((table1, column1.get, table2, column2.get))
+            }
+        } }
+        
+        setup(firstSet._1.databaseName, references)
+    }
+    
+    /**
      * Finds all references that are made from the provided column
      * @param table The table that contains the column
      * @param column the referencing column
