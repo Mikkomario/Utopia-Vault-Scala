@@ -6,6 +6,8 @@ import utopia.vault.sql.SqlTarget
 import utopia.vault.sql.SqlSegment
 import scala.collection.immutable.HashSet
 
+import utopia.vault.sql.JoinType._
+
 /**
  * A table represents a table in the database. Each table has a set of columns, one of which is 
  * usually the primary column. Tables may reference other tables through columns too.
@@ -77,5 +79,6 @@ class Table(val name: String, val databaseName: String, val columns: Vector[Colu
      * @param propertyName the name of a property matching a column in this table, which makes a 
      * reference to another table
      */
-    def joinFrom(propertyName: String): SqlTarget = apply(propertyName).map { joinFrom(_) }.getOrElse(this)
+    def joinFrom(propertyName: String, joinType: JoinType): SqlTarget = 
+            apply(propertyName).map { joinFrom(_, joinType) }.getOrElse(this)
 }

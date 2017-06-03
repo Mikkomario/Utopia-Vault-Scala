@@ -29,6 +29,12 @@ class Row(val columnData: Map[Table, Model[Constant]]) extends Equatable
      */
     def toModel = if (!columnData.isEmpty) columnData.values.reduce { _ ++ _ } else new Model(Vector())
     
+    /**
+     * The indices for each of the contained table
+     */
+    def indices = columnData.flatMap { case (table, model) => table.primaryColumn.flatMap { column => 
+            model.findExisting(column.name).map { constant => (table, constant.value) } } }
+    
     
     // OPERATORS    ---------------------------
     
@@ -37,4 +43,18 @@ class Row(val columnData: Map[Table, Model[Constant]]) extends Equatable
      * @param table The table whose data is requested
      */
     def apply(table: Table) = columnData.getOrElse(table, new Model(Vector()))
+    
+    /**
+     * Finds the value of a single property in the row
+     * @param propertyName the name of the property
+     */
+    def apply(propertyName: String) = toModel(propertyName)
+    
+    
+    // OTHER METHODS    ----------------------
+    
+    /**
+     * Finds the index of the row in the specified table
+     */
+    def index(table: Table) = table.primaryColumn.map { column => apply(table)(column.name) }
 }
