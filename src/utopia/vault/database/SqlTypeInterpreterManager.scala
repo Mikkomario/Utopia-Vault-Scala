@@ -13,7 +13,7 @@ object SqlTypeInterpreterManager
 {
     // ATTRIBUTES    -------------------
     
-    private var interpreters = Vector[SqlTypeInterpreter]()
+    private var interpreters = Vector[SqlTypeInterpreter](BasicSqlTypeInterpreter)
     
     
     // OPERATORS    --------------------
