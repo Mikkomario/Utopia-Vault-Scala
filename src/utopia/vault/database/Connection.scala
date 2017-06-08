@@ -16,6 +16,7 @@ import scala.collection.immutable.HashSet
 import utopia.vault.sql.SqlSegment
 import utopia.vault.model.Result
 import utopia.vault.model.Row
+import scala.collection.immutable.VectorBuilder
 
 object Connection
 {
@@ -130,18 +131,7 @@ class Connection(initialDBName: Option[String] = None)
                         else Statement.NO_GENERATED_KEYS));
                 
                 // Inserts provided values
-                for ( i <- 0 until values.size )
-                {
-                    val conversionResult = Connection.sqlValueConverter(values(i))
-                    if (conversionResult.isDefined)
-                    {
-                        statement.get.setObject(i + 1, conversionResult.get._1, conversionResult.get._2)
-                    }
-                    else
-                    {
-                        statement.get.setNull(i + 1, Types.NULL)
-                    }
-                }
+                setValues(statement.get, values)
                 
                 // Executes the statement and retrieves the result
                 results = Some(statement.get.executeQuery())
@@ -238,6 +228,85 @@ class Connection(initialDBName: Option[String] = None)
                 statement.foreach { _.close() }
             }
         }
+    }
+    
+    /**
+     * Executes a query that allows use of prepared values. Reads and returns the resulting 
+     * column data. Most of the time, using different versions of apply is better than using this method, 
+     * but this one can be used without table data.
+     * @param sql The sql string. Slots for values are indicated with question marks (?)
+     * @param values the values inserted to the query. There should be a matching amount of values 
+     * and slots in the sql string.
+     * @return A map for each row. Each map contains a string value read from the database data. 
+     * Since the resulting strings can be null, they are wrapped into optionals.
+     */
+    @throws(classOf[EnvironmentNotSetupException])
+    @throws(classOf[NoConnectionException])
+    @throws(classOf[SQLException])
+    def executeQuery(sql: String, values: Seq[Value] = Vector()) = 
+    {
+        // Empty statements are not executed
+        if (sql.isEmpty())
+        {
+            Vector[Map[String, Option[String]]]()
+        }
+        else 
+        {
+            var statement: Option[PreparedStatement] = None
+            var results: Option[ResultSet] = None
+            try
+            {
+                // Creates the statement
+                statement = Some(connection.prepareStatement(sql))
+                
+                // Inserts provided values
+                setValues(statement.get, values)
+                
+                // Executes the statement and retrieves the result
+                results = Some(statement.get.executeQuery())
+                val meta = results.get.getMetaData
+                
+                val columnIndices = Vector.range(1, meta.getColumnCount + 1).map { index => 
+                        (meta.getColumnName(index), index) }
+                
+                // Parses data out of the result
+                val buffer = Vector.newBuilder[Map[String, Option[String]]]
+                while (results.get.next())
+                {
+                    buffer += columnIndices.map { case (name, index) => 
+                            (name, stringFromResult(results.get, index)) }.toMap
+                }
+                
+                buffer.result()
+            }
+            finally
+            {
+                results.foreach { _.close() }
+                statement.foreach { _.close() }
+            }
+        }
+    }
+    
+    private def setValues(statement: PreparedStatement, values: Seq[Value]) = 
+    {
+        for ( i <- 0 until values.size )
+        {
+            val conversionResult = Connection.sqlValueConverter(values(i))
+            if (conversionResult.isDefined)
+            {
+                statement.setObject(i + 1, conversionResult.get._1, conversionResult.get._2)
+            }
+            else
+            {
+                statement.setNull(i + 1, Types.NULL)
+            }
+        }
+    }
+    
+    private def stringFromResult(result: ResultSet, index: Int) = 
+    {
+        val value = result.getString(index)
+        if (value == null) None else Some(value)
     }
     
     private def rowsFromResult(resultSet: ResultSet, tables: Iterable[Table]) = 
