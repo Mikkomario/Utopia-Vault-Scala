@@ -26,8 +26,8 @@ object BasicSqlTypeInterpreter extends SqlTypeInterpreter
             case "bigint" => Some(LongType)
             case "float" => Some(FloatType)
             case "double" | "decimal" => Some(DoubleType)
-            case "varchar" | "char" => Some(StringType)
-            case "tinyint" => Some(if (typeString.endsWith("(1)")) BooleanType else IntType)
+            case "varchar" | "char" | "character" => Some(StringType)
+            case "tinyint" => Some(if (typeString.endsWith("(1)") || typeString.toLowerCase == "tinyint") BooleanType else IntType)
             case "timestamp" | "datetime" => Some(InstantType)
             case s if (s.endsWith("text") || s.endsWith("blob")) => Some(StringType)
             case _ => None
