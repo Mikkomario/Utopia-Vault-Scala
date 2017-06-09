@@ -30,13 +30,13 @@ object DatabaseTableReader
         
         val columns = columnData.map( data => 
         {
-            val columnName = data("Field")
-            val isPrimary = "pri" == data("Key").toLowerCase
-            val usesAutoIncrement = "auto_increment" == data("Extra").toLowerCase
-            val dataType = SqlTypeInterpreterManager(data("Type")).getOrElse(AnyType)
+            val columnName = data.getOrElse("COLUMN_NAME", data("Field"))
+            val isPrimary = "pri" == data.getOrElse("COLUMN_KEY", data("Key")).toLowerCase
+            val usesAutoIncrement = "auto_increment" == data.getOrElse("EXTRA", data("Extra")).toLowerCase
+            val dataType = SqlTypeInterpreterManager(data.getOrElse("COLUMN_TYPE", data("Type"))).getOrElse(AnyType)
             // val nullAllowed = "yes" == data("Null").toLowerCase
             
-            val defaultString = data("Default")
+            val defaultString = data.getOrElse("COLUMN_DEFAULT", data.getOrElse("Default", "null"))
             val defaultValue = if (defaultString.toLowerCase == "null" || 
                     defaultString.toLowerCase == "current_timestamp") None 
                     else Value.of(defaultString).castTo(dataType);
