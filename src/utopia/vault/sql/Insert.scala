@@ -27,7 +27,7 @@ object Insert
         // Only properties matching columns (that are not auto-increment) are included
         val insertedPropertyNames = rows.foldLeft(HashSet[String]()) {
                 _ ++ _.attributesWithValue.map { _.name }.filter { 
-                table(_).exists { !_.usesAutoIncrement } } }.toVector
+                table.find(_).exists { !_.usesAutoIncrement } } }.toVector
         
         if (insertedPropertyNames.isEmpty)
         {
@@ -35,7 +35,7 @@ object Insert
         }
         else 
         {
-            val columnNames = insertedPropertyNames.map { table(_).get.columnName }.reduce(_ + ", " + _)
+            val columnNames = insertedPropertyNames.map { table(_).columnName }.reduce(_ + ", " + _)
             val singleValueSql = "(?" + ", ?" * (insertedPropertyNames.size - 1) + ")"
             val valuesSql = singleValueSql + (", " + singleValueSql) * (rows.size - 1)
             

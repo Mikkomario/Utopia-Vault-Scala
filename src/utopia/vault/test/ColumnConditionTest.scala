@@ -40,10 +40,10 @@ object ColumnConditionTest extends App
         
         def countRows(condition: Condition) = connection(SelectAll(table) + Where(condition)).rows.size
         
-        val isAdminColumn = table("isAdmin").get
+        val isAdminColumn = table("isAdmin")
         assert(countRows(isAdminColumn <=> Value.of(true)) == 1)
         
-        val ageColumn = table("age").get
+        val ageColumn = table("age")
         assert(countRows(ageColumn > Value.of(31)) == 1)
         assert(countRows(ageColumn >= Value.of(31)) == 2)
         assert(countRows(ageColumn < Value.of(31)) == 1)

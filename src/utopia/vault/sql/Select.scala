@@ -36,7 +36,7 @@ object Select
     /**
      * Creates an sql segment that selects a column with a matching property name from a table
      */
-    def apply(table: Table, propertyName: String): SqlSegment = apply(table, table(propertyName).toSeq);
+    def apply(table: Table, propertyName: String): SqlSegment = apply(table, table.find(propertyName).toSeq);
     
     /**
      * Creates an sql segment that selects multiple columns matching property names from a table

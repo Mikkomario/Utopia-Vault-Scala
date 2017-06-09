@@ -7,7 +7,6 @@ import utopia.vault.sql.SqlSegment
 import utopia.vault.sql.ConditionElement
 import utopia.vault.sql.Condition
 
-// TODO: Possibly remove the non-null feature
 /**
  * Columns represent database columns and can be used as templates for different properties
  * @author Mikko Hilpinen

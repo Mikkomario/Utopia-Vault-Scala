@@ -41,8 +41,8 @@ object References
         // Converts the tuple data into a reference set
         val references = (HashSet(firstSet) ++ more).flatMap { case (table1, name1, table2, name2) => 
         {
-            val column1 = table1(name1)
-            val column2 = table2(name2)
+            val column1 = table1.find(name1)
+            val column2 = table2.find(name2)
             
             if (column1.isEmpty || column2.isEmpty)
             {
@@ -78,7 +78,7 @@ object References
      * @return All references that start from the provided column (target table, target column)
      */
     def from(table: Table, columnName: String): Option[Tuple2[Table, Column]] = 
-            table(columnName).flatMap { from(table, _) }
+            table.find(columnName).flatMap { from(table, _) }
     
     /**
      * Finds all places where the provided column is referenced
@@ -101,7 +101,7 @@ object References
      * @return All references to the specified column (source table, source column)
      */
     def to(table: Table, columnName: String): Set[Tuple2[Table, Column]] = 
-            table(columnName).map { to(table, _) }.getOrElse(HashSet());
+            table.find(columnName).map { to(table, _) }.getOrElse(HashSet());
     
     /**
      * Finds all references made from a specific table (source column, target table, target column)

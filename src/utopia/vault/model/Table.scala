@@ -46,9 +46,10 @@ class Table(val name: String, val databaseName: String, val columns: Vector[Colu
     // OPERATORS    ----------------------------
     
     /**
-     * Finds a column with the provided property name associated with it
+     * Finds a column with the provided property name associated with it. If you are unsure whether 
+     * such a column exists in the table, use find instead
      */
-    def apply(propertyName: String) = columns.find { _.name == propertyName }
+    def apply(propertyName: String) = find(propertyName).get
     
     /**
      * Finds the columns matching the provided property names
@@ -65,9 +66,21 @@ class Table(val name: String, val databaseName: String, val columns: Vector[Colu
     // OTHER METHODS    ------------------------
     
     /**
-     * Finds a column with the specified column name
+     * Finds a column with the provided property name. Returns None if no such column exists in 
+     * the table
      */
-    def columnWithColumnName(columnName: String) = columns.find { _.columnName == columnName }
+    def find(propertyName: String) = columns.find { _.name == propertyName }
+    
+    /**
+     * Finds a column with the specified column name. Returns None if no such column exists.
+     */
+    def findColumnWithColumnName(columnName: String) = columns.find { _.columnName == columnName }
+    
+    /**
+     * Finds a column with the specified column name. If you are unsure whether such a column 
+     * exists, please used findColumnWithColumnName instead
+     */
+    def columnWithColumnName(columnName: String) = findColumnWithColumnName(columnName).get
     
     /**
      * Checks whether this table contains a matching column
@@ -80,5 +93,5 @@ class Table(val name: String, val databaseName: String, val columns: Vector[Colu
      * reference to another table
      */
     def joinFrom(propertyName: String, joinType: JoinType): SqlTarget = 
-            apply(propertyName).map { joinFrom(_, joinType) }.getOrElse(this)
+            find(propertyName).map { joinFrom(_, joinType) }.getOrElse(this)
 }

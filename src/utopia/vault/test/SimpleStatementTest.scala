@@ -48,7 +48,7 @@ object SimpleStatementTest extends App
         assert(connection(Select(table, "age")).rows.head.toModel("age") == Value.of(22))
         
         connection(Insert(table, Model(Vector(("name", Value of "Last"), ("age", Value of 2)))))
-        assert(connection(SelectAll(table) + OrderBy(table("age").get) + Limit(1)
+        assert(connection(SelectAll(table) + OrderBy(table("age")) + Limit(1)
                 ).rows.head.toModel("name") == Value.of("Last"));
         
         connection(Delete(table))

@@ -27,7 +27,7 @@ object Update
     def apply(target: SqlTarget, set: Map[Table, Model[Property]]) = 
     {
         val valueSet = set.flatMap { case (table, model) => model.attributes.flatMap { 
-                property => table(property.name).map { (_, property.value) } } }
+                property => table.find(property.name).map { (_, property.value) } } }
         
         if (valueSet.isEmpty)
         {

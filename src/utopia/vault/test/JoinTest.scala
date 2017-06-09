@@ -60,7 +60,7 @@ object JoinTest extends App
         
         // Tries retrieving row data with a conditional select
         val result1 = connection(SelectAll(person join strength) + 
-                Where(strength("name").get <=> Value.of("discipline")));
+                Where(strength("name") <=> Value.of("discipline")));
         
         assert(result1.rows.size == 1)
         assert(result1.rows.head(person)("rowId") == Value.of(camillaId))
@@ -68,7 +68,7 @@ object JoinTest extends App
         
         def powersForPerson(personName: String) = connection(
                 Select(person join strength, strength.columns) + 
-                Where(person("name").get <=> Value.of(personName)));
+                Where(person("name") <=> Value.of(personName)));
         
         assert(powersForPerson("Arttu").isEmpty)
         assert(powersForPerson("Camilla").rows.size == 3)

@@ -320,7 +320,7 @@ class Connection(initialDBName: Option[String] = None)
         // Resulting map: Table -> (Column, sqlType, index)
         val columnIndices = indicesForTables.flatMap { case (tableOption, indices) => 
                 tableOption.map { table => (table, indices.flatMap { 
-                index => (table.columnWithColumnName( meta.getColumnName(index) ).map { 
+                index => (table.findColumnWithColumnName( meta.getColumnName(index) ).map { 
                 (_, meta.getColumnType(index), index) }) }) } }
         
         // Parses the rows from the resultSet
