@@ -26,8 +26,7 @@ object DatabaseTableReader
     {
         // Reads the column data from the database
         connection.dbName = databaseName
-        val columnData = connection.executeQuery("DESCRIBE " + tableName).map { 
-                _.flatMap { case (key, value) => value.map { (key, _) } } }
+        val columnData = connection.executeQuery("DESCRIBE " + tableName)
         
         val columns = columnData.map( data => 
         {
@@ -35,7 +34,7 @@ object DatabaseTableReader
             val isPrimary = "pri" == data("Key").toLowerCase
             val usesAutoIncrement = "auto_increment" == data("Extra").toLowerCase
             val dataType = SqlTypeInterpreterManager(data("Type")).getOrElse(AnyType)
-            val nullAllowed = "yes" == data("Null").toLowerCase
+            // val nullAllowed = "yes" == data("Null").toLowerCase
             
             val defaultString = data("Default")
             val defaultValue = if (defaultString.toLowerCase == "null" || 
@@ -43,7 +42,7 @@ object DatabaseTableReader
                     else Value.of(defaultString).castTo(dataType);
             
             new Column(columnNameToPropertyName(columnName), columnName, tableName, dataType, 
-                    !nullAllowed, defaultValue, isPrimary, usesAutoIncrement)
+                    defaultValue, isPrimary, usesAutoIncrement)
         } )
         
         new Table(tableName, databaseName, columns)

@@ -237,8 +237,8 @@ class Connection(initialDBName: Option[String] = None)
      * @param sql The sql string. Slots for values are indicated with question marks (?)
      * @param values the values inserted to the query. There should be a matching amount of values 
      * and slots in the sql string.
-     * @return A map for each row. Each map contains a string value read from the database data. 
-     * Since the resulting strings can be null, they are wrapped into optionals.
+     * @return A map for each row. The map contains column name + column value pairs. Only non-null 
+     * values are included.
      */
     @throws(classOf[EnvironmentNotSetupException])
     @throws(classOf[NoConnectionException])
@@ -248,7 +248,7 @@ class Connection(initialDBName: Option[String] = None)
         // Empty statements are not executed
         if (sql.isEmpty())
         {
-            Vector[Map[String, Option[String]]]()
+            Vector[Map[String, String]]()
         }
         else 
         {
@@ -270,11 +270,11 @@ class Connection(initialDBName: Option[String] = None)
                         (meta.getColumnName(index), index) }
                 
                 // Parses data out of the result
-                val buffer = Vector.newBuilder[Map[String, Option[String]]]
+                val buffer = Vector.newBuilder[Map[String, String]]
                 while (results.get.next())
                 {
-                    buffer += columnIndices.map { case (name, index) => 
-                            (name, stringFromResult(results.get, index)) }.toMap
+                    buffer += columnIndices.flatMap { case (name, index) => 
+                            stringFromResult(results.get, index).map { (name, _) } }.toMap
                 }
                 
                 buffer.result()

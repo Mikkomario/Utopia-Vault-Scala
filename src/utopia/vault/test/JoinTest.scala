@@ -42,12 +42,12 @@ object JoinTest extends App
         
         // Adds test powers
         val berttaPower = Model(Vector(("ownerId", Value of berttaId), 
-                ("name", Value of "imagination"), ("level", Value of 9999)));
+                ("name", Value of "imagination"), ("powerLevel", Value of 9999)));
         val camillaPower1 = Model(Vector(("ownerId", Value of camillaId), ("name", Value of "is teacher")));
         val camillaPower2 = Model(Vector(("ownerId", Value of camillaId), ("name", Value of "discipline"), 
-                ("level", Value of 172)));
+                ("powerLevel", Value of 172)));
         val camillaPower3 = Model(Vector(("ownerId", Value of camillaId), ("name", Value of "imagination"), 
-                ("level", Value of 250)))
+                ("powerLevel", Value of 250)))
         
         connection(Insert(strength, berttaPower, camillaPower1, camillaPower2, camillaPower3))
         
