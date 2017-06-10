@@ -34,7 +34,7 @@ object DatabaseReferenceReader
      * same database
      * @param connection the database connection that is used
      */
-    def apply(tables: Set[Table], connection: Connection) = 
+    def apply(tables: Set[Table])(implicit connection: Connection) = 
     {
         if (tables.isEmpty)
         {
@@ -72,10 +72,10 @@ object DatabaseReferenceReader
      * tables for each included database
      * @param connection the database connection used
      */
-    def setupReferences(tables: Set[Table], connection: Connection) = 
+    def setupReferences(tables: Set[Table])(implicit connection: Connection) = 
     {
         val tablesForDatabase = tables.groupBy { _.databaseName }
         tablesForDatabase.foreach { case (dbName, tables) => 
-                References.setup(dbName, apply(tables, connection).toSet) }
+                References.setup(dbName, apply(tables)(connection).toSet) }
     }
 }

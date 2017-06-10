@@ -14,10 +14,9 @@ object ReferenceReadTest extends App
 {
     DataType.setup()
     
-    val connection = new Connection()
-    try
+    Connection.tryTransaction( implicit connection => 
     {
-        val readReferences = DatabaseReferenceReader(HashSet(TestTables.person, TestTables.strength), connection)
+        val readReferences = DatabaseReferenceReader(HashSet(TestTables.person, TestTables.strength))
         
         assert(readReferences.size == 1)
         assert(readReferences.head._1 == TestTables.strength)
@@ -26,9 +25,5 @@ object ReferenceReadTest extends App
         assert(readReferences.head._4 == TestTables.person.primaryColumn.get)
         
         println("Success!")
-    }
-    finally
-    {
-        connection.close()
-    }
+    })
 }
