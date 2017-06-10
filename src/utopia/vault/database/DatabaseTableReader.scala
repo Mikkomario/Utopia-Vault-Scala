@@ -21,8 +21,8 @@ object DatabaseTableReader
      * default, converts all names with underscores and / or whitespaces to camel case 
      * (Eg. day_of_birth => dayOfBirth)
      */
-    def apply(databaseName: String, tableName: String, connection: Connection, 
-            columnNameToPropertyName: String => String = underlineToCamelCase) = 
+    def apply(databaseName: String, tableName: String, 
+            columnNameToPropertyName: String => String = underlineToCamelCase)(implicit connection: Connection) = 
     {
         // Reads the column data from the database
         connection.dbName = databaseName

@@ -15,20 +15,15 @@ object TableReadTest extends App
 {
     DataType.setup()
     
-    val connection = new Connection()
-    try 
-    {
+    Connection.doTransaction(implicit connection => 
+    {    
         connection.dbName = "vault_test"
         val testResults = connection.executeQuery("DESCRIBE person ")
         testResults.foreach { _.foreach { case (key, value) => println(s"$key: $value") } }
         
-        assert(DatabaseTableReader("vault_test", "person", connection) == TestTables.person)
-        assert(DatabaseTableReader("vault_test", "strength", connection) == TestTables.strength)
+        assert(DatabaseTableReader("vault_test", "person") == TestTables.person)
+        assert(DatabaseTableReader("vault_test", "strength") == TestTables.strength)
         
         println("Success!")
-    }
-    finally
-    {
-        connection.close()
-    }
+    } )
 }

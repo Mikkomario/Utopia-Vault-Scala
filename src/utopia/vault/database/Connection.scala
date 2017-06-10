@@ -17,9 +17,12 @@ import utopia.vault.sql.SqlSegment
 import utopia.vault.model.Result
 import utopia.vault.model.Row
 import scala.collection.immutable.VectorBuilder
+import scala.util.Try
 
 object Connection
 {
+    // ATTRIBUTES    ------------------------
+    
     /**
      * The converter that converts values to sql compatible format
      */
@@ -36,6 +39,35 @@ object Connection
     
     // If an external driver is used in database operations, it is stored here after instantiation
     private var driver: Option[Any] = None
+    
+    
+    // OTHER METHODS    ---------------------
+    
+    /**
+     * Creates a temporary database connection for a specific operation. The connection is closed 
+     * after the operation completes, even in error situations. No errors are catched though
+     * @param dbName the name of the database that is used. Optional, and may be set later too.
+     * @param f The function that is performed and which uses a database connection
+     */
+    def doTransaction[T](f: Connection => T) = 
+    {
+        val connection = new Connection()
+        try 
+        {
+            f(connection)
+        }
+        finally
+        {
+            connection.close()
+        }
+    }
+    
+    /**
+     * Creates a temporary database connection for a specific operation. The connection is closed 
+     * after the operation completes. Any errors are catched and the resulting try reflects the 
+     * success / failure state of the operation
+     */
+    def tryTransaction[T](f: Connection => T) = doTransaction(connection => { Try(f(connection)) })
 }
 
 /**
