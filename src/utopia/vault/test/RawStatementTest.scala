@@ -62,7 +62,7 @@ object RawStatementTest extends App
         
         // Checks that the time value was preserved
         val lastResult = connection(s"SELECT created FROM ${table.name} WHERE row_id = ?", 
-                Vector(Value of latestIndex), HashSet(table), false).rows.head.toModel;
+                Vector(latestIndex), HashSet(table), false).rows.head.toModel;
         
         println(lastResult.toJSON)
         println(s"Previously ${creationTime.longOr()} (${creationTime.dataType}), now ${lastResult("created").longOr()} (${lastResult("created").dataType})")

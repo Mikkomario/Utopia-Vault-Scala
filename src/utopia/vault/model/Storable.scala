@@ -34,30 +34,29 @@ trait Storable
     
     def declaration = new DeclarationConstantGenerator(table.toModelDeclaration)
     
-    def toModel = 
+    
+    // OTHER METHODS    ------------------------------
+    
+    def toModel(includeEmpty: Boolean = false) = 
     {
         val properties = table.columns.flatMap(column => 
         {
             val value = valueForProperty(column.name)
-            if (value.isEmpty) None else Some((column.name, value))
+            if (value.isEmpty && !includeEmpty) None else Some((column.name, value))
         } )
         
         Model(properties, declaration)
     }
     
-    
-    // OTHER METHODS    ------------------------------
-    
-    def push(implicit connection: Connection) = 
+    def push(writeNulls: Boolean = false)(implicit connection: Connection) = 
     {
         // Either inserts as a new row or updates an existing row
         val index = this.index
         
         if (index.isDefined)
         {
-            // TODO: This implementation doesn't overwrite with null (should it?)
             val indexColumn = table.primaryColumn.get
-            connection(Update(table, toModel - indexColumn.name) + Where(indexColumn <=> index))
+            connection(Update(table, toModel(writeNulls) - indexColumn.name) + Where(indexColumn <=> index))
         }
         else if (table.usesAutoIncrement) 
         {

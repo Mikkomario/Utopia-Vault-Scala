@@ -18,6 +18,7 @@ import utopia.vault.model.Result
 import utopia.vault.model.Row
 import scala.collection.immutable.VectorBuilder
 import scala.util.Try
+import utopia.flow.generic.IntType
 
 object Connection
 {
@@ -171,7 +172,7 @@ class Connection(initialDBName: Option[String] = None)
                 // Parses data out of the result
                 // May skip some data in case it is not requested
                 new Result(if (selectedTables.isEmpty) Vector() else rowsFromResult(results.get, selectedTables), 
-                        if (returnGeneratedKeys) generatedKeysFromResult(statement.get) else Vector())
+                        if (returnGeneratedKeys) generatedKeysFromResult(statement.get, selectedTables) else Vector())
             }
             finally
             {
@@ -370,14 +371,20 @@ class Connection(initialDBName: Option[String] = None)
         rowBuffer.result()
     }
     
-    private def generatedKeysFromResult(statement: Statement) = 
+    private def generatedKeysFromResult(statement: Statement, tables: Traversable[Table]) = 
     {
+        // Retrieves keys as ints if all of the tables (that use indexing) use int as key type
+        val useInt = tables.forall { _.primaryColumn.map { _.dataType == IntType }.getOrElse(true) }
         val results = statement.getGeneratedKeys()
-        val keyBuffer = Vector.newBuilder[Int]
+        val keyBuffer = Vector.newBuilder[Value]
         
         while (results.next())
         {
-            keyBuffer += results.getInt(1)
+            val key = if (useInt) Value.of(results.getInt(1)) else Value.of(results.getLong(1))
+            if (key.isDefined)
+            {
+                keyBuffer += key
+            }
         }
         
         keyBuffer.result()

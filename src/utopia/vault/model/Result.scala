@@ -1,6 +1,7 @@
 package utopia.vault.model
 
 import utopia.flow.util.Equatable
+import utopia.flow.datastructure.immutable.Value
 
 /**
  * A result is generated based on the data retrieved from a executed database query. 
@@ -9,7 +10,7 @@ import utopia.flow.util.Equatable
  * @author Mikko Hilpinen
  * @since 25.4.2017
  */
-class Result(val rows: Vector[Row], val generatedKeys: Vector[Int] = Vector()) extends Equatable
+class Result(val rows: Vector[Row], val generatedKeys: Vector[Value] = Vector()) extends Equatable
 {
     // COMPUTED PROPERTIES    ------------
     
@@ -25,6 +26,16 @@ class Result(val rows: Vector[Row], val generatedKeys: Vector[Int] = Vector()) e
      * Whether this result is empty and doesn't contain any meaningful data
      */
     def isEmpty = generatedKeys.isEmpty && rows.forall { _.isEmpty }
+    
+    /**
+     * The generated keys in integer format
+     */
+    def generatedIntKeys = generatedKeys.flatMap { _.int }
+    
+    /**
+     * The generated keys in long format
+     */
+    def generatedLongKeys = generatedKeys.flatMap { _.long }
     
     
     // OTHER METHODS    ------------------

@@ -41,12 +41,12 @@ object JoinTest extends App
         val camillaId = connection(Insert(person, camilla)).generatedKeys.head
         
         // Adds test powers
-        val berttaPower = Model(Vector(("ownerId", Value of berttaId), 
+        val berttaPower = Model(Vector(("ownerId", berttaId), 
                 ("name", Value of "imagination"), ("powerLevel", Value of 9999)));
-        val camillaPower1 = Model(Vector(("ownerId", Value of camillaId), ("name", Value of "is teacher")));
-        val camillaPower2 = Model(Vector(("ownerId", Value of camillaId), ("name", Value of "discipline"), 
+        val camillaPower1 = Model(Vector(("ownerId", camillaId), ("name", Value of "is teacher")));
+        val camillaPower2 = Model(Vector(("ownerId", camillaId), ("name", Value of "discipline"), 
                 ("powerLevel", Value of 172)));
-        val camillaPower3 = Model(Vector(("ownerId", Value of camillaId), ("name", Value of "imagination"), 
+        val camillaPower3 = Model(Vector(("ownerId", camillaId), ("name", Value of "imagination"), 
                 ("powerLevel", Value of 250)))
         
         connection(Insert(strength, berttaPower, camillaPower1, camillaPower2, camillaPower3))
@@ -63,7 +63,7 @@ object JoinTest extends App
                 Where(strength("name") <=> Value.of("discipline")));
         
         assert(result1.rows.size == 1)
-        assert(result1.rows.head(person)("rowId") == Value.of(camillaId))
+        assert(result1.rows.head(person)("rowId") == camillaId)
         assert(result1.rows.head(strength)("name") == Value.of("discipline"))
         
         def powersForPerson(personName: String) = connection(
