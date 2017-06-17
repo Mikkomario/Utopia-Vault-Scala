@@ -8,6 +8,7 @@ import utopia.flow.generic.DeclarationConstantGenerator
 import utopia.vault.sql.Update
 import utopia.vault.sql.Where
 import utopia.vault.sql.Insert
+import utopia.vault.sql.Condition
 
 /**
  * Storable instances can be stored into a database table.
@@ -56,15 +57,33 @@ trait Storable
         {
             val value = valueForProperty(column.name)
             if (value.isEmpty && !includeEmpty) None else Some((column.name, value))
-        } )
+        })
         
         Model(properties, new DeclarationConstantGenerator(declaration))
     }
     
     /**
+     * Converts this storable instance's properties into a condition. The condition checks that 
+     * each of the instances DEFINED properties match their value in the database. Does not include 
+     * any null / empty properties.
+     * @return a condition based on this storable instance. None if the instance didn't contain 
+     * any properties that could be used for forming a condition
+     */
+    def toCondition() = 
+    {
+        val conditions = table.columns.flatMap(column => 
+        {
+            val value = valueForProperty(column.name)
+            if (value.isEmpty) None else Some(column <=> value)
+        })
+        
+        conditions.headOption.map { _ && conditions.tail }
+    }
+    
+    /**
      * Pushes the storable instance's data to the database using either insert or update. In case 
-     * the instance doesn't have a specified index AND it's table doesn't use auto-increment 
-     * indexing, cannot push data and returns None.
+     * the instance doesn't have a specified index AND it's table uses indexing that is not 
+     * auto-increment, cannot push data and returns None.
      * @param writeNulls Whether empty / null values should be pushed to the database (on update). 
      * False by default, which means that columns will never be specifically set to null. Use 
      * true if you specifically want to set a column to null.
@@ -74,24 +93,90 @@ trait Storable
     def push(writeNulls: Boolean = false)(implicit connection: Connection) = 
     {
         // Either inserts as a new row or updates an existing row
-        val index = this.index
-        
-        if (index.isDefined)
+        if (update(writeNulls))
         {
-            val indexColumn = table.primaryColumn.get
-            connection(Update(table, toModel(writeNulls) - indexColumn.name) + Where(indexColumn <=> index))
             Some(index)
         }
         else if (table.usesAutoIncrement) 
         {
             connection(Insert(table, toModel())).generatedKeys.headOption
         }
-        else
+        else if (table.primaryColumn.isEmpty)
         {
-            // TODO: In case the table doesn't use indexing, just insert the model
+            // If the table doesn't have an index, just inserts every time
+            connection(Insert(table, toModel()))
+            None
+        }
+        else 
+        {
             None
         }
     }
     
-    // TODO: Update(where) and insert
+    /**
+     * Pushes storable data to the database, but only allows updating of an existing row. No 
+     * inserts will be made. This will only succeed if the instance has a defined index.
+     * @param writeNulls whether null values should be updated to the database. Defaults to false.
+     * @return whether the database was actually updated
+     */
+    def update(writeNulls: Boolean = false)(implicit connection: Connection) = 
+    {
+        val index = this.index
+        if (index.isDefined)
+        {
+            connection(toUpdateStatement(writeNulls) + Where(table.primaryColumn.get <=> index))
+            true
+        }
+        else 
+        {
+            false
+        }
+    }
+    
+    /**
+     * Creates an update sql segment based on this storable instance. This update segment can then 
+     * be combined with a condition in order to update row data to match that of this storable instance.
+     * @param writeNulls whether null / empty value assignments should be included in the update segment. 
+     * Defaults to false.
+     * @param writeIndex whether index should specifically be included among the set column values 
+     * (where applicable). Defaults to false.
+     */
+    def toUpdateStatement(writeNulls: Boolean = false, writeIndex: Boolean = false) = 
+    {
+        val primaryColumn = table.primaryColumn
+        val updateModel = if (writeIndex || primaryColumn.isEmpty) 
+                toModel(writeNulls) else toModel(writeNulls) - primaryColumn.get.name
+        Update(table, updateModel)
+    }
+    
+    /**
+     * Pushes storable data to the database, but will always insert the instance as a new row 
+     * instead of updating an existing row. This will only work for tables that use auto-increment 
+     * indexing or no indexing at all.
+     * @return A option with the depth of two. The first layer determines whether an insert was 
+     * actually performed, and the second layer provides access to the generated key, where applicable.
+     * For example, returns None if no operation was performed, returns Some(None) if an operation 
+     * was performed but no index generated (for tables with no indices) and Some(Some(...)) when 
+     * an operation was performed and a key generated.
+     */
+    def insert(implicit connection: Connection) = 
+    {
+        // Only works with tables that use auto-increment indexing or no indices at all
+        if (table.primaryColumn.isDefined)
+        {
+            if (table.usesAutoIncrement)
+            {
+                Some(connection(Insert(table, toModel() - table.primaryColumn.get.name)).generatedKeys.headOption)
+            }
+            else 
+            {
+                None
+            }
+        }
+        else
+        {
+            connection(Insert(table, toModel()))
+            Some(None)
+        }
+    }
 }
