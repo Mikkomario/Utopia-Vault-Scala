@@ -19,6 +19,7 @@ object BasicSqlTypeInterpreter extends SqlTypeInterpreter
 {
     def apply(typeString: String) = 
     {   
+        // TODO: Unsigned int should be read as long since it can have double as large a value
         // Doesn't include the text in parentheses '()'
         typeString.toLowerCase.span { _ != '(' }._1 match 
         {
