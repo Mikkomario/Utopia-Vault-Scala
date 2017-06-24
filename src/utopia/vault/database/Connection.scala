@@ -19,6 +19,7 @@ import utopia.vault.model.Row
 import scala.collection.immutable.VectorBuilder
 import scala.util.Try
 import utopia.flow.generic.IntType
+import utopia.flow.generic.ValueConversions._
 
 object Connection
 {
@@ -380,7 +381,7 @@ class Connection(initialDBName: Option[String] = None)
         
         while (results.next())
         {
-            val key = if (useInt) Value.of(results.getInt(1)) else Value.of(results.getLong(1))
+            val key: Value = if (useInt) results.getInt(1) else results.getLong(1)
             if (key.isDefined)
             {
                 keyBuffer += key

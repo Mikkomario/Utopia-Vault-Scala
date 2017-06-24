@@ -25,9 +25,9 @@ trait Storable
     def table: Table
     
     /**
-     * This methods is used for retrieving property data from the model
+     * The model properties of this storable instance
      */
-    def valueForProperty(propertyName: String): Value
+    def valueProperties: Traversable[(String, Value)]
     
     
     // COMPUTED PROPERTIES    ------------------------
@@ -36,12 +36,15 @@ trait Storable
      * The index of this storable instance. Index is the primary method way to identify the 
      * instance in database context.
      */
-    def index = table.primaryColumn.map { column => valueForProperty(column.name) }.getOrElse(Value.empty())
+    def index = table.primaryColumn.flatMap { column => valueProperties.find { case (name, _) => 
+            name.equalsIgnoreCase(column.name) }.map { case (_, value) => value } }.getOrElse(Value.empty())
     
     /**
      * A declaration that describes this instance. The declaration is based on the instance's table
      */
     def declaration = table.toModelDeclaration
+    
+    def toModel = Model(valueProperties, new DeclarationConstantGenerator(declaration))
     
     
     // OTHER METHODS    ------------------------------
@@ -51,16 +54,21 @@ trait Storable
      * @param includeEmpty should empty property values be included in the final model. 
      * Default is false.
      */
+    /*
     def toModel(includeEmpty: Boolean = false) = 
     {
+        val generator = new DeclarationConstantGenerator(declaration)
+        
+        
+        /*        
         val properties = table.columns.flatMap(column => 
         {
             val value = valueForProperty(column.name)
             if (value.isEmpty && !includeEmpty) None else Some((column.name, value))
         })
         
-        Model(properties, new DeclarationConstantGenerator(declaration))
-    }
+        Model(properties, new DeclarationConstantGenerator(declaration))*/
+    }*/
     
     /**
      * Converts this storable instance's properties into a condition. The condition checks that 
@@ -71,9 +79,10 @@ trait Storable
      */
     def toCondition() = 
     {
+        val model = toModel
         val conditions = table.columns.flatMap(column => 
         {
-            val value = valueForProperty(column.name)
+            val value = model(column.name)
             if (value.isEmpty) None else Some(column <=> value)
         })
         
@@ -99,12 +108,12 @@ trait Storable
         }
         else if (table.usesAutoIncrement) 
         {
-            connection(Insert(table, toModel())).generatedKeys.headOption
+            connection(Insert(table, toModel)).generatedKeys.headOption
         }
         else if (table.primaryColumn.isEmpty)
         {
             // If the table doesn't have an index, just inserts every time
-            connection(Insert(table, toModel()))
+            connection(Insert(table, toModel))
             None
         }
         else 
@@ -144,8 +153,9 @@ trait Storable
     def toUpdateStatement(writeNulls: Boolean = false, writeIndex: Boolean = false) = 
     {
         val primaryColumn = table.primaryColumn
+        val originalModel = if (writeNulls) toModel else toModel.withoutEmptyValues
         val updateModel = if (writeIndex || primaryColumn.isEmpty) 
-                toModel(writeNulls) else toModel(writeNulls) - primaryColumn.get.name
+                originalModel else originalModel - primaryColumn.get.name
         Update(table, updateModel)
     }
     
@@ -166,7 +176,7 @@ trait Storable
         {
             if (table.usesAutoIncrement)
             {
-                Some(connection(Insert(table, toModel() - table.primaryColumn.get.name)).generatedKeys.headOption)
+                Some(connection(Insert(table, toModel - table.primaryColumn.get.name)).generatedKeys.headOption)
             }
             else 
             {
@@ -175,7 +185,7 @@ trait Storable
         }
         else
         {
-            connection(Insert(table, toModel()))
+            connection(Insert(table, toModel))
             Some(None)
         }
     }

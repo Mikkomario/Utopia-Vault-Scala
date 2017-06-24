@@ -9,6 +9,7 @@ import utopia.flow.generic.InstantType
 import utopia.flow.datastructure.immutable.Value
 import utopia.vault.model.References
 import scala.collection.immutable.HashSet
+import utopia.flow.generic.ValueConversions._
 
 /**
  * This is a collection of tables used in the tests
@@ -20,7 +21,7 @@ object TestTables
             new Column("rowId", "row_id", "person", IntType, None, true, true), 
             new Column("name", "name", "person", StringType), 
             new Column("age", "age", "person", IntType), 
-            new Column("isAdmin", "is_admin", "person", BooleanType, Some(Value of false)), 
+            new Column("isAdmin", "is_admin", "person", BooleanType, Some(false)), 
             new Column("created", "created", "person", InstantType)))
     
     val strength = new Table("strength", "vault_test", Vector(

@@ -12,6 +12,8 @@ import utopia.vault.sql.ConditionElement
 import utopia.flow.datastructure.template.Model
 import utopia.flow.datastructure.template.Property
 import utopia.vault.model.References
+import utopia.flow.generic.ValueConversions._
+import utopia.vault.sql.ConditionValue
 
 /**
  * This object can be used for reading and setting up table references by reading them directly 
@@ -43,9 +45,10 @@ object DatabaseReferenceReader
         else 
         {
             val databaseName = tables.head.databaseName
-            val tableOptions = tables.map { table => new ConditionValue(Value of table.name) }.toSeq
+            // TODO: Consider making this easier using proper implicit conversions
+            val tableOptions = tables.map { table => new ConditionValue(table.name) }.toSeq
             val results = connection(Select(keys, keys.columns) + Where(
-                    keys("schema") <=> Value.of(databaseName) && 
+                    keys("schema") <=> databaseName && 
                     keys("tableName").in(tableOptions) && 
                     keys("referencedTableName").in(tableOptions))).rows.map { _.toModel }
             

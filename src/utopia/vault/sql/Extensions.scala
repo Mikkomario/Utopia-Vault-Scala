@@ -11,12 +11,7 @@ import scala.language.implicitConversions
 object Extensions
 {
     /**
-     * This extension allows values to be used as condition elements
+     * Wraps a value into a condition element
      */
-    implicit class ConditionValue(val value: Value) extends ConditionElement
-    {
-        // COMPUTED PROPERTIES    ------------------
-        
-        def toSqlSegment = SqlSegment("?", Vector(value))
-    }
+    implicit def valueToConditionElement[T](value: T)(implicit f: T => Value): ConditionElement = new ConditionValue(value)
 }

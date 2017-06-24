@@ -9,6 +9,7 @@ import utopia.vault.sql.Insert
 import utopia.vault.sql.Condition
 import utopia.vault.sql.SelectAll
 import utopia.vault.sql.Where
+import utopia.flow.generic.ValueConversions._
 
 import utopia.vault.sql.Extensions._
 
@@ -31,37 +32,37 @@ object ColumnConditionTest extends App
         connection(Delete(table))
         
         // Inserts various rows
-        val test1 = Model(Vector(("name", Value of "test 1"), ("age", Value of 31), ("isAdmin", Value of true)))
-        val test2 = Model(Vector(("name", Value of "test 2"), ("age", Value of 32)))
-        val test3 = Model(Vector(("name", Value of "test 3"), ("age", Value of 3)))
-        val test4 = Model(Vector(("name", Value of "test 4")))
+        val test1 = Model(Vector("name" -> "test 1", "age" -> 31, "isAdmin" -> true))
+        val test2 = Model(Vector("name" -> "test 2", "age" -> 32))
+        val test3 = Model(Vector("name" -> "test 3", "age" -> 3))
+        val test4 = Model(Vector("name" -> "test 4"))
         
         connection(Insert(table, test1, test2, test3, test4))
         
         def countRows(condition: Condition) = connection(SelectAll(table) + Where(condition)).rows.size
         
         val isAdminColumn = table("isAdmin")
-        assert(countRows(isAdminColumn <=> Value.of(true)) == 1)
+        assert(countRows(isAdminColumn <=> true) == 1)
         
         val ageColumn = table("age")
-        assert(countRows(ageColumn > Value.of(31)) == 1)
-        assert(countRows(ageColumn >= Value.of(31)) == 2)
-        assert(countRows(ageColumn < Value.of(31)) == 1)
-        assert(countRows(ageColumn <= Value.of(31)) == 2)
-        assert(countRows(ageColumn <=> Value.of(31)) == 1)
-        assert(countRows(ageColumn <> Value.of(31)) == 2)
+        assert(countRows(ageColumn > 31) == 1)
+        assert(countRows(ageColumn >= 31) == 2)
+        assert(countRows(ageColumn < 31) == 1)
+        assert(countRows(ageColumn <= 31) == 2)
+        assert(countRows(ageColumn <=> 31) == 1)
+        assert(countRows(ageColumn <> 31) == 2)
         
         assert(countRows(ageColumn.isNull) == 1)
         assert(countRows(ageColumn <=> Value.empty()) == 1)
         assert(countRows(ageColumn.isNotNull) == 3)
         assert(countRows(ageColumn <> Value.empty()) == 3)
         
-        assert(countRows(isAdminColumn <=> Value.of(true) || (ageColumn < Value.of(5))) == 2)
-        assert(countRows(ageColumn > Value.of(5) && (ageColumn < Value.of(32))) == 1)
+        assert(countRows(isAdminColumn <=> true || (ageColumn < 5)) == 2)
+        assert(countRows(ageColumn > 5 && (ageColumn < 32)) == 1)
         assert(countRows(!ageColumn.isNull) == 3)
         
-        assert(countRows(ageColumn.in(Vector(Value.of(31), Value.of(32)))) == 2)
-        assert(countRows(ageColumn.isBetween(Value of 1, Value of 31)) == 2)
+        assert(countRows(ageColumn.in(Vector(31, 32))) == 2)
+        assert(countRows(ageColumn.isBetween(1, 31)) == 2)
         
         println("Success!")
     }

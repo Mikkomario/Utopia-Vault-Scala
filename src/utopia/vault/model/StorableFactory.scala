@@ -27,7 +27,7 @@ trait StorableFactory[T]
     /**
      * Creates a new storable instance based on a model / attribute collection
      */
-    def apply(tableModel: Model[Property]): T
+    def apply(tableModel: Model[Property]): Option[T]
     
     
     // OTHER METHODS    -----------------------
@@ -51,8 +51,6 @@ trait StorableFactory[T]
      */
     def get(where: Condition)(implicit connection: Connection) = 
     {
-        connection(SelectAll(table) + Where(where) + Limit(1)).rows.headOption.map { _.toModel }.map(apply)
+        connection(SelectAll(table) + Where(where) + Limit(1)).rows.headOption.map { _.toModel }.flatMap(apply)
     }
 }
-
-// TODO: also make a more general version that allows conversion from json

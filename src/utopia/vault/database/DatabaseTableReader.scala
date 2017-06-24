@@ -4,6 +4,7 @@ import utopia.vault.model.Table
 import utopia.vault.model.Column
 import utopia.flow.generic.AnyType
 import utopia.flow.datastructure.immutable.Value
+import utopia.flow.generic.ValueConversions._
 
 /**
  * This object is able to read table / column data from the database itself
@@ -39,7 +40,7 @@ object DatabaseTableReader
             val defaultString = data.getOrElse("COLUMN_DEFAULT", data.getOrElse("Default", "null"))
             val defaultValue = if (defaultString.toLowerCase == "null" || 
                     defaultString.toLowerCase == "current_timestamp") None 
-                    else Value.of(defaultString).castTo(dataType);
+                    else defaultString.castTo(dataType);
             
             new Column(columnNameToPropertyName(columnName), columnName, tableName, dataType, 
                     defaultValue, isPrimary, usesAutoIncrement)

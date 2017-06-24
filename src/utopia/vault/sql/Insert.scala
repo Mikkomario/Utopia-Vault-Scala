@@ -18,8 +18,8 @@ object Insert
      * Creates a new statement that inserts multiple rows into an sql database. This statement is
      * generally not combined with other statements and targets a single table only
      * @param table the table into which the rows are inserted
-     * @param rows models representing rows in the table. Only properties matching those of the
-     * table are used
+     * @param rows models representing rows in the table. Only properties with values and which 
+     * match those of the table are used
      */
     def apply(table: Table, rows: Vector[Model[Property]]) = 
     {

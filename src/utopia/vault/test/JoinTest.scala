@@ -11,6 +11,7 @@ import utopia.vault.sql.JoinType._
 import utopia.vault.sql.Select
 import utopia.vault.sql.SelectAll
 import utopia.vault.sql.Where
+import utopia.flow.generic.ValueConversions._
 
 /**
  * This test tests the use of joined sql targets and the use of references too. It is expected 
@@ -32,22 +33,22 @@ object JoinTest extends App
         connection(Delete(person))
         
         // Inserts test persons
-        val arttu = Model(Vector(("name", Value of "Arttu"), ("age", Value of 16)))
-        val bertta = Model(Vector(("name", Value of "Bertta"), ("age", Value of 8)))
-        val camilla = Model(Vector(("name", Value of "Camilla"), ("age", Value of 31)))
+        val arttu = Model(Vector("name" -> "Arttu", "age" -> 16))
+        val bertta = Model(Vector("name" -> "Bertta", "age" -> 8))
+        val camilla = Model(Vector("name" -> "Camilla", "age" -> 31))
         
         val arttuId = connection(Insert(person, arttu)).generatedKeys.head
         val berttaId = connection(Insert(person, bertta)).generatedKeys.head
         val camillaId = connection(Insert(person, camilla)).generatedKeys.head
         
         // Adds test powers
-        val berttaPower = Model(Vector(("ownerId", berttaId), 
-                ("name", Value of "imagination"), ("powerLevel", Value of 9999)));
-        val camillaPower1 = Model(Vector(("ownerId", camillaId), ("name", Value of "is teacher")));
-        val camillaPower2 = Model(Vector(("ownerId", camillaId), ("name", Value of "discipline"), 
-                ("powerLevel", Value of 172)));
-        val camillaPower3 = Model(Vector(("ownerId", camillaId), ("name", Value of "imagination"), 
-                ("powerLevel", Value of 250)))
+        val berttaPower = Model(Vector("ownerId" -> berttaId, "name" -> "imagination", 
+                "powerLevel" -> 9999));
+        val camillaPower1 = Model(Vector("ownerId" -> camillaId, "name" -> "is teacher"))
+        val camillaPower2 = Model(Vector("ownerId" -> camillaId, "name" -> "discipline", 
+                "powerLevel" -> 172));
+        val camillaPower3 = Model(Vector("ownerId" -> camillaId, "name" -> "imagination", 
+                "powerLevel" -> 250))
         
         connection(Insert(strength, berttaPower, camillaPower1, camillaPower2, camillaPower3))
         
@@ -59,20 +60,19 @@ object JoinTest extends App
         assert(countRows(Inner) == 4)
         
         // Tries retrieving row data with a conditional select
-        val result1 = connection(SelectAll(person join strength) + 
-                Where(strength("name") <=> Value.of("discipline")));
+        val result1 = connection(SelectAll(person join strength) + Where(strength("name") <=> "discipline"))
         
         assert(result1.rows.size == 1)
         assert(result1.rows.head(person)("rowId") == camillaId)
-        assert(result1.rows.head(strength)("name") == Value.of("discipline"))
+        assert(result1.rows.head(strength)("name") == "discipline".toValue)
         
         def powersForPerson(personName: String) = connection(
                 Select(person join strength, strength.columns) + 
-                Where(person("name") <=> Value.of(personName)));
+                Where(person("name") <=> personName));
         
         assert(powersForPerson("Arttu").isEmpty)
         assert(powersForPerson("Camilla").rows.size == 3)
-        assert(powersForPerson("Bertta").rows.head("name") == Value.of("imagination"))
+        assert(powersForPerson("Bertta").rows.head("name") == "imagination".toValue)
         
         println("Success!")
     }
