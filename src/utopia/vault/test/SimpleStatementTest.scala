@@ -48,9 +48,14 @@ object SimpleStatementTest extends App
         connection(Update(table, "age", 22))
         assert(connection(Select(table, "age")).rows.head.toModel("age") == 22.toValue)
         
-        connection(Insert(table, Model(Vector("name" -> "Last", "age" -> 2))))
+        connection(Insert(table, Model(Vector("name" -> "Last", "age" -> 2, "isAdmin" -> true))))
         assert(connection(SelectAll(table) + OrderBy(table("age")) + Limit(1)
                 ).rows.head.toModel("name") == "Last".toValue);
+        
+        val result2 = connection(Select(table, "isAdmin")).rowModels
+        assert(!result2.isEmpty)
+        //result2.foreach(println)
+        assert(result2.exists { _("isAdmin").booleanOr() })
         
         connection(Delete(table))
         assert(countRows == 0)

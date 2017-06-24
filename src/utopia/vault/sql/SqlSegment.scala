@@ -51,6 +51,11 @@ case class SqlSegment(val sql: String, val values: Seq[Value] = Vector(),
      */
     def description = s"sql: $toString\nvalues: ${values.map { _.description }.reduce(_ + ", " + _)}"
     
+    /**
+     * Whether the segment is considered to be empty (no-op)
+     */
+    def isEmpty = sql.isEmpty()
+    
     
     // OPERATORS    ---------------------
     

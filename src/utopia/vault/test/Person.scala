@@ -9,6 +9,7 @@ import utopia.flow.datastructure.template.Model
 import utopia.flow.datastructure.template.Property
 
 import utopia.flow.generic.ValueConversions._
+import utopia.flow.util.Equatable
 
 object Person extends StorableFactory[Person]
 {
@@ -30,7 +31,7 @@ object Person extends StorableFactory[Person]
  * @since 18.6.2017
  */
 class Person(val name: String, val age: Option[Int] = None, val isAdmin: Boolean = false, 
-        val created: Instant = Instant.now(), val rowId: Option[Int] = None) extends Storable
+        val created: Instant = Instant.now(), val rowId: Option[Int] = None) extends Storable with Equatable
 {
     // COMPUTED PROPERTIES    ------------------
     
@@ -38,4 +39,6 @@ class Person(val name: String, val age: Option[Int] = None, val isAdmin: Boolean
     
     override def valueProperties = Vector("name" -> name, "age" -> age, "isAdmin" -> isAdmin, 
             "created" -> created, "rowId" -> rowId);
+    
+    override def properties = Vector(name, age, isAdmin, created, rowId)
 }

@@ -49,4 +49,21 @@ trait StorableFactory[T] extends FromModelFactory[T]
     {
         connection(SelectAll(table) + Where(where) + Limit(1)).rows.headOption.map { _.toModel }.flatMap(apply)
     }
+    
+    /**
+     * Finds possibly multiple instances from the database
+     * @param where the condition with which the instances are filtered
+     * @return Parsed instance data
+     */
+    def getMany(where: Condition)(implicit connection: Connection) = 
+    {
+        connection(SelectAll(table) + Where(where)).rowModels.flatMap(apply)
+    }
+    
+    /**
+     * Finds every single instance of this type from the database. This method should only be 
+     * used in case of somewhat small tables.
+     * @see #getMany(Condition)
+     */
+    def getAll()(implicit connection: Connection) = connection(SelectAll(table)).rowModels.flatMap(apply)
 }

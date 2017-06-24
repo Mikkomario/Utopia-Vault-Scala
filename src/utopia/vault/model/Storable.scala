@@ -10,6 +10,7 @@ import utopia.vault.sql.Where
 import utopia.vault.sql.Insert
 import utopia.vault.sql.Condition
 import utopia.flow.generic.ModelConvertible
+import utopia.vault.sql.SqlSegment
 
 /**
  * Storable instances can be stored into a database table.
@@ -91,21 +92,21 @@ trait Storable extends ModelConvertible
         // Either inserts as a new row or updates an existing row
         if (update(writeNulls))
         {
-            Some(index)
+            index
         }
         else if (table.usesAutoIncrement) 
         {
-            connection(Insert(table, toModel)).generatedKeys.headOption
+            connection(Insert(table, toModel)).generatedKeys.headOption.getOrElse(Value.empty())
         }
         else if (table.primaryColumn.isEmpty)
         {
             // If the table doesn't have an index, just inserts every time
             connection(Insert(table, toModel))
-            None
+            Value.empty()
         }
         else 
         {
-            None
+            Value.empty()
         }
     }
     
@@ -147,33 +148,82 @@ trait Storable extends ModelConvertible
     }
     
     /**
-     * Pushes storable data to the database, but will always insert the instance as a new row 
-     * instead of updating an existing row. This will only work for tables that use auto-increment 
-     * indexing or no indexing at all.
-     * @return A option with the depth of two. The first layer determines whether an insert was 
-     * actually performed, and the second layer provides access to the generated key, where applicable.
-     * For example, returns None if no operation was performed, returns Some(None) if an operation 
-     * was performed but no index generated (for tables with no indices) and Some(Some(...)) when 
-     * an operation was performed and a key generated.
+     * Updates certain properties to the database
+     * @param propertyNames the names of the properties that are updated / pushed to the database
+     * @return whether any update was performed
      */
-    def insert(implicit connection: Connection) = 
+    def updateProperties(propertyNames: Traversable[String])(implicit connection: Connection) = 
     {
-        // Only works with tables that use auto-increment indexing or no indices at all
-        if (table.primaryColumn.isDefined)
+        val index = this.index
+        if (index.isDefined)
         {
-            if (table.usesAutoIncrement)
+            val update = updateStatementForProperties(propertyNames)
+            if (update.isEmpty)
             {
-                Some(connection(Insert(table, toModel - table.primaryColumn.get.name)).generatedKeys.headOption)
+                false
             }
             else 
             {
-                None
+                connection(update + Where(table.primaryColumn.get <=> index))
+                true
+            }
+        }
+        else
+        {
+            false
+        }
+    }
+    
+    /**
+     * Updates certain properties to the database
+     * @return whether any update was performed
+     */
+    def updateProperties(name1: String, more: String*)(implicit connection: Connection): Boolean = 
+            updateProperties(Vector(name1) ++ more);
+    
+    /**
+     * Creates an update statement that updates only the specified properties
+     * @param propertyNames the names of the properties that will be included in the update segment
+     */
+    def updateStatementForProperties(propertyNames: Traversable[String]) = 
+    {
+        def updatedProperties = valueProperties.filter { case (name, _) => 
+                propertyNames.exists(name.equalsIgnoreCase) }
+        Update(table, Model(updatedProperties))
+    }
+    
+    /**
+     * Creates an update statement that updates only the specified properties
+     */
+    def updateStatementForProperties(name1: String, more: String*): SqlSegment = 
+            updateStatementForProperties(Vector(name1) ++ more);
+    
+    /**
+     * Pushes storable data to the database, but will always insert the instance as a new row 
+     * instead of updating an existing row. This will only work for tables that use auto-increment 
+     * indexing or no indexing at all.
+     * @return The generated index, if an insertion was made and one was generated. Empty value otherwise.
+     */
+    def insert()(implicit connection: Connection) = 
+    {
+        val primaryColumn = table.primaryColumn
+        // Only works with tables that use auto-increment indexing or no indices at all
+        if (primaryColumn.isDefined)
+        {
+            if (table.usesAutoIncrement)
+            {
+                connection(Insert(table, toModel - primaryColumn.get.name)
+                        ).generatedKeys.headOption.getOrElse(Value.empty(primaryColumn.get.dataType))
+            }
+            else 
+            {
+                Value.empty(primaryColumn.get.dataType)
             }
         }
         else
         {
             connection(Insert(table, toModel))
-            Some(None)
+            Value.empty()
         }
     }
 }

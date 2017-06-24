@@ -32,7 +32,7 @@ object BasicSqlValueGenerator extends SqlValueGenerator
             case Types.INTEGER | Types.SMALLINT | Types.TINYINT => wrap(value, IntType)
             case Types.FLOAT => wrap(value, FloatType)
             case Types.VARCHAR => wrap(value, StringType)
-            case Types.BOOLEAN => wrap(value, BooleanType)
+            case Types.BOOLEAN | Types.BIT => wrap(value, BooleanType)
             case Types.BIGINT => wrap(value, LongType)
             
             case _ => None
