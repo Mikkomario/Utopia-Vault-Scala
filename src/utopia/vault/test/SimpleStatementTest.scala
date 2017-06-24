@@ -2,14 +2,19 @@ package utopia.vault.test
 
 import utopia.flow.generic.DataType
 import utopia.vault.database.Connection
-import utopia.vault.database.SelectAll
-import utopia.vault.database.Delete
+import utopia.vault.sql.SelectAll
+import utopia.vault.sql.Delete
 import utopia.flow.datastructure.immutable.Model
 import utopia.flow.datastructure.immutable.Value
-import utopia.vault.database.Insert
+import utopia.vault.sql.Insert
+import utopia.vault.sql.Select
+import utopia.vault.sql.Limit
+import utopia.vault.sql.Update
+import utopia.vault.sql.OrderBy
+import utopia.flow.generic.ValueConversions._
 
 /**
- * This test tests basic uses cases for very simple statements delete and select all.
+ * sqlt tests basic uses cases for very simple statements delete and select all.
  * @author Mikko Hilpinen
  * @since 22.5.2017
  */
@@ -28,13 +33,29 @@ object SimpleStatementTest extends App
         connection(Delete(table))
         assert(countRows == 0)
         
-        val testModel = Model(Vector(("name", Value of "SimpleStatementTest")))
+        val testModel = Model(Vector("name" -> "SimpleStatementTest"))
         connection(Insert(table, Vector(testModel, testModel, testModel)))
         
         assert(countRows == 3)
+        assert(connection(Select.nothing(table)).rows.size == 3)
+        assert(connection(Select.nothing(table) + Limit(1)).rows.size == 1)
         
         val result = connection(SelectAll(table))
-        assert(result.rows.head.toModel("name") == Value.of("SimpleStatementTest"))
+        assert(result.rows.head.toModel("name") == "SimpleStatementTest".toValue)
+        assert(connection(Select(table, table.columns)) == result)
+        assert(connection(Select(table, "name")).rows.head.toModel("name") == "SimpleStatementTest".toValue)
+        
+        connection(Update(table, "age", 22))
+        assert(connection(Select(table, "age")).rows.head.toModel("age") == 22.toValue)
+        
+        connection(Insert(table, Model(Vector("name" -> "Last", "age" -> 2, "isAdmin" -> true))))
+        assert(connection(SelectAll(table) + OrderBy(table("age")) + Limit(1)
+                ).rows.head.toModel("name") == "Last".toValue);
+        
+        val result2 = connection(Select(table, "isAdmin")).rowModels
+        assert(!result2.isEmpty)
+        //result2.foreach(println)
+        assert(result2.exists { _("isAdmin").booleanOr() })
         
         connection(Delete(table))
         assert(countRows == 0)

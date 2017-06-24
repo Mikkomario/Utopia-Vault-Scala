@@ -1,4 +1,4 @@
-package utopia.vault.database
+package utopia.vault.sql
 
 /**
  * ConditionElements are elements used in logical conditions. Usually two or more elements are 

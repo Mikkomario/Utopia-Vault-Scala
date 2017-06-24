@@ -1,4 +1,6 @@
-package utopia.vault.database
+package utopia.vault.sql
+
+import scala.Vector
 
 object Where
 {

@@ -1,36 +1,35 @@
-package utopia.vault.generic
+package utopia.vault.model
 
 import utopia.flow.datastructure.immutable.PropertyDeclaration
 import utopia.flow.generic.DataType
 import utopia.flow.datastructure.immutable.Value
-import utopia.vault.database.SqlSegment
-import utopia.vault.database.Condition
-import utopia.vault.database.ConditionElement
+import utopia.vault.sql.SqlSegment
+import utopia.vault.sql.ConditionElement
+import utopia.vault.sql.Condition
 
-// TODO: Possibly remove the non-null feature
 /**
  * Columns represent database columns and can be used as templates for different properties
  * @author Mikko Hilpinen
  * @since 8.3.2017
  */
 class Column(propertyName: String, val columnName: String, val tableName: String, 
-        dataType: DataType, val notNull: Boolean = false, defaultValue: Option[Value] = None, 
+        dataType: DataType, defaultValue: Option[Value] = None, 
         val isPrimary: Boolean = false, val usesAutoIncrement: Boolean = false) 
         extends PropertyDeclaration(propertyName, dataType, defaultValue) with ConditionElement
 {
     // COMPUTED PROPERTIES    ------------------
     
-    override def properties = super.properties ++ Vector(columnName, notNull, isPrimary, usesAutoIncrement)
+    override def properties = super.properties ++ Vector(columnName, isPrimary, usesAutoIncrement)
     
-    override def toString = s"$columnName $dataType ${if (notNull) "NOT NULL " else ""} ${
-            if (isPrimary) "PRIMARY KEY " else ""} ${if (usesAutoIncrement) "AUTO_INCREMENT " else ""}"
+    override def toString = s"$columnName $dataType ${ if (isPrimary) "PRIMARY KEY " else ""} ${
+            if (usesAutoIncrement) "AUTO_INCREMENT " else ""}"
     
     override def toSqlSegment = SqlSegment(columnNameWithTable)
             
     /**
      * Whether a value is required in this column when data is inserted to the database
      */
-    def isRequiredInInsert = notNull && !defaultValue.exists { _.isDefined } && !usesAutoIncrement
+    // def isRequiredInInsert = notNull && !defaultValue.exists { _.isDefined } && !usesAutoIncrement
     
     /**
      * The name of the column, including the table name for disambiguity

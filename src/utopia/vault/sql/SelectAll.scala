@@ -1,6 +1,6 @@
-package utopia.vault.database
+package utopia.vault.sql
 
-import utopia.vault.generic.Table
+import utopia.vault.model.Table
 import scala.collection.immutable.HashSet
 
 /**
@@ -16,6 +16,6 @@ object SelectAll
      * targeted rows. This statement can then be followed by a join- or where clause and possibly 
      * a limit
      */
-    def apply(table: Table) = SqlSegment(s"SELECT * FROM ${ table.name }", Vector(), 
-            Some(table.databaseName), HashSet(table));
+    def apply(target: SqlTarget) = SqlSegment(s"SELECT * FROM", Vector(), None, HashSet(), 
+            true) + target.toSqlSegment;
 }

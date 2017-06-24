@@ -1,7 +1,7 @@
 package utopia.vault.test
 
-import utopia.vault.generic.Table
-import utopia.vault.generic.Column
+import utopia.vault.model.Table
+import utopia.vault.model.Column
 import utopia.flow.generic.IntType
 import utopia.flow.generic.StringType
 import utopia.flow.generic.BooleanType
@@ -13,6 +13,7 @@ import utopia.vault.database.ConnectionSettings
 import java.time.Instant
 import utopia.flow.generic.VectorType
 import scala.collection.immutable.HashSet
+import utopia.flow.generic.ValueConversions._
 
 /**
  * This test runs some raw statements using the sql client and checks the results
@@ -36,8 +37,7 @@ object RawStatementTest extends App
         def insert(name: String, age: Int, isAdmin: Boolean = false) = 
         {
             assert(!connection(s"INSERT INTO ${table.name} (name, age, is_admin) VALUES (?, ?, ?)", 
-                    Vector(Value.of(name), Value.of(age), Value.of(isAdmin)), HashSet(), 
-                    true).generatedKeys.isEmpty)
+                    Vector(name, age, isAdmin), HashSet(), true).generatedKeys.isEmpty)
         }
         
         // Inserts a couple of elements into the table. Makes sure new indices are generated
@@ -53,24 +53,24 @@ object RawStatementTest extends App
         
         // Tries to insert null values
         connection(s"INSERT INTO ${table.name} (name, age) VALUES (?, ?)", 
-                Vector(Value.of("Test"), Value.empty(IntType)));
+                Vector("Test", Value.empty(IntType)));
         
         // Also tries inserting a time value
-        val creationTime = Value of Instant.now()
+        val creationTime = Instant.now().toValue
         val latestIndex = connection(s"INSERT INTO ${table.name} (name, created) VALUES (?, ?)", 
-                Vector(Value.of("Test2"), creationTime), HashSet(), true).generatedKeys.head;
+                Vector("Test2", creationTime), HashSet(), true).generatedKeys.head;
         
         // Checks that the time value was preserved
         val lastResult = connection(s"SELECT created FROM ${table.name} WHERE row_id = ?", 
-                Vector(Value of latestIndex), HashSet(table), false).rows.head.toModel;
+                Vector(latestIndex), HashSet(table), false).rows.head.toModel;
         
         println(lastResult.toJSON)
         println(s"Previously ${creationTime.longOr()} (${creationTime.dataType}), now ${lastResult("created").longOr()} (${lastResult("created").dataType})")
         assert(lastResult("created").longOr() == creationTime.longOr())
         
         // Tests a bit more tricky version where data types may not be correct
-        connection(s"INSERT INTO ${table.name} (name) VALUES (?)", Vector(Value.of(32)))
-        connection(s"INSERT INTO ${table.name} (name, created) VALUES (?, ?)", Vector(Value.of("Null Test"), Value.empty(VectorType)))
+        connection(s"INSERT INTO ${table.name} (name) VALUES (?)", Vector(32))
+        connection(s"INSERT INTO ${table.name} (name, created) VALUES (?, ?)", Vector("Null Test", Value.empty(VectorType)))
         
         println("Success!")
     }
