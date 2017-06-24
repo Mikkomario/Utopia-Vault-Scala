@@ -8,6 +8,7 @@ import utopia.vault.sql.SelectAll
 import utopia.vault.sql.Where
 import utopia.vault.sql.Condition
 import utopia.vault.sql.Limit
+import utopia.flow.generic.FromModelFactory
 
 /**
  * These factory instances are used for converting database-originated model data into a 
@@ -15,7 +16,7 @@ import utopia.vault.sql.Limit
  * @author Mikko Hilpinen
  * @since 18.6.2017
  */
-trait StorableFactory[T]
+trait StorableFactory[T] extends FromModelFactory[T]
 {
     // ABSTRACT METHODS    --------------------
     
@@ -23,11 +24,6 @@ trait StorableFactory[T]
      * The table which resembles the generated storable structure
      */
     def table: Table
-    
-    /**
-     * Creates a new storable instance based on a model / attribute collection
-     */
-    def apply(tableModel: Model[Property]): Option[T]
     
     
     // OTHER METHODS    -----------------------

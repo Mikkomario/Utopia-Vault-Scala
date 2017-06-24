@@ -9,13 +9,14 @@ import utopia.vault.sql.Update
 import utopia.vault.sql.Where
 import utopia.vault.sql.Insert
 import utopia.vault.sql.Condition
+import utopia.flow.generic.ModelConvertible
 
 /**
  * Storable instances can be stored into a database table.
  * @author Mikko Hilpinen
  * @since 10.6.2017
  */
-trait Storable
+trait Storable extends ModelConvertible
 {
     // ABSTRACT PROPERTIES & METHODS    --------------
     
@@ -32,6 +33,8 @@ trait Storable
     
     // COMPUTED PROPERTIES    ------------------------
     
+    override def toModel = Model(valueProperties, new DeclarationConstantGenerator(declaration))
+    
     /**
      * The index of this storable instance. Index is the primary method way to identify the 
      * instance in database context.
@@ -44,31 +47,8 @@ trait Storable
      */
     def declaration = table.toModelDeclaration
     
-    def toModel = Model(valueProperties, new DeclarationConstantGenerator(declaration))
-    
     
     // OTHER METHODS    ------------------------------
-    
-    /**
-     * Generates a model that represents this storable instance
-     * @param includeEmpty should empty property values be included in the final model. 
-     * Default is false.
-     */
-    /*
-    def toModel(includeEmpty: Boolean = false) = 
-    {
-        val generator = new DeclarationConstantGenerator(declaration)
-        
-        
-        /*        
-        val properties = table.columns.flatMap(column => 
-        {
-            val value = valueForProperty(column.name)
-            if (value.isEmpty && !includeEmpty) None else Some((column.name, value))
-        })
-        
-        Model(properties, new DeclarationConstantGenerator(declaration))*/
-    }*/
     
     /**
      * Converts this storable instance's properties into a condition. The condition checks that 
@@ -77,13 +57,20 @@ trait Storable
      * @return a condition based on this storable instance. None if the instance didn't contain 
      * any properties that could be used for forming a condition
      */
-    def toCondition() = 
+    def toCondition(limitKeys: String*) = 
     {
         val model = toModel
         val conditions = table.columns.flatMap(column => 
         {
-            val value = model(column.name)
-            if (value.isEmpty) None else Some(column <=> value)
+            if (limitKeys.isEmpty || limitKeys.exists { column.name.equalsIgnoreCase })
+            {
+                val value = model(column.name)
+                if (value.isEmpty) None else Some(column <=> value)
+            }
+            else 
+            {
+                None
+            }
         })
         
         conditions.headOption.map { _ && conditions.tail }
