@@ -20,12 +20,19 @@ object SqlSegment
      */
     def combine(segments: Seq[SqlSegment], sqlReduce: (String, String) => String = { _ + " " + _ }) = 
     {
-        val sql = segments.view.map { _.sql }.reduceLeft(sqlReduce)
-        val databaseName = segments.view.flatMap { _.databaseName }.headOption
-        
-        SqlSegment(sql, segments.flatMap { _.values }, databaseName, 
-                segments.flatMap { _.targetTables }.toSet, segments.exists { _.isSelect }, 
-                segments.exists { _.generatesKeys })
+        if (segments.isEmpty)
+        {
+            SqlSegment.empty
+        }
+        else
+        {
+            val sql = segments.view.map { _.sql }.reduceLeft(sqlReduce)
+            val databaseName = segments.view.flatMap { _.databaseName }.headOption
+            
+            SqlSegment(sql, segments.flatMap { _.values }, databaseName, 
+                    segments.flatMap { _.targetTables }.toSet, segments.exists { _.isSelect }, 
+                    segments.exists { _.generatesKeys })
+        }
     }
 }
 
@@ -49,7 +56,8 @@ case class SqlSegment(val sql: String, val values: Seq[Value] = Vector(),
     /**
      * A textual description of the seqment. Contains the sql string as well as the included values
      */
-    def description = s"sql: $toString\nvalues: ${values.map { _.description }.reduce(_ + ", " + _)}"
+    def description = s"sql: $toString${if (values.isEmpty) "" else "\nvalues: " + 
+            values.map { _.description }.reduce(_ + ", " + _)}"
     
     /**
      * Whether the segment is considered to be empty (no-op)
