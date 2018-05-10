@@ -8,8 +8,7 @@ import scala.collection.immutable.HashSet
 
 /**
  * This object is used for creating join sql segments that allow selection and manipulation of 
- * multiple tables at once. Some of the methods in this object use the References -interface, 
- * which should be properly set up before it is used.
+ * multiple tables at once.
  * @author Mikko Hilpinen
  * @since 30.5.2017
  */

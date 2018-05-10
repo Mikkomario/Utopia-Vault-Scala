@@ -4,6 +4,7 @@ import utopia.flow.datastructure.immutable.Value
 import utopia.vault.model.Table
 import scala.collection.immutable.HashSet
 import scala.Vector
+import utopia.vault.database.Connection
 
 object SqlSegment
 {
@@ -87,4 +88,12 @@ case class SqlSegment(val sql: String, val values: Seq[Value] = Vector(),
      * of this segment. A whitespace character is added between the two segments.
      */
     def prepend(sql: String) = copy(sql = sql + " " + this.sql)
+    
+    
+    // OTHER METHODS    ----------------
+    
+    /**
+     * Runs this sql segment / statement over a database connection
+     */
+    def execute()(implicit connection: Connection) = connection(this)
 }

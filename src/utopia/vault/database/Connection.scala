@@ -375,7 +375,7 @@ class Connection(initialDBName: Option[String] = None)
     private def generatedKeysFromResult(statement: Statement, tables: Traversable[Table]) = 
     {
         // Retrieves keys as ints if all of the tables (that use indexing) use int as key type
-        val useInt = tables.forall { _.primaryColumn.map { _.dataType == IntType }.getOrElse(true) }
+        val useInt = tables.forall { _.primaryColumn.forall { _.dataType == IntType } }
         val results = statement.getGeneratedKeys()
         val keyBuffer = Vector.newBuilder[Value]
         
