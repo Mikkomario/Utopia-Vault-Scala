@@ -1,5 +1,8 @@
 package utopia.vault.database
 
+import utopia.flow.generic.ValueConversions._
+import utopia.vault.sql.Extensions._
+
 import utopia.vault.model.Table
 import utopia.vault.model.Column
 import utopia.flow.generic.StringType
@@ -12,8 +15,8 @@ import utopia.vault.sql.ConditionElement
 import utopia.flow.datastructure.template.Model
 import utopia.flow.datastructure.template.Property
 import utopia.vault.model.References
-import utopia.flow.generic.ValueConversions._
 import utopia.vault.sql.ConditionValue
+import utopia.vault.model.Reference
 
 /**
  * This object can be used for reading and setting up table references by reading them directly 
@@ -45,14 +48,14 @@ object DatabaseReferenceReader
         else 
         {
             val databaseName = tables.head.databaseName
-            // TODO: Consider making this easier using proper implicit conversions
-            val tableOptions = tables.map { table => new ConditionValue(table.name) }.toSeq
+            val tableOptions = tables.map(_.name: ConditionElement).toSeq
             val results = connection(Select(keys, keys.columns) + Where(
                     keys("schema") <=> databaseName && 
                     keys("tableName").in(tableOptions) && 
-                    keys("referencedTableName").in(tableOptions))).rows.map { _.toModel }
+                    keys("referencedTableName").in(tableOptions))).rows.map(_.toModel)
             
-            def findTable(keyName: String, row: Model[Property]) = tables.find { _.name == row(keyName).stringOr() }.get
+            def findTable(keyName: String, row: Model[Property]) = tables.find(
+                    _.name == row(keyName).stringOr()).get
             def findColumn(table: Table, keyName: String, row: Model[Property]) = 
                     table.columnWithColumnName(row(keyName).stringOr())
             
@@ -63,7 +66,7 @@ object DatabaseReferenceReader
                 val targetTable = findTable("referencedTableName", row)
                 val targetColumn = findColumn(targetTable, "referencedColumnName", row)
                 
-                (sourceTable, sourceColumn, targetTable, targetColumn)
+                Reference(sourceTable, sourceColumn, targetTable, targetColumn)
             } )
         }
     }
@@ -77,7 +80,7 @@ object DatabaseReferenceReader
      */
     def setupReferences(tables: Set[Table])(implicit connection: Connection) = 
     {
-        val tablesForDatabase = tables.groupBy { _.databaseName }
+        val tablesForDatabase = tables.groupBy(_.databaseName)
         tablesForDatabase.foreach { case (dbName, tables) => 
                 References.setup(dbName, apply(tables)(connection).toSet) }
     }

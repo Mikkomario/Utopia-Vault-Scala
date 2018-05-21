@@ -37,9 +37,9 @@ trait SqlTarget
     def join(table: Table, joinType: JoinType = Inner) = 
     {
         // Finds the first table referencing the provided table and uses that for a join
-        toSqlSegment.targetTables.view.map { 
-            left => References.between(left, table) }.find { !_.isEmpty }.map { 
-            matches => this + Join(matches.head._1, table, matches.head._2, joinType)}.getOrElse(this)
+        toSqlSegment.targetTables.view.map(left => References.columnsBetween(left, table)).find(
+                !_.isEmpty).map(matches => this + Join(matches.head._1, table, matches.head._2, 
+                joinType)).getOrElse(this)
     }
     
     /**
@@ -49,8 +49,7 @@ trait SqlTarget
      */
     def joinFrom(column: Column, joinType: JoinType = Inner) = 
     {
-        toSqlSegment.targetTables.find { _.contains(column) }.flatMap { 
-                References.from(_, column) }.map { case (targetTable, targetColumn) => 
-                this + Join(column, targetTable, targetColumn, joinType) }.getOrElse(this)
+        toSqlSegment.targetTables.find(_.contains(column)).flatMap(References.from(_, column)).map(
+                target => this + Join(column, target.table, target.column, joinType)).getOrElse(this)
     }
 }

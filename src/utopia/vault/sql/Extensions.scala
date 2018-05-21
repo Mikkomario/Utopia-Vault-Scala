@@ -14,4 +14,6 @@ object Extensions
      * Wraps a value into a condition element
      */
     implicit def valueToConditionElement[T](value: T)(implicit f: T => Value): ConditionElement = new ConditionValue(value)
+    
+    
 }

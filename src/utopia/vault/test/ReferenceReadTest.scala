@@ -19,10 +19,10 @@ object ReferenceReadTest extends App
         val readReferences = DatabaseReferenceReader(HashSet(TestTables.person, TestTables.strength))
         
         assert(readReferences.size == 1)
-        assert(readReferences.head._1 == TestTables.strength)
-        assert(readReferences.head._3 == TestTables.person)
-        assert(readReferences.head._2 == TestTables.strength("ownerId"))
-        assert(readReferences.head._4 == TestTables.person.primaryColumn.get)
+        assert(readReferences.head.from.table == TestTables.strength)
+        assert(readReferences.head.to.table == TestTables.person)
+        assert(readReferences.head.from.column == TestTables.strength("ownerId"))
+        assert(readReferences.head.to.column == TestTables.person.primaryColumn.get)
         
         println("Success!")
     })
