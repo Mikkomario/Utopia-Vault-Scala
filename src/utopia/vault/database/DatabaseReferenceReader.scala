@@ -27,11 +27,11 @@ import utopia.vault.model.Reference
 object DatabaseReferenceReader
 {
     private val keys = new Table("KEY_COLUMN_USAGE", "INFORMATION_SCHEMA", Vector(
-            new Column("schema", "TABLE_SCHEMA", "KEY_COLUMN_USAGE", StringType), 
-            new Column("tableName", "TABLE_NAME", "KEY_COLUMN_USAGE", StringType), 
-            new Column("columnName", "COLUMN_NAME", "KEY_COLUMN_USAGE", StringType), 
-            new Column("referencedTableName", "REFERENCED_TABLE_NAME", "KEY_COLUMN_USAGE", StringType), 
-            new Column("referencedColumnName", "REFERENCED_COLUMN_NAME", "KEY_COLUMN_USAGE", StringType)))
+            new Column("schema", "TABLE_SCHEMA", "KEY_COLUMN_USAGE", StringType, false), 
+            new Column("tableName", "TABLE_NAME", "KEY_COLUMN_USAGE", StringType, true), 
+            new Column("columnName", "COLUMN_NAME", "KEY_COLUMN_USAGE", StringType, true), 
+            new Column("referencedTableName", "REFERENCED_TABLE_NAME", "KEY_COLUMN_USAGE", StringType, true), 
+            new Column("referencedColumnName", "REFERENCED_COLUMN_NAME", "KEY_COLUMN_USAGE", StringType, true)))
     
     /**
      * Reads all references between the provided tables

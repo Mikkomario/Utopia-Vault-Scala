@@ -13,7 +13,7 @@ import utopia.vault.sql.Condition
  * @since 8.3.2017
  */
 class Column(propertyName: String, val columnName: String, val tableName: String, 
-        dataType: DataType, defaultValue: Option[Value] = None, 
+        dataType: DataType, val allowsNull: Boolean = true, defaultValue: Option[Value] = None, 
         val isPrimary: Boolean = false, val usesAutoIncrement: Boolean = false) 
         extends PropertyDeclaration(propertyName, dataType, defaultValue) with ConditionElement
 {

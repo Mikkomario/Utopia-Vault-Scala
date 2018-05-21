@@ -35,7 +35,7 @@ object DatabaseTableReader
             val isPrimary = "pri" == data.getOrElse("COLUMN_KEY", data("Key")).toLowerCase
             val usesAutoIncrement = "auto_increment" == data.getOrElse("EXTRA", data("Extra")).toLowerCase
             val dataType = SqlTypeInterpreterManager(data.getOrElse("COLUMN_TYPE", data("Type"))).getOrElse(AnyType)
-            // val nullAllowed = "yes" == data("Null").toLowerCase
+            val nullAllowed = "yes" == data("Null").toLowerCase
             
             val defaultString = data.getOrElse("COLUMN_DEFAULT", data.getOrElse("Default", "null"))
             val defaultValue = if (defaultString.toLowerCase == "null" || 
@@ -43,7 +43,7 @@ object DatabaseTableReader
                     else defaultString.castTo(dataType);
             
             new Column(columnNameToPropertyName(columnName), columnName, tableName, dataType, 
-                    defaultValue, isPrimary, usesAutoIncrement)
+                    nullAllowed, defaultValue, isPrimary, usesAutoIncrement)
         } )
         
         new Table(tableName, databaseName, columns)

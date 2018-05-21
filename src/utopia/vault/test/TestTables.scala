@@ -18,17 +18,17 @@ object TestTables
 {
     // TODO: Make it so that default values are generated only when asked?
     val person = new Table("person", "vault_test", Vector(
-            new Column("rowId", "row_id", "person", IntType, None, true, true), 
-            new Column("name", "name", "person", StringType), 
-            new Column("age", "age", "person", IntType), 
-            new Column("isAdmin", "is_admin", "person", BooleanType, Some(false)), 
-            new Column("created", "created", "person", InstantType)))
+            new Column("rowId", "row_id", "person", IntType, false, None, true, true), 
+            new Column("name", "name", "person", StringType, false), 
+            new Column("age", "age", "person", IntType, true), 
+            new Column("isAdmin", "is_admin", "person", BooleanType, true, Some(false)), 
+            new Column("created", "created", "person", InstantType, false)))
     
     val strength = new Table("strength", "vault_test", Vector(
-            new Column("rowId", "row_id", "strength", IntType, None, true, true), 
-            new Column("ownerId", "owner_id", "strength", IntType), 
-            new Column("name", "name", "strength", StringType), 
-            new Column("powerLevel", "power_level", "strength", IntType)))
+            new Column("rowId", "row_id", "strength", IntType, false, None, true, true), 
+            new Column("ownerId", "owner_id", "strength", IntType, false), 
+            new Column("name", "name", "strength", StringType, false), 
+            new Column("powerLevel", "power_level", "strength", IntType, true)))
     
     // Also records references
     References.setup((strength, "ownerId", person, "rowId"))
