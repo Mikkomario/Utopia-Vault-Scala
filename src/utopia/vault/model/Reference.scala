@@ -1,5 +1,7 @@
 package utopia.vault.model
 
+import utopia.vault.sql.Join
+
 object Reference
 {
     /**
@@ -30,3 +32,9 @@ object Reference
 * @since 21.5.2018
 **/
 case class Reference(val from: ReferencePoint, val to: ReferencePoint)
+{
+    /**
+     * This reference as a valid sql target that includes two tables
+     */
+    def toSqlTarget = from.table + Join(from.column, to)    
+}
