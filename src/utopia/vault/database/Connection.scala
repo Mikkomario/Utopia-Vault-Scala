@@ -20,6 +20,7 @@ import scala.collection.immutable.VectorBuilder
 import scala.util.Try
 import utopia.flow.generic.IntType
 import utopia.flow.generic.ValueConversions._
+import utopia.vault.sql.SqlSegment
 
 object Connection
 {
@@ -185,6 +186,11 @@ class Connection(initialDBName: Option[String] = None)
     
     
     // OTHER METHODS    -------------
+    
+    /**
+     * Tries to execute a statement. Wraps the results in a try
+     */
+    def tryExec(statement: SqlSegment) = Try(this(statement))
     
     /**
      * Opens a new database connection. This is done automatically when the connection is used, too

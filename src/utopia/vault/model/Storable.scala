@@ -48,6 +48,11 @@ trait Storable extends ModelConvertible
      */
     def declaration = table.toModelDeclaration
     
+    /**
+     * A condition for finding the row for this storable's index
+     */
+    def indexCondition = table.primaryColumn.map(_ <=> index)
+    
     
     // OTHER METHODS    ------------------------------
     
@@ -118,16 +123,13 @@ trait Storable extends ModelConvertible
      */
     def update(writeNulls: Boolean = false)(implicit connection: Connection) = 
     {
-        val index = this.index
-        if (index.isDefined)
+        indexCondition.map
         {
-            connection(toUpdateStatement(writeNulls) + Where(table.primaryColumn.get <=> index))
-            true
-        }
-        else 
-        {
-            false
-        }
+            cond => 
+                connection(toUpdateStatement(writeNulls) + Where(cond))
+                true
+                
+        } getOrElse false
     }
     
     /**
@@ -154,24 +156,19 @@ trait Storable extends ModelConvertible
      */
     def updateProperties(propertyNames: Traversable[String])(implicit connection: Connection) = 
     {
-        val index = this.index
-        if (index.isDefined)
+        indexCondition.map
         {
-            val update = updateStatementForProperties(propertyNames)
-            if (update.isEmpty)
-            {
-                false
-            }
-            else 
-            {
-                connection(update + Where(table.primaryColumn.get <=> index))
-                true
-            }
-        }
-        else
-        {
-            false
-        }
+            cond => 
+                val update = updateStatementForProperties(propertyNames)
+                if (update.isEmpty) 
+                    false 
+                else
+                {
+                    connection(update + Where(cond))
+                    true
+                }
+                
+        } getOrElse false
     }
     
     /**
