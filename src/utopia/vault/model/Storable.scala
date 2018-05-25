@@ -11,6 +11,7 @@ import utopia.vault.sql.Insert
 import utopia.vault.sql.Condition
 import utopia.flow.generic.ModelConvertible
 import utopia.vault.sql.SqlSegment
+import utopia.vault.sql.Delete
 
 /**
  * Storable instances can be stored into a database table.
@@ -223,4 +224,11 @@ trait Storable extends ModelConvertible
             Value.empty()
         }
     }
+    
+    /**
+     * Deletes this storable instance from the database. If the storable has no index, this 
+     * method does nothing
+     */
+    def delete()(implicit connection: Connection) = indexCondition.map(
+            Delete(table) + Where(_)).foreach(connection.apply)
 }

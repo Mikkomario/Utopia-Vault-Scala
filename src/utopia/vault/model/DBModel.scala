@@ -1,19 +1,21 @@
 package utopia.vault.model
 
 import utopia.flow.datastructure.template
+import utopia.flow.datastructure.immutable
 
 import utopia.flow.datastructure.mutable.Model
 import utopia.flow.datastructure.mutable.Variable
 import utopia.flow.generic.DeclarationVariableGenerator
 import utopia.flow.datastructure.immutable.Value
 import utopia.flow.datastructure.template.Property
+import utopia.flow.datastructure.immutable.Constant
 
-object StorableModel
+object DBModel
 {
     /**
      * Creates a new factory for storable models of a certain table
      */
-    def makeFactory(table: Table) = new StorableModelFactory(table)
+    def makeFactory(table: Table) = new DBModelFactory(table)
 }
 
 /**
@@ -21,28 +23,24 @@ object StorableModel
 * @author Mikko Hilpinen
 * @since 22.5.2018
 **/
-class StorableModel(override val table: Table) extends Model[Variable](
-        new DeclarationVariableGenerator(table.toModelDeclaration)) with Storable
+class DBModel(override val table: Table) extends Model[Variable](
+        new DeclarationVariableGenerator(table.toModelDeclaration)) with Storable with Readable
 {
     // COMPUTED    -------------------
     
 	override def valueProperties = attributes.map(v => v.name -> v.value)
 	
-	/**
-	 * Updates the index for this model
-	 */
-	def index_=(newIndex: Value) = table.primaryColumn.foreach(
-	        c => this += new Variable(c.name, newIndex))
+	override def set(data: immutable.Model[Constant]) = update(data)
 }
 
 /**
  * These factories are used for constructing storable models from table data
  */
-class StorableModelFactory(val table: Table) extends StorableFactory[StorableModel]
+class DBModelFactory(val table: Table) extends StorableFactory[DBModel]
 {
     def apply(model: template.Model[Property]) = 
     {
-        val storable = new StorableModel(table)
+        val storable = new DBModel(table)
         storable ++= model.attributes.map(p => new Variable(p.name, p.value))
         
         Some(storable)

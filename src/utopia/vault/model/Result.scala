@@ -23,6 +23,12 @@ class Result(val rows: Vector[Row], val generatedKeys: Vector[Value] = Vector())
     def rowModels = rows.map { _.toModel }
     
     /**
+     * The data of the first result row in model format. This should be used only when no joins 
+     * were present in the query and each row contains data from a single table only
+     */
+    def firstModel = rows.headOption.map(_.toModel)
+    
+    /**
      * Whether this result is empty and doesn't contain any meaningful data
      */
     def isEmpty = generatedKeys.isEmpty && rows.forall { _.isEmpty }

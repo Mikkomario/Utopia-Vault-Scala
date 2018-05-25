@@ -34,15 +34,10 @@ object Select
             apply(target, Vector(first, second) ++ more);
     
     /**
-     * Creates an sql segment that selects a column with a matching property name from a table
+     * Creates an sql segment that selects one or multiple properties from a single table
      */
-    def apply(table: Table, propertyName: String): SqlSegment = apply(table, table.find(propertyName).toSeq);
-    
-    /**
-     * Creates an sql segment that selects multiple columns matching property names from a table
-     */
-    def apply(table: Table, first: String, second: String, more: String*): SqlSegment = 
-            apply(table, (Vector(first, second) ++ more).flatMap { table(_) });
+    def apply(table: Table, firstName: String, moreNames: String*): SqlSegment = 
+            apply(table, table(firstName +: moreNames))
     
     
     // OTHER METHODS    -------------
