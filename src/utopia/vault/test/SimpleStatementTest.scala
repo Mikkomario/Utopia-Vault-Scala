@@ -34,7 +34,7 @@ object SimpleStatementTest extends App
         assert(countRows == 0)
         
         val testModel = Model(Vector("name" -> "SimpleStatementTest"))
-        connection(Insert(table, Vector(testModel, testModel, testModel)))
+        connection(Insert(table, Vector(testModel, testModel, testModel)).get)
         
         assert(countRows == 3)
         assert(connection(Select.nothing(table)).rows.size == 3)
@@ -45,10 +45,10 @@ object SimpleStatementTest extends App
         assert(connection(Select(table, table.columns)) == result)
         assert(connection(Select(table, "name")).rows.head.toModel("name") == "SimpleStatementTest".toValue)
         
-        connection(Update(table, "age", 22))
+        connection(Update(table, "age", 22).get)
         assert(connection(Select(table, "age")).rows.head.toModel("age") == 22.toValue)
         
-        connection(Insert(table, Model(Vector("name" -> "Last", "age" -> 2, "isAdmin" -> true))))
+        connection(Insert(table, Model(Vector("name" -> "Last", "age" -> 2, "isAdmin" -> true))).get)
         assert(connection(SelectAll(table) + OrderBy(table("age")) + Limit(1)
                 ).rows.head.toModel("name") == "Last".toValue);
         

@@ -15,7 +15,7 @@ object Delete
      * tables must be included in the provided target.
      * @param target The target for the delete operation, may be a single table or join, but must 
      * contain all deleted tables.
-     * @param deletedTables The tables from which rows are deleted
+     * @param deletedTables The tables from which rows are deleted (shouldn't be empty)
      */
     def apply(target: SqlTarget, deletedTables: Seq[Table]) = 
             if (deletedTables.isEmpty) SqlSegment.empty else SqlSegment(

@@ -20,6 +20,7 @@ object Insert
      * @param table the table into which the rows are inserted
      * @param rows models representing rows in the table. Only properties with values and which 
      * match those of the table are used
+     * @return An insert segment. None if there was nothing to insert
      */
     def apply(table: Table, rows: Vector[Model[Property]]) = 
     {
@@ -30,9 +31,7 @@ object Insert
                 table.find(_).exists { !_.usesAutoIncrement } } }.toVector
         
         if (insertedPropertyNames.isEmpty)
-        {
-            SqlSegment.empty
-        }
+            None
         else 
         {
             val columnNames = insertedPropertyNames.map { table(_).columnName }.reduce(_ + ", " + _)
@@ -41,8 +40,8 @@ object Insert
             
             val values = rows.flatMap { model => insertedPropertyNames.map { model(_) } }
             
-            SqlSegment(s"INSERT INTO ${table.name} ($columnNames) VALUES $valuesSql", values, 
-                    Some(table.databaseName), HashSet(table), false, table.usesAutoIncrement)
+            Some(SqlSegment(s"INSERT INTO ${table.name} ($columnNames) VALUES $valuesSql", values, 
+                    Some(table.databaseName), HashSet(table), false, table.usesAutoIncrement))
         }
     }
     
@@ -51,14 +50,16 @@ object Insert
      * @param table The table to which the row is inserted
      * @param row the row that is inserted to the table. Only properties matching table columns are
      * used
+     * @return An insert segment. None if there was nothing to insert
      */
-    def apply(table: Table, row: Model[Property]): SqlSegment = apply(table, Vector(row))
+    def apply(table: Table, row: Model[Property]): Option[SqlSegment] = apply(table, Vector(row))
     
     /**
      * Creates a new statement that inserts multiple rows into an sql database. This statement is
      * generally not combined with other statements and targets a single table only
      * @param table the table into which the rows are inserted
+     * @return An insert segment. None if there was nothing to insert
      */
     def apply(table: Table, first: Model[Property], second: Model[Property], 
-            more: Model[Property]*): SqlSegment = apply(table, Vector(first, second) ++ more);
+            more: Model[Property]*): Option[SqlSegment] = apply(table, Vector(first, second) ++ more);
 }

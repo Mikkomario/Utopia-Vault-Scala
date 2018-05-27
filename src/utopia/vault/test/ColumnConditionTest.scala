@@ -25,49 +25,46 @@ object ColumnConditionTest extends App
     
     val table = TestTables.person
     
-    val connection = new Connection()
-    try
+    Connection.doTransaction
     {
-        // Empties the table, like usually
-        connection(Delete(table))
+        implicit connection => 
         
-        // Inserts various rows
-        val test1 = Model(Vector("name" -> "test 1", "age" -> 31, "isAdmin" -> true))
-        val test2 = Model(Vector("name" -> "test 2", "age" -> 32))
-        val test3 = Model(Vector("name" -> "test 3", "age" -> 3))
-        val test4 = Model(Vector("name" -> "test 4"))
-        
-        connection(Insert(table, test1, test2, test3, test4))
-        
-        def countRows(condition: Condition) = connection(SelectAll(table) + Where(condition)).rows.size
-        
-        val isAdminColumn = table("isAdmin")
-        assert(countRows(isAdminColumn <=> true) == 1)
-        
-        val ageColumn = table("age")
-        assert(countRows(ageColumn > 31) == 1)
-        assert(countRows(ageColumn >= 31) == 2)
-        assert(countRows(ageColumn < 31) == 1)
-        assert(countRows(ageColumn <= 31) == 2)
-        assert(countRows(ageColumn <=> 31) == 1)
-        assert(countRows(ageColumn <> 31) == 2)
-        
-        assert(countRows(ageColumn.isNull) == 1)
-        assert(countRows(ageColumn <=> Value.empty()) == 1)
-        assert(countRows(ageColumn.isNotNull) == 3)
-        assert(countRows(ageColumn <> Value.empty()) == 3)
-        
-        assert(countRows(isAdminColumn <=> true || (ageColumn < 5)) == 2)
-        assert(countRows(ageColumn > 5 && (ageColumn < 32)) == 1)
-        assert(countRows(!ageColumn.isNull) == 3)
-        
-        assert(countRows(ageColumn.in(Vector(31, 32))) == 2)
-        assert(countRows(ageColumn.isBetween(1, 31)) == 2)
-        
-        println("Success!")
-    }
-    finally
-    {
-        connection.close()
+            // Empties the table, like usually
+            Delete(table).execute()
+            
+            // Inserts various rows
+            val test1 = Model(Vector("name" -> "test 1", "age" -> 31, "isAdmin" -> true))
+            val test2 = Model(Vector("name" -> "test 2", "age" -> 32))
+            val test3 = Model(Vector("name" -> "test 3", "age" -> 3))
+            val test4 = Model(Vector("name" -> "test 4"))
+            
+            Insert(table, test1, test2, test3, test4).foreach(_.execute())
+            
+            def countRows(condition: Condition) = connection(SelectAll(table) + Where(condition)).rows.size
+            
+            val isAdminColumn = table("isAdmin")
+            assert(countRows(isAdminColumn <=> true) == 1)
+            
+            val ageColumn = table("age")
+            assert(countRows(ageColumn > 31) == 1)
+            assert(countRows(ageColumn >= 31) == 2)
+            assert(countRows(ageColumn < 31) == 1)
+            assert(countRows(ageColumn <= 31) == 2)
+            assert(countRows(ageColumn <=> 31) == 1)
+            assert(countRows(ageColumn <> 31) == 2)
+            
+            assert(countRows(ageColumn.isNull) == 1)
+            assert(countRows(ageColumn <=> Value.empty()) == 1)
+            assert(countRows(ageColumn.isNotNull) == 3)
+            assert(countRows(ageColumn <> Value.empty()) == 3)
+            
+            assert(countRows(isAdminColumn <=> true || (ageColumn < 5)) == 2)
+            assert(countRows(ageColumn > 5 && (ageColumn < 32)) == 1)
+            assert(countRows(!ageColumn.isNull) == 3)
+            
+            assert(countRows(ageColumn.in(Vector(31, 32))) == 2)
+            assert(countRows(ageColumn.isBetween(1, 31)) == 2)
+            
+            println("Success!")
     }
 }

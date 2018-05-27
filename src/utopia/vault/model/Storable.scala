@@ -102,12 +102,12 @@ trait Storable extends ModelConvertible
         }
         else if (table.usesAutoIncrement) 
         {
-            connection(Insert(table, toModel)).generatedKeys.headOption.getOrElse(Value.empty())
+            Insert(table, toModel).flatMap(_.execute().generatedKeys.headOption).getOrElse(Value.empty())
         }
         else if (table.primaryColumn.isEmpty)
         {
             // If the table doesn't have an index, just inserts every time
-            connection(Insert(table, toModel))
+            Insert(table, toModel).foreach(_.execute())
             Value.empty()
         }
         else 
@@ -124,13 +124,10 @@ trait Storable extends ModelConvertible
      */
     def update(writeNulls: Boolean = false)(implicit connection: Connection) = 
     {
-        indexCondition.map
-        {
-            cond => 
-                connection(toUpdateStatement(writeNulls) + Where(cond))
-                true
-                
-        } getOrElse false
+        val update = indexCondition.flatMap(cond => toUpdateStatement(writeNulls).map(_ + Where(cond)))
+        
+        update.foreach(_.execute())
+        update.isDefined
     }
     
     /**
@@ -157,19 +154,10 @@ trait Storable extends ModelConvertible
      */
     def updateProperties(propertyNames: Traversable[String])(implicit connection: Connection) = 
     {
-        indexCondition.map
-        {
-            cond => 
-                val update = updateStatementForProperties(propertyNames)
-                if (update.isEmpty) 
-                    false 
-                else
-                {
-                    connection(update + Where(cond))
-                    true
-                }
-                
-        } getOrElse false
+        val update = indexCondition.flatMap(cond => updateStatementForProperties(propertyNames).map(
+                _ + Where(cond)));
+        update.foreach(_.execute())
+        update.isDefined
     }
     
     /**
@@ -193,7 +181,7 @@ trait Storable extends ModelConvertible
     /**
      * Creates an update statement that updates only the specified properties
      */
-    def updateStatementForProperties(name1: String, more: String*): SqlSegment = 
+    def updateStatementForProperties(name1: String, more: String*): Option[SqlSegment] = 
             updateStatementForProperties(Vector(name1) ++ more);
     
     /**
@@ -210,8 +198,9 @@ trait Storable extends ModelConvertible
         {
             if (table.usesAutoIncrement)
             {
-                connection(Insert(table, toModel - primaryColumn.get.name)
-                        ).generatedKeys.headOption.getOrElse(Value.empty(primaryColumn.get.dataType))
+                Insert(table, toModel - primaryColumn.get.name).flatMap(
+                        _.execute().generatedKeys.headOption) getOrElse 
+                        Value.empty(primaryColumn.get.dataType);
             }
             else 
             {
@@ -220,7 +209,7 @@ trait Storable extends ModelConvertible
         }
         else
         {
-            connection(Insert(table, toModel))
+            Insert(table, toModel).foreach(_.execute())
             Value.empty()
         }
     }
@@ -230,5 +219,5 @@ trait Storable extends ModelConvertible
      * method does nothing
      */
     def delete()(implicit connection: Connection) = indexCondition.map(
-            Delete(table) + Where(_)).foreach(connection.apply)
+            Delete(table) + Where(_)).foreach(_.execute())
 }
