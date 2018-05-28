@@ -16,7 +16,7 @@ import utopia.flow.generic.FromModelFactory
  * @author Mikko Hilpinen
  * @since 18.6.2017
  */
-trait StorableFactory[T] extends FromModelFactory[T]
+trait StorableFactory[+T] extends FromModelFactory[T]
 {
     // ABSTRACT METHODS    --------------------
     
