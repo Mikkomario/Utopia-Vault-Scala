@@ -88,6 +88,11 @@ class Table(val name: String, val databaseName: String, val columns: Vector[Colu
     def contains(column: Column) = columns.contains(column)
     
     /**
+     * checks whether this table contains a column matching the provided property name
+     */
+    def contains(propertyName: String) = columns.exists(_.name == propertyName)
+    
+    /**
      * Joins a new table, creating a new sql target.
      * @param propertyName the name of a property matching a column in this table, which makes a 
      * reference to another table
