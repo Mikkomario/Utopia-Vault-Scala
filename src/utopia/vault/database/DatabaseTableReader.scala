@@ -38,9 +38,9 @@ object DatabaseTableReader
             val nullAllowed = "yes" == data("Null").toLowerCase
             
             val defaultString = data.getOrElse("COLUMN_DEFAULT", data.getOrElse("Default", "null"))
-            val defaultValue = if (defaultString.toLowerCase == "null" || 
-                    defaultString.toLowerCase == "current_timestamp") None 
+            val defaultValue = if (defaultString.toLowerCase == "null") None 
                     else defaultString.castTo(dataType);
+            // Used to have:  || defaultString.toLowerCase == "current_timestamp"
             
             new Column(columnNameToPropertyName(columnName), columnName, tableName, dataType, 
                     nullAllowed, defaultValue, isPrimary, usesAutoIncrement)

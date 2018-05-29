@@ -29,7 +29,7 @@ class Column(propertyName: String, val columnName: String, val tableName: String
     /**
      * Whether a value is required in this column when data is inserted to the database
      */
-    // def isRequiredInInsert = notNull && !defaultValue.exists { _.isDefined } && !usesAutoIncrement
+    def isRequiredInInsert = !allowsNull && !usesAutoIncrement && defaultValue.isEmpty
     
     /**
      * The name of the column, including the table name for disambiguity
