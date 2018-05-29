@@ -16,6 +16,16 @@ object DBModel
      * Creates a new factory for storable models of a certain table
      */
     def makeFactory(table: Table) = new DBModelFactory(table)
+    
+    /**
+     * Wraps a model into a db model
+     */
+    def apply(table: Table, model: template.Model[Property]) = 
+    {
+        val result = new DBModel(table)
+        result.set(model)
+        result
+    }
 }
 
 /**
@@ -30,7 +40,7 @@ class DBModel(override val table: Table) extends Model[Variable](
     
 	override def valueProperties = attributes.map(v => v.name -> v.value)
 	
-	override def set(data: immutable.Model[Constant]) = update(data)
+	override def set(data: template.Model[Property]) = update(data)
 }
 
 /**

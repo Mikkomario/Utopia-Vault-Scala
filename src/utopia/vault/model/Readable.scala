@@ -1,5 +1,7 @@
 package utopia.vault.model
 
+import utopia.flow.datastructure.template
+
 import utopia.flow.datastructure.immutable.Model
 import utopia.flow.datastructure.immutable.Constant
 import utopia.flow.datastructure.immutable.Value
@@ -9,6 +11,7 @@ import utopia.vault.sql.Where
 import utopia.vault.sql.Select
 import utopia.vault.sql.SqlSegment
 import utopia.vault.sql.Limit
+import utopia.flow.datastructure.template.Property
 
 /**
 * Readable instances can be read / updated from the database. This trait is designed to be used 
@@ -24,7 +27,7 @@ trait Readable extends Storable
      * Updates data in this object. This object may not use all of the data in the update
      * @param data the updated properties
      */
-	def set(data: Model[Constant]): Unit
+	def set(data: template.Model[Property]): Unit
 	
 	
 	// COMPUTED    ---------------------
@@ -72,7 +75,7 @@ trait Readable extends Storable
 	 * Updates data in this object, then pushes all data to the database. May insert a new row. 
 	 * May update the index for this object.
 	 */
-	def setAndPush(data: Model[Constant], writeNulls: Boolean = false)(implicit connection: Connection) = 
+	def setAndPush(data: template.Model[Property], writeNulls: Boolean = false)(implicit connection: Connection) = 
 	{
 	    set(data)
 	    // Updates the index as well
