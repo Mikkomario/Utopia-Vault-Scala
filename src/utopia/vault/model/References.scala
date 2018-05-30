@@ -139,9 +139,15 @@ object References
     }
     
     /**
-     * Finds all references between the two tables
+     * Finds all references from the left table to the right table. Only one sided references 
+     * are included
      */
-    def between(left: Table, right: Table) = from(left) intersect to(right)
+    def fromTo(left: Table, right: Table) = from(left) intersect to(right)
+    
+    /**
+     * Finds all references between the two tables. The reference(s) may point to either direction
+     */
+    def between(a: Table, b: Table) = fromTo(a, b) ++ fromTo(b, a)
     
     /**
      * Finds all tables referenced from a certain table

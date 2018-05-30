@@ -33,8 +33,20 @@ object Reference
 **/
 case class Reference(val from: ReferencePoint, val to: ReferencePoint)
 {
+    // COMPUTED    ----------------------
+    
     /**
      * This reference as a valid sql target that includes two tables
      */
-    def toSqlTarget = from.table + Join(from.column, to)    
+    def toSqlTarget = from.table + Join(from.column, to)
+    
+    /**
+     * The tables that are included in this reference
+     */
+    def tables = Vector(from.table, to.table)
+    
+    /**
+     * The columns that are used by this reference
+     */
+    def columns = Vector(from.column, to.column)
 }
