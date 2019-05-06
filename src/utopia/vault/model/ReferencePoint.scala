@@ -4,11 +4,10 @@ object ReferencePoint
 {
     /**
      * Finds a reference point from a table
-     * @param the table for the reference point
-     * @param the property name for the associated column
+     * @param table the table for the reference point
+     * @param propertyName the property name for the associated column
      */
-    def apply(table: Table, propertyName: String) = table.find(propertyName).map(
-            new ReferencePoint(table, _))
+    def apply(table: Table, propertyName: String): Option[ReferencePoint] = table.find(propertyName).map { ReferencePoint(table, _) }
 }
 
 /**
@@ -16,5 +15,7 @@ object ReferencePoint
 * is targeted by a reference
 * @author Mikko Hilpinen
 * @since 21.5.2018
+  * @param table The table of this reference point
+  * @param column The column of this reference point
 **/
-case class ReferencePoint(val table: Table, val column: Column)
+case class ReferencePoint(table: Table, column: Column)

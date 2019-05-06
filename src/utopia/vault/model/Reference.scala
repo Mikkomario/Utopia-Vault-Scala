@@ -31,7 +31,7 @@ object Reference
 * @author Mikko Hilpinen
 * @since 21.5.2018
 **/
-case class Reference(val from: ReferencePoint, val to: ReferencePoint)
+case class Reference(from: ReferencePoint, to: ReferencePoint)
 {
     // COMPUTED    ----------------------
     

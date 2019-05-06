@@ -12,19 +12,12 @@ import utopia.vault.sql.Condition
  * @author Mikko Hilpinen
  * @since 8.3.2017
  */
-class Column(propertyName: String, val columnName: String, val tableName: String, 
-        dataType: DataType, val allowsNull: Boolean = true, defaultValue: Option[Value] = None, 
-        val isPrimary: Boolean = false, val usesAutoIncrement: Boolean = false) 
-        extends PropertyDeclaration(propertyName, dataType, defaultValue) with ConditionElement
+case class Column(propertyName: String, columnName: String, tableName: String, override val dataType: DataType,
+                  allowsNull: Boolean = true, override val defaultValue: Option[Value] = None,
+                  isPrimary: Boolean = false, usesAutoIncrement: Boolean = false)
+        extends PropertyDeclaration with ConditionElement
 {
     // COMPUTED PROPERTIES    ------------------
-    
-    override def properties = super.properties ++ Vector(columnName, isPrimary, usesAutoIncrement)
-    
-    override def toString = s"$columnName $dataType ${ if (isPrimary) "PRIMARY KEY " else ""} ${
-            if (usesAutoIncrement) "AUTO_INCREMENT " else ""}"
-    
-    override def toSqlSegment = SqlSegment(columnNameWithTable)
             
     /**
      * Whether a value is required in this column when data is inserted to the database
@@ -47,6 +40,16 @@ class Column(propertyName: String, val columnName: String, val tableName: String
     def isNotNull = Condition(SqlSegment(columnNameWithTable + " IS NOT NULL"))
     
     
+    // IMPLEMENTED  -----------------------------
+    
+    def name = propertyName
+    
+    override def toString = s"$columnName $dataType ${ if (isPrimary) "PRIMARY KEY " else ""} ${
+        if (usesAutoIncrement) "AUTO_INCREMENT " else ""}"
+    
+    override def toSqlSegment = SqlSegment(columnNameWithTable)
+    
+    
     // OPERATORS    ----------------------------
     
     /**
@@ -64,6 +67,6 @@ class Column(propertyName: String, val columnName: String, val tableName: String
     
     // OTHER METHODS    ---------------------
     
-    private def makeCondition(operator: String, value: Value) = Condition(
-            SqlSegment(s"$columnNameWithTable $operator ?", Vector(value)));
+    private def makeCondition(operator: String, value: Value) = Condition(SqlSegment(
+        s"$columnNameWithTable $operator ?", Vector(value)))
 }

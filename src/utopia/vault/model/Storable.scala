@@ -1,17 +1,28 @@
 package utopia.vault.model
 
+import utopia.flow.datastructure.template
 import utopia.flow.datastructure.immutable.Value
 import utopia.vault.database.Connection
-import utopia.flow.datastructure.immutable.Constant
 import utopia.flow.datastructure.immutable.Model
+import utopia.flow.datastructure.template.Property
 import utopia.flow.generic.DeclarationConstantGenerator
 import utopia.vault.sql.Update
 import utopia.vault.sql.Where
 import utopia.vault.sql.Insert
-import utopia.vault.sql.Condition
 import utopia.flow.generic.ModelConvertible
 import utopia.vault.sql.SqlSegment
 import utopia.vault.sql.Delete
+
+object Storable
+{
+    /**
+      * Wraps a model into a storable instance
+      * @param table The table the model uses
+      * @param model A model that contains data
+      * @return A new storable instance based on the model
+      */
+    def apply(table: Table, model: template.Model[Property]): Storable = new StorableWrapper(table, model)
+}
 
 /**
  * Storable instances can be stored into a database table.
@@ -35,8 +46,6 @@ trait Storable extends ModelConvertible
     
     // COMPUTED PROPERTIES    ------------------------
     
-    override def toModel = Model(valueProperties, new DeclarationConstantGenerator(declaration))
-    
     /**
      * The index of this storable instance. Index is the primary method way to identify the 
      * instance in database context.
@@ -55,6 +64,11 @@ trait Storable extends ModelConvertible
     def indexCondition = table.primaryColumn.map(_ <=> index)
     
     
+    // IMPLEMENTED  ----------------------------------
+    
+    override def toModel = Model(valueProperties, new DeclarationConstantGenerator(declaration))
+    
+    
     // OTHER METHODS    ------------------------------
     
     /**
@@ -67,20 +81,16 @@ trait Storable extends ModelConvertible
     def toCondition(limitKeys: String*) = 
     {
         val model = toModel
-        val conditions = table.columns.flatMap(column => 
+        val columns = if (limitKeys.isEmpty) table.columns else table.columns.filter {
+            c => limitKeys.exists(c.name.equalsIgnoreCase) }
+        val conditions = columns.flatMap
         {
-            if (limitKeys.isEmpty || limitKeys.exists { column.name.equalsIgnoreCase })
-            {
-                val value = model(column.name)
-                if (value.isEmpty) None else Some(column <=> value)
-            }
-            else 
-            {
-                None
-            }
-        })
+            c =>
+                val value = model(c.name)
+                if (value.isEmpty) None else Some(c <=> value)
+        }
         
-        conditions.headOption.map { _ && conditions.tail }
+        conditions.headOption.map { _ && conditions.drop(1) }
     }
     
     /**
@@ -97,23 +107,17 @@ trait Storable extends ModelConvertible
     {
         // Either inserts as a new row or updates an existing row
         if (update(writeNulls))
-        {
             index
-        }
-        else if (table.usesAutoIncrement) 
-        {
-            Insert(table, toModel).flatMap(_.execute().generatedKeys.headOption).getOrElse(Value.empty())
-        }
+        else if (table.usesAutoIncrement)
+            Insert(table, toModel).flatMap { _.execute().generatedKeys.headOption }.getOrElse(Value.empty())
         else if (table.primaryColumn.isEmpty)
         {
             // If the table doesn't have an index, just inserts every time
-            Insert(table, toModel).foreach(_.execute())
+            Insert(table, toModel).foreach { _.execute() }
             Value.empty()
         }
-        else 
-        {
+        else
             Value.empty()
-        }
     }
     
     /**
@@ -124,9 +128,9 @@ trait Storable extends ModelConvertible
      */
     def update(writeNulls: Boolean = false)(implicit connection: Connection) = 
     {
-        val update = indexCondition.flatMap(cond => toUpdateStatement(writeNulls).map(_ + Where(cond)))
+        val update = indexCondition.flatMap { cond => toUpdateStatement(writeNulls).map { _ + Where(cond) } }
         
-        update.foreach(_.execute())
+        update.foreach { _.execute() }
         update.isDefined
     }
     
@@ -154,9 +158,8 @@ trait Storable extends ModelConvertible
      */
     def updateProperties(propertyNames: Traversable[String])(implicit connection: Connection) = 
     {
-        val update = indexCondition.flatMap(cond => updateStatementForProperties(propertyNames).map(
-                _ + Where(cond)));
-        update.foreach(_.execute())
+        val update = indexCondition.flatMap { cond => updateStatementForProperties(propertyNames).map { _ + Where(cond) } }
+        update.foreach { _.execute() }
         update.isDefined
     }
     
@@ -165,7 +168,7 @@ trait Storable extends ModelConvertible
      * @return whether any update was performed
      */
     def updateProperties(name1: String, more: String*)(implicit connection: Connection): Boolean = 
-            updateProperties(Vector(name1) ++ more);
+            updateProperties(Vector(name1) ++ more)
     
     /**
      * Creates an update statement that updates only the specified properties
@@ -182,7 +185,7 @@ trait Storable extends ModelConvertible
      * Creates an update statement that updates only the specified properties
      */
     def updateStatementForProperties(name1: String, more: String*): Option[SqlSegment] = 
-            updateStatementForProperties(Vector(name1) ++ more);
+            updateStatementForProperties(Vector(name1) ++ more)
     
     /**
      * Pushes storable data to the database, but will always insert the instance as a new row 
@@ -197,19 +200,14 @@ trait Storable extends ModelConvertible
         if (primaryColumn.isDefined)
         {
             if (table.usesAutoIncrement)
-            {
-                Insert(table, toModel - primaryColumn.get.name).flatMap(
-                        _.execute().generatedKeys.headOption) getOrElse 
-                        Value.empty(primaryColumn.get.dataType);
-            }
-            else 
-            {
+                Insert(table, toModel - primaryColumn.get.name).flatMap {_.execute().generatedKeys.headOption } getOrElse
+                        Value.empty(primaryColumn.get.dataType)
+            else
                 Value.empty(primaryColumn.get.dataType)
-            }
         }
         else
         {
-            Insert(table, toModel).foreach(_.execute())
+            Insert(table, toModel).foreach { _.execute() }
             Value.empty()
         }
     }
@@ -218,6 +216,10 @@ trait Storable extends ModelConvertible
      * Deletes this storable instance from the database. If the storable has no index, this 
      * method does nothing
      */
-    def delete()(implicit connection: Connection) = indexCondition.map(
-            Delete(table) + Where(_)).foreach(_.execute())
+    def delete()(implicit connection: Connection) = indexCondition.map { Delete(table) + Where(_) }.foreach { _.execute() }
+}
+
+private class StorableWrapper(override val table: Table, val model: template.Model[Property]) extends Storable
+{
+    override def valueProperties = model.attributes.map { c => c.name -> c.value }
 }

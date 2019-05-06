@@ -25,24 +25,27 @@ object References
      * @param databaseName the name of the database
      * @param references a set of references in the database
      */
-    def setup(databaseName: String, references: Set[Reference]) = 
-            referenceData += (databaseName -> references);
+    def setup(databaseName: String, references: Set[Reference]) = referenceData += (databaseName -> references)
+    
+    /**
+      * Sets up reference data for a single database. Each pair should contain 4 elements:
+      * 1) referencing table, 2) name of the referencing property, 3) referenced table,
+      * 4) name of the referenced property.
+      */
+    def setup(sets: Traversable[(Table, String, Table, String)]): Unit =
+    {
+        // Converts the tuple data into a reference set
+        val references = sets.flatMap { case (table1, name1, table2, name2) => Reference(table1, name1, table2, name2) }
+        referenceData ++= references.groupBy { _.from.table.databaseName }
+    }
     
     /**
      * Sets up reference data for a single database. Each pair should contain 4 elements: 
      * 1) referencing table, 2) name of the referencing property, 3) referenced table, 
      * 4) name of the referenced property.
      */
-    def setup(firstSet: Tuple4[Table, String, Table, String], 
-            more: Tuple4[Table, String, Table, String]*): Unit = 
-    {
-        // Converts the tuple data into a reference set
-        val references = (HashSet(firstSet) ++ more).flatMap { case (table1, name1, table2, name2) => 
-            Reference(table1, name1, table2, name2)
-        }
-        
-        referenceData ++= references.groupBy(_.from.table.databaseName)
-    }
+    def setup(firstSet: (Table, String, Table, String), more: (Table, String, Table, String)*): Unit =
+        setup(HashSet(firstSet) ++ more)
     
     /**
      * Finds a possible reference that is made from the provided reference point (table + column)
@@ -53,7 +56,7 @@ object References
     def from(point: ReferencePoint) = 
     {
         checkIsSetup(point.table.databaseName)
-        referenceData(point.table.databaseName).find(_.from == point).map(_.to)
+        referenceData(point.table.databaseName).find { _.from == point }.map { _.to }
     }
     
     /**
@@ -89,7 +92,7 @@ object References
     /**
      * Finds all places where the provided reference point is referenced
      * @param table the table that contains the column
-     * @param columnn the referenced column
+     * @param column the referenced column
      * @return All reference points that target the specified reference point
      */
     def to(table: Table, column: Column): Set[ReferencePoint] = to(ReferencePoint(table, column))
@@ -97,7 +100,7 @@ object References
     /**
      * Finds all places where the provided reference point is referenced
      * @param table the table that contains the column
-     * @param columnnName the name of the referenced column
+     * @param columnName the name of the referenced column
      * @return All reference points that target the specified reference point
      */
     def to(table: Table, columnName: String): Set[ReferencePoint] = 

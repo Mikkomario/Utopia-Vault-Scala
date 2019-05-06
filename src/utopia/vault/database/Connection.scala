@@ -13,10 +13,8 @@ import utopia.vault.model.Table
 import utopia.flow.datastructure.immutable.Model
 import utopia.flow.datastructure.immutable.Constant
 import scala.collection.immutable.HashSet
-import utopia.vault.sql.SqlSegment
 import utopia.vault.model.Result
 import utopia.vault.model.Row
-import scala.collection.immutable.VectorBuilder
 import scala.util.Try
 import utopia.flow.generic.IntType
 import utopia.flow.generic.ValueConversions._
@@ -49,7 +47,6 @@ object Connection
     /**
      * Creates a temporary database connection for a specific operation. The connection is closed 
      * after the operation completes, even in error situations. No errors are catched though
-     * @param dbName the name of the database that is used. Optional, and may be set later too.
      * @param f The function that is performed and which uses a database connection
      */
     def doTransaction[T](f: Connection => T) = 
@@ -79,7 +76,7 @@ object Connection
  * @author Mikko Hilpinen
  * @since 16.4.2017
  */
-class Connection(initialDBName: Option[String] = None)
+class Connection(initialDBName: Option[String] = None) extends AutoCloseable
 {
     // ATTRIBUTES    -----------------
     
@@ -93,13 +90,11 @@ class Connection(initialDBName: Option[String] = None)
     def dbName = _dbName.orElse(Connection.settings.defaultDBName)
     def dbName_=(databaseName: String) = 
     {
-        if (!dbName.exists { _ == databaseName })
+        if (!dbName.contains(databaseName))
         {
             // Performs a database change, if necessary
-            if (isOpen && !_dbName.exists { _ == databaseName })
-            {
+            if (isOpen && !_dbName.contains(databaseName))
                 execute(s"USE $databaseName")
-            }
             
             _dbName = Some(databaseName)
         }
@@ -114,7 +109,7 @@ class Connection(initialDBName: Option[String] = None)
     /**
      * Whether the connection to the database has already been established
      */
-    def isOpen = _connection.exists { !_.isClosed() }
+    def isOpen = _connection.exists { !_.isClosed }
     
     
     // OPERATORS    -----------------
@@ -150,7 +145,7 @@ class Connection(initialDBName: Option[String] = None)
             returnGeneratedKeys: Boolean = false) = 
     {
         // Empty statements are not executed
-        if (sql.isEmpty())
+        if (sql.isEmpty)
         {
             new Result(Vector())
         }
@@ -161,9 +156,8 @@ class Connection(initialDBName: Option[String] = None)
             try
             {
                 // Creates the statement
-                statement = Some(connection.prepareStatement(sql, 
-                        if (returnGeneratedKeys) Statement.RETURN_GENERATED_KEYS 
-                        else Statement.NO_GENERATED_KEYS));
+                statement = Some(connection.prepareStatement(sql,
+                        if (returnGeneratedKeys) Statement.RETURN_GENERATED_KEYS else Statement.NO_GENERATED_KEYS))
                 
                 // Inserts provided values
                 setValues(statement.get, values)
@@ -233,7 +227,7 @@ class Connection(initialDBName: Option[String] = None)
     /**
      * Closes this database connection. This should be called before the connection is discarded
      */
-    def close()
+    override def close()
     {
         try
         {
@@ -255,7 +249,7 @@ class Connection(initialDBName: Option[String] = None)
     def execute(sql: String) = 
     {
         // Empty statements are not executed
-        if (!sql.isEmpty())
+        if (!sql.isEmpty)
         {
             var statement: Option[Statement] = None
             try
@@ -286,7 +280,7 @@ class Connection(initialDBName: Option[String] = None)
     def executeQuery(sql: String, values: Seq[Value] = Vector()) = 
     {
         // Empty statements are not executed
-        if (sql.isEmpty())
+        if (sql.isEmpty)
         {
             Vector[Map[String, String]]()
         }
@@ -329,29 +323,22 @@ class Connection(initialDBName: Option[String] = None)
     
     private def setValues(statement: PreparedStatement, values: Seq[Value]) = 
     {
-        for ( i <- 0 until values.size )
+        values.indices.foreach
         {
-            val conversionResult = Connection.sqlValueConverter(values(i))
-            if (conversionResult.isDefined)
-            {
-                statement.setObject(i + 1, conversionResult.get._1, conversionResult.get._2)
-            }
-            else
-            {
-                statement.setNull(i + 1, Types.NULL)
-            }
+            i =>
+                val conversionResult = Connection.sqlValueConverter(values(i))
+                if (conversionResult.isDefined)
+                    statement.setObject(i + 1, conversionResult.get._1, conversionResult.get._2)
+                else
+                    statement.setNull(i + 1, Types.NULL)
         }
     }
     
-    private def stringFromResult(result: ResultSet, index: Int) = 
-    {
-        val value = result.getString(index)
-        if (value == null) None else Some(value)
-    }
+    private def stringFromResult(result: ResultSet, index: Int) = Option(result.getString(index))
     
     private def rowsFromResult(resultSet: ResultSet, tables: Iterable[Table]) = 
     {
-        val meta = resultSet.getMetaData()
+        val meta = resultSet.getMetaData
         
         // Sorts the column indices for targeted tables
         val indicesForTables = Vector.range(1, meta.getColumnCount + 1).groupBy { 
@@ -360,8 +347,8 @@ class Connection(initialDBName: Option[String] = None)
         // Resulting map: Table -> (Column, sqlType, index)
         val columnIndices = indicesForTables.flatMap { case (tableOption, indices) => 
                 tableOption.map { table => (table, indices.flatMap { 
-                index => (table.findColumnWithColumnName( meta.getColumnName(index) ).map { 
-                (_, meta.getColumnType(index), index) }) }) } }
+                index => table.findColumnWithColumnName( meta.getColumnName(index) ).map {
+                (_, meta.getColumnType(index), index) } }) } }
         
         // Parses the rows from the resultSet
         val rowBuffer = Vector.newBuilder[Row]
@@ -370,8 +357,8 @@ class Connection(initialDBName: Option[String] = None)
             // Reads the object data from each row, parses them into constants and creates a model 
             // The models are mapped to each table separately
             // NB: view.force is added in order to create a concrete map
-            rowBuffer += new Row(columnIndices.mapValues { data => 
-                new Model(data.map { case (column, sqlType, index) => new Constant(column.name, 
+            rowBuffer += Row(columnIndices.mapValues { data =>
+                Model.withConstants(data.map { case (column, sqlType, index) => new Constant(column.name,
                 Connection.sqlValueGenerator(resultSet.getObject(index), sqlType)) }) }.view.force)
         }
         
@@ -382,16 +369,14 @@ class Connection(initialDBName: Option[String] = None)
     {
         // Retrieves keys as ints if all of the tables (that use indexing) use int as key type
         val useInt = tables.forall { _.primaryColumn.forall { _.dataType == IntType } }
-        val results = statement.getGeneratedKeys()
+        val results = statement.getGeneratedKeys
         val keyBuffer = Vector.newBuilder[Value]
         
         while (results.next())
         {
             val key: Value = if (useInt) results.getInt(1) else results.getLong(1)
             if (key.isDefined)
-            {
                 keyBuffer += key
-            }
         }
         
         keyBuffer.result()

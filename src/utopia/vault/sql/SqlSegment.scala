@@ -3,7 +3,6 @@ package utopia.vault.sql
 import utopia.flow.datastructure.immutable.Value
 import utopia.vault.model.Table
 import scala.collection.immutable.HashSet
-import scala.Vector
 import utopia.vault.database.Connection
 
 object SqlSegment
@@ -46,9 +45,8 @@ object SqlSegment
  * @param values The values that will be inserted to this segment when it is used. Each '?' in the sql will 
  * be replaced with a single value. Empty values will be interpreted as NULL.
  */
-case class SqlSegment(val sql: String, val values: Seq[Value] = Vector(), 
-        val databaseName: Option[String] = None, val targetTables: Set[Table] = HashSet(), 
-        val isSelect: Boolean = false, val generatesKeys: Boolean = false)
+case class SqlSegment(sql: String, values: Seq[Value] = Vector(), databaseName: Option[String] = None,
+                      targetTables: Set[Table] = HashSet(), isSelect: Boolean = false, generatesKeys: Boolean = false)
 {
     // COMPUTED PROPERTIES    -----------
     
@@ -63,7 +61,7 @@ case class SqlSegment(val sql: String, val values: Seq[Value] = Vector(),
     /**
      * Whether the segment is considered to be empty (no-op)
      */
-    def isEmpty = sql.isEmpty()
+    def isEmpty = sql.isEmpty
     
     
     // OPERATORS    ---------------------
@@ -74,7 +72,7 @@ case class SqlSegment(val sql: String, val values: Seq[Value] = Vector(),
      */
     def +(other: SqlSegment) = SqlSegment(sql + " " + other.sql, values ++ other.values, 
             databaseName orElse other.databaseName, targetTables ++ other.targetTables, 
-            isSelect || other.isSelect, generatesKeys || other.generatesKeys);
+            isSelect || other.isSelect, generatesKeys || other.generatesKeys)
     
     /**
      * Appends this sql segment with an sql string. 

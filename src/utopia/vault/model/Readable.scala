@@ -35,7 +35,7 @@ trait Readable extends Storable
 	/**
 	 * Updates the index of this object
 	 */
-	def index_=(index: Value) = table.primaryColumn.foreach(c => set(c.name, index))
+	def index_=(index: Value) = table.primaryColumn.foreach { c => set(c.name, index) }
 	
 	
 	// OTHER    ------------------------
@@ -59,7 +59,7 @@ trait Readable extends Storable
 	 * @return Whether any data was read
 	 */
 	def pull(firstPropName: String, morePropNames: String*)(implicit connection: Connection): Boolean = 
-	    pull(Select(table, firstPropName, morePropNames: _*));
+	    pull(Select(table, firstPropName, morePropNames: _*))
 	
 	/**
 	 * Updates data in this object, then updates the database as well. Only works when this object 
@@ -84,7 +84,7 @@ trait Readable extends Storable
 	
 	private def pull(select: SqlSegment)(implicit connection: Connection) = 
 	{
-	    val data = indexCondition.flatMap(c => connection(select + Where(c) + Limit(1)).firstModel)
+	    val data = indexCondition.flatMap { c => connection(select + Where(c) + Limit(1)).firstModel }
 	    data.foreach(set)
 	    data.isDefined
 	}

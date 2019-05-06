@@ -1,7 +1,5 @@
 package utopia.vault.sql
 
-import scala.Vector
-
 object Where
 {
     /**
@@ -47,8 +45,7 @@ case class Condition(private val segment: SqlSegment)
      * Combines the conditions together using a logical AND. All of the conditions are wrapped in 
      * single parentheses '()' and performed together, from left to right.
      */
-    def &&(first: Condition, second: Condition, more: Condition*): Condition = 
-            this && (Vector(first, second) ++ more);
+    def &&(first: Condition, second: Condition, more: Condition*): Condition = this && (Vector(first, second) ++ more)
     
     /**
      * Combines the conditions together using a logical OR. All of the conditions are wrapped in 
@@ -66,8 +63,7 @@ case class Condition(private val segment: SqlSegment)
      * Combines the conditions together using a logical OR. All of the conditions are wrapped in 
      * single parentheses '()' and performed together, from left to right.
      */
-    def ||(first: Condition, second: Condition, more: Condition*): Condition = 
-            this || (Vector(first, second) ++ more);
+    def ||(first: Condition, second: Condition, more: Condition*): Condition = this || (Vector(first, second) ++ more)
     
     /**
      * Applies a logical NOT operator on this condition, reversing any logical outcome
@@ -86,13 +82,10 @@ case class Condition(private val segment: SqlSegment)
     private def combine(others: Seq[Condition], separator: String) = 
     {
         if (others.isEmpty)
-        {
             this
-        }
         else 
         {
-            val noParentheses = SqlSegment.combine(segment +: others.map { _.segment }, 
-                    { _ + separator + _ });
+            val noParentheses = SqlSegment.combine(segment +: others.map { _.segment }, { _ + separator + _ })
             Condition(noParentheses.copy(sql = "(" + noParentheses.sql + ")"))
         }
     }

@@ -1,14 +1,23 @@
 package utopia.vault.model
 
-import utopia.flow.datastructure.template.Model
-import utopia.flow.datastructure.template.Property
 import utopia.flow.datastructure.immutable.Value
+import utopia.flow.datastructure.template.{Model, Property}
 import utopia.vault.database.Connection
 import utopia.vault.sql.SelectAll
 import utopia.vault.sql.Where
 import utopia.vault.sql.Condition
 import utopia.vault.sql.Limit
 import utopia.flow.generic.FromModelFactory
+
+object StorableFactory
+{
+    /**
+      * Creates a new simple storable factory
+      * @param table The target table
+      * @return A factory for that table
+      */
+    def apply(table: Table): StorableFactory[Storable] = new ImmutableStorableFactory(table)
+}
 
 /**
  * These factory instances are used for converting database-originated model data into a 
@@ -66,4 +75,9 @@ trait StorableFactory[+T] extends FromModelFactory[T]
      * @see #getMany(Condition)
      */
     def getAll()(implicit connection: Connection) = connection(SelectAll(table)).rowModels.flatMap(apply)
+}
+
+private class ImmutableStorableFactory(override val table: Table) extends StorableFactory[Storable]
+{
+    override def apply(model: Model[Property]) = Some(Storable(table, model))
 }

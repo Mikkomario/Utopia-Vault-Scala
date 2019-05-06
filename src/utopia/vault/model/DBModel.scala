@@ -1,14 +1,11 @@
 package utopia.vault.model
 
 import utopia.flow.datastructure.template
-import utopia.flow.datastructure.immutable
 
 import utopia.flow.datastructure.mutable.Model
 import utopia.flow.datastructure.mutable.Variable
 import utopia.flow.generic.DeclarationVariableGenerator
-import utopia.flow.datastructure.immutable.Value
 import utopia.flow.datastructure.template.Property
-import utopia.flow.datastructure.immutable.Constant
 
 object DBModel
 {
@@ -38,7 +35,7 @@ class DBModel(override val table: Table) extends Model[Variable](
 {
     // COMPUTED    -------------------
     
-	override def valueProperties = attributes.map(v => v.name -> v.value)
+	override def valueProperties = attributes.map { v => v.name -> v.value }
 	
 	override def set(data: template.Model[Property]) = update(data)
 }
@@ -51,7 +48,7 @@ class DBModelFactory(val table: Table) extends StorableFactory[DBModel]
     def apply(model: template.Model[Property]) = 
     {
         val storable = new DBModel(table)
-        storable ++= model.attributes.map(p => new Variable(p.name, p.value))
+        storable ++= model.attributes.map { p => new Variable(p.name, p.value) }
         
         Some(storable)
     }
