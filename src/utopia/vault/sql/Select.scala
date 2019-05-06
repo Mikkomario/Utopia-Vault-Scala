@@ -18,9 +18,8 @@ object Select
      * Creates an sql segment that selects a number of columns from a table
      */
     def apply(target: SqlTarget, columns: Seq[Column]) = SqlSegment(s"SELECT ${ 
-            if (columns.isEmpty) "NULL" else columns.view.map { 
-            _.columnNameWithTable }.reduceLeft { _ + ", " + _ } } FROM", Vector(), None, HashSet(), 
-            true) + target.toSqlSegment;
+        if (columns.isEmpty) "NULL" else columns.view.map { _.columnNameWithTable }.reduceLeft { _ + ", " + _ } } FROM",
+        Vector(), None, HashSet(), true) + target.toSqlSegment
     
     /**
      * Creates an sql segment that selects a single column from a table
@@ -31,7 +30,7 @@ object Select
      * Creates an sql segment that selects a number of columns from a table
      */
     def apply(target: SqlTarget, first: Column, second: Column, more: Column*): SqlSegment = 
-            apply(target, Vector(first, second) ++ more);
+            apply(target, Vector(first, second) ++ more)
     
     /**
      * Creates an sql segment that selects one or multiple properties from a single table

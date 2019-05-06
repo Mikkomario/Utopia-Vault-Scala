@@ -1,6 +1,5 @@
 package utopia.vault.model
 
-import utopia.flow.util.Equatable
 import utopia.flow.datastructure.immutable.Value
 
 /**
@@ -10,11 +9,9 @@ import utopia.flow.datastructure.immutable.Value
  * @author Mikko Hilpinen
  * @since 25.4.2017
  */
-class Result(val rows: Vector[Row], val generatedKeys: Vector[Value] = Vector()) extends Equatable
+case class Result(rows: Vector[Row], generatedKeys: Vector[Value] = Vector())
 {
     // COMPUTED PROPERTIES    ------------
-    
-    override def properties = rows ++ generatedKeys
     
     /**
      * The row data in model format. This should be used when no joins were present in the query and
@@ -26,7 +23,7 @@ class Result(val rows: Vector[Row], val generatedKeys: Vector[Value] = Vector())
      * The data of the first result row in model format. This should be used only when no joins 
      * were present in the query and each row contains data from a single table only
      */
-    def firstModel = rows.headOption.map(_.toModel)
+    def firstModel = rows.headOption.map { _.toModel }
     
     /**
      * Whether this result is empty and doesn't contain any meaningful data

@@ -34,9 +34,8 @@ object Update
             None
         else 
             Some(target.toSqlSegment.prepend("UPDATE") + SqlSegment("SET " + 
-                    valueSet.view.map { case (column, value) => 
-                    column.columnNameWithTable + " = ?" }.reduceLeft { _ + ", " + _ }, 
-                    valueSet.map { _._2 }.toVector))
+                valueSet.view.map { case (column, _) => column.columnNameWithTable + " = ?" }.reduceLeft { _ + ", " + _ },
+                valueSet.values.toVector))
     }
     
     /**
@@ -50,5 +49,5 @@ object Update
      * @return an update segment or none if there is nothing to update
      */
     def apply(table: Table, key: String, value: Value): Option[SqlSegment] = apply(table, 
-            immutable.Model(Vector((key, value))));
+            immutable.Model(Vector((key, value))))
 }

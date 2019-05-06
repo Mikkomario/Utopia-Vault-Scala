@@ -1,6 +1,5 @@
 package utopia.vault.model
 
-import utopia.flow.util.Equatable
 import utopia.flow.datastructure.immutable.ModelDeclaration
 import utopia.vault.sql.SqlTarget
 import utopia.vault.sql.SqlSegment
@@ -14,7 +13,7 @@ import utopia.vault.sql.JoinType._
  * @author Mikko Hilpinen
  * @since 9.3.2017
  */
-class Table(val name: String, val databaseName: String, val columns: Vector[Column]) extends Equatable with SqlTarget
+case class Table(name: String, databaseName: String, columns: Vector[Column]) extends SqlTarget
 {
     // ATTRIBUTES    ---------------------------
     
@@ -27,8 +26,6 @@ class Table(val name: String, val databaseName: String, val columns: Vector[Colu
     // COMPUTED PROPERTIES    ------------------
  
     override def toString = name
-    
-    override def properties: Vector[Any] = Vector(name, databaseName, columns)
     
     override def toSqlSegment = SqlSegment(name, Vector(), Some(databaseName), HashSet(this))
     
@@ -54,20 +51,20 @@ class Table(val name: String, val databaseName: String, val columns: Vector[Colu
     /**
      * Finds the columns matching the provided property names
      */
-    def apply(propertyNames: Traversable[String]) = columns.filter { 
+    def apply(propertyNames: Traversable[String]) = columns.filter {
             column => propertyNames.exists { _ == column.name } }
     
     /**
      * Finds columns matching the provided property names
      */
-    def apply(propertyName: String, others: String*): Vector[Column] = apply(others :+ propertyName)
+    def apply(propertyName: String, second: String, others: String*): Vector[Column] = apply(Vector(propertyName, second) ++ others)
     
     
     // OTHER METHODS    ------------------------
     
     /**
      * Finds a column with the provided property name. Returns None if no such column exists in 
-     * the table
+     * this table
      */
     def find(propertyName: String) = columns.find { _.name == propertyName }
     
@@ -90,7 +87,7 @@ class Table(val name: String, val databaseName: String, val columns: Vector[Colu
     /**
      * checks whether this table contains a column matching the provided property name
      */
-    def contains(propertyName: String) = columns.exists(_.name == propertyName)
+    def contains(propertyName: String) = columns.exists { _.name == propertyName }
     
     /**
      * Joins a new table, creating a new sql target.

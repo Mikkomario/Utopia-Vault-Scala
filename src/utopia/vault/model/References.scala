@@ -35,7 +35,7 @@ object References
     def setup(sets: Traversable[(Table, String, Table, String)]): Unit =
     {
         // Converts the tuple data into a reference set
-        val references = sets.flatMap { case (table1, name1, table2, name2) => Reference(table1, name1, table2, name2) }
+        val references = sets.flatMap { case (table1, name1, table2, name2) => Reference(table1, name1, table2, name2) }.toSet
         referenceData ++= references.groupBy { _.from.table.databaseName }
     }
     
@@ -75,8 +75,7 @@ object References
      * @return A reference from the provided reference point. None if the point doesn't reference 
      * anything
      */
-    def from(table: Table, columnName: String): Option[ReferencePoint] = 
-            ReferencePoint(table, columnName).flatMap(from);
+    def from(table: Table, columnName: String): Option[ReferencePoint] = ReferencePoint(table, columnName).flatMap(from)
     
     /**
      * Finds all places where the provided reference point is referenced
@@ -86,7 +85,7 @@ object References
     def to(point: ReferencePoint) = 
     {
         checkIsSetup(point.table.databaseName)
-        referenceData(point.table.databaseName).filter(_.to == point).map(_.from)
+        referenceData(point.table.databaseName).filter { _.to == point }.map { _.from }
     }
     
     /**
@@ -104,7 +103,7 @@ object References
      * @return All reference points that target the specified reference point
      */
     def to(table: Table, columnName: String): Set[ReferencePoint] = 
-            table.find(columnName).map(ReferencePoint(table, _)).map(to).getOrElse(HashSet());
+            table.find(columnName).map { ReferencePoint(table, _) }.map(to).getOrElse(HashSet())
     
     /**
      * Finds all references made from a specific table
@@ -112,7 +111,7 @@ object References
     def from(table: Table) = 
     {
         checkIsSetup(table.databaseName)
-        referenceData(table.databaseName).filter(_.from.table == table)
+        referenceData(table.databaseName).filter { _.from.table == table }
     }
     
     /**
@@ -121,7 +120,7 @@ object References
     def to(table: Table) = 
     {
         checkIsSetup(table.databaseName)
-        referenceData(table.databaseName).filter(_.to.table == table)
+        referenceData(table.databaseName).filter { _.to.table == table }
     }
     
     /**

@@ -12,8 +12,7 @@ object Join
     /**
      * Creates a join based on a reference
      */
-    def apply(leftColumn: Column, target: ReferencePoint) = new Join(leftColumn, target.table, 
-            target.column)
+    def apply(leftColumn: Column, target: ReferencePoint) = new Join(leftColumn, target.table, target.column)
 }
 
 /**
@@ -22,7 +21,7 @@ object Join
  * @author Mikko Hilpinen
  * @since 30.5.2017
  */
-case class Join(val leftColumn: Column, val rightTable: Table, val rightColumn: Column, val joinType: JoinType = Inner)
+case class Join(leftColumn: Column, rightTable: Table, rightColumn: Column, joinType: JoinType = Inner)
 {
     // COMPUTED PROPERTIES    ----------------
     
@@ -31,7 +30,7 @@ case class Join(val leftColumn: Column, val rightTable: Table, val rightColumn: 
      */
     def toSqlSegment = SqlSegment(s"$joinType JOIN $rightTable ON ${ 
             leftColumn.columnNameWithTable } = ${ rightColumn.columnNameWithTable }", Vector(), 
-            Some(rightTable.databaseName), HashSet(rightTable));
+            Some(rightTable.databaseName), HashSet(rightTable))
     
     /**
      * The point targeted / included by this join

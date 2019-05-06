@@ -4,7 +4,6 @@ import utopia.vault.model.Table
 import utopia.flow.datastructure.template.Model
 import utopia.flow.datastructure.template.Property
 import scala.collection.immutable.HashSet
-import scala.Vector
 
 /**
  * Insert object is used for generating insert statements that can then be executed with a 
@@ -26,15 +25,14 @@ object Insert
     {
         // Finds the inserted properties that are applicable to this table
         // Only properties matching columns (that are not auto-increment) are included
-        val insertedPropertyNames = rows.foldLeft(HashSet[String]()) {
-                _ ++ _.attributesWithValue.map { _.name }.filter { 
-                table.find(_).exists { !_.usesAutoIncrement } } }.toVector
+        val insertedPropertyNames = rows.flatMap { _.attributesWithValue.map { _.name } }.filter {
+            table.find(_).exists { !_.usesAutoIncrement } }
         
         if (insertedPropertyNames.isEmpty)
             None
         else 
         {
-            val columnNames = insertedPropertyNames.map { table(_).columnName }.reduce(_ + ", " + _)
+            val columnNames = insertedPropertyNames.map { table(_).columnName }.mkString(", ")
             val singleValueSql = "(?" + ", ?" * (insertedPropertyNames.size - 1) + ")"
             val valuesSql = singleValueSql + (", " + singleValueSql) * (rows.size - 1)
             
@@ -61,5 +59,5 @@ object Insert
      * @return An insert segment. None if there was nothing to insert
      */
     def apply(table: Table, first: Model[Property], second: Model[Property], 
-            more: Model[Property]*): Option[SqlSegment] = apply(table, Vector(first, second) ++ more);
+            more: Model[Property]*): Option[SqlSegment] = apply(table, Vector(first, second) ++ more)
 }
