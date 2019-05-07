@@ -13,6 +13,5 @@ package utopia.vault.database
  * @author Mikko Hilpinen
  * @since 16.4.2017
  */
-case class ConnectionSettings(val connectionTarget: String = "jdbc:mysql://localhost:3306/", 
-        val user: String = "root", val password: String = "", val defaultDBName: Option[String] = None, 
-        val driver: Option[String] = None)
+case class ConnectionSettings(connectionTarget: String = "jdbc:mysql://localhost:3306/",
+        user: String = "root", password: String = "", defaultDBName: Option[String] = None, driver: Option[String] = None)

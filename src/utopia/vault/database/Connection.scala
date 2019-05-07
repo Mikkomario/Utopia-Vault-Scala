@@ -146,9 +146,7 @@ class Connection(initialDBName: Option[String] = None) extends AutoCloseable
     {
         // Empty statements are not executed
         if (sql.isEmpty)
-        {
-            new Result(Vector())
-        }
+            Result.empty
         else 
         {
             var statement: Option[PreparedStatement] = None
@@ -167,7 +165,7 @@ class Connection(initialDBName: Option[String] = None) extends AutoCloseable
                 
                 // Parses data out of the result
                 // May skip some data in case it is not requested
-                new Result(if (selectedTables.isEmpty) Vector() else rowsFromResult(results.get, selectedTables), 
+                Result(if (selectedTables.isEmpty) Vector() else rowsFromResult(results.get, selectedTables),
                         if (returnGeneratedKeys) generatedKeysFromResult(statement.get, selectedTables) else Vector())
             }
             finally

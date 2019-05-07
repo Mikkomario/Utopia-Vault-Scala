@@ -3,7 +3,6 @@ package utopia.vault.database
 import utopia.vault.model.Table
 import utopia.vault.model.Column
 import utopia.flow.generic.AnyType
-import utopia.flow.datastructure.immutable.Value
 import utopia.flow.generic.ValueConversions._
 
 /**
@@ -38,15 +37,14 @@ object DatabaseTableReader
             val nullAllowed = "yes" == data("Null").toLowerCase
             
             val defaultString = data.getOrElse("COLUMN_DEFAULT", data.getOrElse("Default", "null"))
-            val defaultValue = if (defaultString.toLowerCase == "null") None 
-                    else defaultString.castTo(dataType);
+            val defaultValue = if (defaultString.toLowerCase == "null") None else defaultString.castTo(dataType)
             // Used to have:  || defaultString.toLowerCase == "current_timestamp"
             
-            new Column(columnNameToPropertyName(columnName), columnName, tableName, dataType, 
+            Column(columnNameToPropertyName(columnName), columnName, tableName, dataType,
                     nullAllowed, defaultValue, isPrimary, usesAutoIncrement)
         } )
         
-        new Table(tableName, databaseName, columns)
+        Table(tableName, databaseName, columns)
     }
     
     // Converts underscrore naming style strings to camelcase naming style strings

@@ -34,7 +34,7 @@ object BasicSqlTypeInterpreter extends SqlTypeInterpreter
             case "timestamp" | "datetime" => Some(InstantType)
             case "date" => Some(LocalDateType)
             case "time" => Some(LocalTimeType)
-            case s if (s.endsWith("text") || s.endsWith("blob")) => Some(StringType)
+            case s if s.endsWith("text") || s.endsWith("blob") => Some(StringType)
             case _ => None
         }
     }

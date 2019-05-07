@@ -2,6 +2,14 @@ package utopia.vault.model
 
 import utopia.flow.datastructure.immutable.Value
 
+object Result
+{
+    /**
+      * An empty result
+      */
+    val empty = Result(Vector())
+}
+
 /**
  * A result is generated based on the data retrieved from a executed database query. 
  * Usually results are used for accessing read database row data, but in case of an insert

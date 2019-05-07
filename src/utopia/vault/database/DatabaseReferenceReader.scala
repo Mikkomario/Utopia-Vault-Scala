@@ -1,21 +1,18 @@
 package utopia.vault.database
 
 import utopia.flow.generic.ValueConversions._
-import utopia.vault.sql.Extensions._
 
 import utopia.vault.model.Table
 import utopia.vault.model.Column
 import utopia.flow.generic.StringType
 import utopia.vault.sql.Select
 import utopia.vault.sql.Where
-import utopia.flow.datastructure.immutable.Value
 
 import utopia.vault.sql.Extensions._
 import utopia.vault.sql.ConditionElement
 import utopia.flow.datastructure.template.Model
 import utopia.flow.datastructure.template.Property
 import utopia.vault.model.References
-import utopia.vault.sql.ConditionValue
 import utopia.vault.model.Reference
 
 /**
@@ -26,12 +23,12 @@ import utopia.vault.model.Reference
  */
 object DatabaseReferenceReader
 {
-    private val keys = new Table("KEY_COLUMN_USAGE", "INFORMATION_SCHEMA", Vector(
-            new Column("schema", "TABLE_SCHEMA", "KEY_COLUMN_USAGE", StringType, false), 
-            new Column("tableName", "TABLE_NAME", "KEY_COLUMN_USAGE", StringType, true), 
-            new Column("columnName", "COLUMN_NAME", "KEY_COLUMN_USAGE", StringType, true), 
-            new Column("referencedTableName", "REFERENCED_TABLE_NAME", "KEY_COLUMN_USAGE", StringType, true), 
-            new Column("referencedColumnName", "REFERENCED_COLUMN_NAME", "KEY_COLUMN_USAGE", StringType, true)))
+    private val keys = Table("KEY_COLUMN_USAGE", "INFORMATION_SCHEMA", Vector(
+            Column("schema", "TABLE_SCHEMA", "KEY_COLUMN_USAGE", StringType, false),
+            Column("tableName", "TABLE_NAME", "KEY_COLUMN_USAGE", StringType),
+            Column("columnName", "COLUMN_NAME", "KEY_COLUMN_USAGE", StringType),
+            Column("referencedTableName", "REFERENCED_TABLE_NAME", "KEY_COLUMN_USAGE", StringType),
+            Column("referencedColumnName", "REFERENCED_COLUMN_NAME", "KEY_COLUMN_USAGE", StringType)))
     
     /**
      * Reads all references between the provided tables
@@ -81,7 +78,6 @@ object DatabaseReferenceReader
     def setupReferences(tables: Set[Table])(implicit connection: Connection) = 
     {
         val tablesForDatabase = tables.groupBy(_.databaseName)
-        tablesForDatabase.foreach { case (dbName, tables) => 
-                References.setup(dbName, apply(tables)(connection).toSet) }
+        tablesForDatabase.foreach { case (dbName, dbTables) => References.setup(dbName, apply(dbTables)(connection).toSet) }
     }
 }
