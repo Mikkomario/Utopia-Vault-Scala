@@ -1,11 +1,8 @@
-package utopia.vault.model
+package utopia.vault.model.immutable
 
-import utopia.flow.datastructure.immutable.PropertyDeclaration
+import utopia.flow.datastructure.immutable.{PropertyDeclaration, Value}
 import utopia.flow.generic.DataType
-import utopia.flow.datastructure.immutable.Value
-import utopia.vault.sql.SqlSegment
-import utopia.vault.sql.ConditionElement
-import utopia.vault.sql.Condition
+import utopia.vault.sql.{Condition, ConditionElement, SqlSegment}
 
 /**
  * Columns represent database columns and can be used as templates for different properties
@@ -18,7 +15,7 @@ case class Column(propertyName: String, columnName: String, tableName: String, o
         extends PropertyDeclaration with ConditionElement
 {
     // COMPUTED PROPERTIES    ------------------
-            
+    
     /**
      * Whether a value is required in this column when data is inserted to the database
      */
@@ -53,17 +50,17 @@ case class Column(propertyName: String, columnName: String, tableName: String, o
     // OPERATORS    ----------------------------
     
     /**
-     * Creates an equality condition between a column and a specified value. This condition can 
+     * Creates an equality condition between a column and a specified value. This condition can
      * be then used in a sql statement. Calling this with an empty value is same as calling isNull
      */
     def <=>(value: Value) = if (value.isEmpty) isNull else makeCondition("<=>", value)
     
     /**
-     * Creates a not equals condition between a column and a specified value. This condition can 
+     * Creates a not equals condition between a column and a specified value. This condition can
      * be used in a sql statement. Calling this with an empty value is same as calling isNotNull
      */
     def <>(value: Value) = if (value.isEmpty) isNotNull else makeCondition("<>", value)
-       
+    
     
     // OTHER METHODS    ---------------------
     

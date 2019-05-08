@@ -5,7 +5,6 @@ import utopia.vault.database.Connection
 import utopia.vault.sql.SelectAll
 import utopia.vault.sql.Delete
 import utopia.flow.datastructure.immutable.Model
-import utopia.flow.datastructure.immutable.Value
 import utopia.vault.sql.Insert
 import utopia.vault.sql.Select
 import utopia.vault.sql.Limit
@@ -49,11 +48,10 @@ object SimpleStatementTest extends App
         assert(connection(Select(table, "age")).rows.head.toModel("age") == 22.toValue)
         
         connection(Insert(table, Model(Vector("name" -> "Last", "age" -> 2, "isAdmin" -> true))).get)
-        assert(connection(SelectAll(table) + OrderBy(table("age")) + Limit(1)
-                ).rows.head.toModel("name") == "Last".toValue);
+        assert(connection(SelectAll(table) + OrderBy(table("age")) + Limit(1)).rows.head.toModel("name") == "Last".toValue)
         
         val result2 = connection(Select(table, "isAdmin")).rowModels
-        assert(!result2.isEmpty)
+        assert(result2.nonEmpty)
         //result2.foreach(println)
         assert(result2.exists { _("isAdmin").booleanOr() })
         

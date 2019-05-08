@@ -10,5 +10,14 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Utopia-Flow-Scala" />
     <orderEntry type="library" name="scala-sdk-2.12.8" level="application" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/mariadb-java-client-1.5.9.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

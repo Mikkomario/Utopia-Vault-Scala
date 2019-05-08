@@ -1,11 +1,9 @@
 package utopia.vault.sql
 
-import utopia.vault.model.Column
-import utopia.vault.model.Table
-
 import utopia.vault.sql.JoinType._
+
 import scala.collection.immutable.HashSet
-import utopia.vault.model.ReferencePoint
+import utopia.vault.model.immutable.{Column, ReferencePoint, Table}
 
 object Join
 {

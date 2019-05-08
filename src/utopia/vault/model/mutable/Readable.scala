@@ -1,20 +1,14 @@
-package utopia.vault.model
+package utopia.vault.model.mutable
 
+import utopia.flow.datastructure.immutable.{Constant, Model, Value}
 import utopia.flow.datastructure.template
-
-import utopia.flow.datastructure.immutable.Model
-import utopia.flow.datastructure.immutable.Constant
-import utopia.flow.datastructure.immutable.Value
-import utopia.vault.database.Connection
-import utopia.vault.sql.SelectAll
-import utopia.vault.sql.Where
-import utopia.vault.sql.Select
-import utopia.vault.sql.SqlSegment
-import utopia.vault.sql.Limit
 import utopia.flow.datastructure.template.Property
+import utopia.vault.database.Connection
+import utopia.vault.model.immutable.Storable
+import utopia.vault.sql._
 
 /**
-* Readable instances can be read / updated from the database. This trait is designed to be used 
+* Readable instances can be read / updated from the database. This trait is designed to be used
 * with tables that use primary key indexing. Readable classes are mutable.
 * @author Mikko Hilpinen
 * @since 25.5.2018
@@ -45,7 +39,7 @@ trait Readable extends Storable
 	 * @param propertyName the name of the property
 	 * @param value the new value for the property
 	 */
-	def set(propertyName: String, value: Value): Unit = set(Model(Vector(propertyName -> value)))	
+	def set(propertyName: String, value: Value): Unit = set(Model(Vector(propertyName -> value)))
 	
 	/**
 	 * Updates this object based on the current database state. Requires an index
@@ -54,35 +48,35 @@ trait Readable extends Storable
 	def pull()(implicit connection: Connection): Boolean = pull(SelectAll(table))
 	
 	/**
-	 * Updates this object based on the current database state. Only updates certain 
+	 * Updates this object based on the current database state. Only updates certain
 	 * properties. Requires an index
 	 * @return Whether any data was read
 	 */
-	def pull(firstPropName: String, morePropNames: String*)(implicit connection: Connection): Boolean = 
+	def pull(firstPropName: String, morePropNames: String*)(implicit connection: Connection): Boolean =
 	    pull(Select(table, firstPropName, morePropNames: _*))
 	
 	/**
-	 * Updates data in this object, then updates the database as well. Only works when this object 
+	 * Updates data in this object, then updates the database as well. Only works when this object
 	 * has an index
 	 */
-	def setAndUpdate(data: Model[Constant])(implicit connection: Connection) = 
+	def setAndUpdate(data: Model[Constant])(implicit connection: Connection) =
 	{
 	    set(data)
 	    updateProperties(data.attributeNames)
 	}
 	
 	/**
-	 * Updates data in this object, then pushes all data to the database. May insert a new row. 
+	 * Updates data in this object, then pushes all data to the database. May insert a new row.
 	 * May update the index for this object.
 	 */
-	def setAndPush(data: template.Model[Property], writeNulls: Boolean = false)(implicit connection: Connection) = 
+	def setAndPush(data: template.Model[Property], writeNulls: Boolean = false)(implicit connection: Connection) =
 	{
 	    set(data)
 	    // Updates the index as well
 	    index = push(writeNulls)
 	}
 	
-	private def pull(select: SqlSegment)(implicit connection: Connection) = 
+	private def pull(select: SqlSegment)(implicit connection: Connection) =
 	{
 	    val data = indexCondition.flatMap { c => connection(select + Where(c) + Limit(1)).firstModel }
 	    data.foreach(set)

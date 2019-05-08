@@ -21,7 +21,7 @@ object SqlTypeInterpretationTest extends App
     DataType.setup()
     
     def test(typeString: String, expectedType: DataType) = 
-            assert(SqlTypeInterpreterManager(typeString).exists { _ == expectedType });
+            assert(SqlTypeInterpreterManager(typeString).contains(expectedType))
     
     test("varchar(255)", StringType)
     test("varchar(64)", StringType)

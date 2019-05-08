@@ -1,8 +1,9 @@
 package utopia.vault.sql
 
-import utopia.vault.model.Table
 import utopia.flow.datastructure.template.Model
 import utopia.flow.datastructure.template.Property
+import utopia.vault.model.immutable.Table
+
 import scala.collection.immutable.HashSet
 
 /**
@@ -25,8 +26,8 @@ object Insert
     {
         // Finds the inserted properties that are applicable to this table
         // Only properties matching columns (that are not auto-increment) are included
-        val insertedPropertyNames = rows.flatMap { _.attributesWithValue.map { _.name } }.filter {
-            table.find(_).exists { !_.usesAutoIncrement } }
+        val insertedPropertyNames = rows.flatMap { _.attributesWithValue.map { _.name } }.toSet.filter {
+            table.find(_).exists { !_.usesAutoIncrement } }.toVector
         
         if (insertedPropertyNames.isEmpty)
             None
@@ -35,11 +36,12 @@ object Insert
             val columnNames = insertedPropertyNames.map { table(_).columnName }.mkString(", ")
             val singleValueSql = "(?" + ", ?" * (insertedPropertyNames.size - 1) + ")"
             val valuesSql = singleValueSql + (", " + singleValueSql) * (rows.size - 1)
-            
             val values = rows.flatMap { model => insertedPropertyNames.map { model(_) } }
             
-            Some(SqlSegment(s"INSERT INTO ${table.name} ($columnNames) VALUES $valuesSql", values, 
-                    Some(table.databaseName), HashSet(table), false, table.usesAutoIncrement))
+            val segment = SqlSegment(s"INSERT INTO ${table.name} ($columnNames) VALUES $valuesSql", values,
+                Some(table.databaseName), HashSet(table), false, table.usesAutoIncrement)
+            
+            Some(segment)
         }
     }
     

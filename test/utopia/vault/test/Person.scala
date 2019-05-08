@@ -1,15 +1,12 @@
 package utopia.vault.test
 
 import java.time.Instant
-import utopia.vault.model.Storable
-import utopia.flow.datastructure.immutable.Value
-import utopia.flow.generic.IntType
-import utopia.vault.model.StorableFactory
+
 import utopia.flow.datastructure.template.Model
 import utopia.flow.datastructure.template.Property
-
 import utopia.flow.generic.ValueConversions._
 import utopia.flow.util.Equatable
+import utopia.vault.model.immutable.{Storable, StorableFactory}
 
 object Person extends StorableFactory[Person]
 {
@@ -38,7 +35,7 @@ class Person(val name: String, val age: Option[Int] = None, val isAdmin: Boolean
     override def table = Person.table
     
     override def valueProperties = Vector("name" -> name, "age" -> age, "isAdmin" -> isAdmin, 
-            "created" -> created, "rowId" -> rowId);
+            "created" -> created, "rowId" -> rowId)
     
     override def properties = Vector(name, age, isAdmin, created, rowId)
 }

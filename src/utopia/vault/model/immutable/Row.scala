@@ -1,7 +1,6 @@
-package utopia.vault.model
+package utopia.vault.model.immutable
 
-import utopia.flow.datastructure.immutable.Model
-import utopia.flow.datastructure.immutable.Constant
+import utopia.flow.datastructure.immutable.{Constant, Model}
 
 /**
  * A row represents a single row in a query result set. A row can contain columns from multiple
@@ -32,7 +31,7 @@ case class Row(columnData: Map[Table, Model[Constant]])
     /**
      * The indices for each of the contained table
      */
-    def indices = columnData.flatMap { case (table, model) => table.primaryColumn.flatMap { column => 
+    def indices = columnData.flatMap { case (table, model) => table.primaryColumn.flatMap { column =>
             model.findExisting(column.name).map { constant => (table, constant.value) } } }
     
     

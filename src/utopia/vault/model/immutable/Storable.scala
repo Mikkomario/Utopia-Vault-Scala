@@ -1,17 +1,11 @@
-package utopia.vault.model
+package utopia.vault.model.immutable
 
+import utopia.flow.datastructure.immutable.{Model, Value}
 import utopia.flow.datastructure.template
-import utopia.flow.datastructure.immutable.Value
-import utopia.vault.database.Connection
-import utopia.flow.datastructure.immutable.Model
 import utopia.flow.datastructure.template.Property
-import utopia.flow.generic.DeclarationConstantGenerator
-import utopia.vault.sql.Update
-import utopia.vault.sql.Where
-import utopia.vault.sql.Insert
-import utopia.flow.generic.ModelConvertible
-import utopia.vault.sql.SqlSegment
-import utopia.vault.sql.Delete
+import utopia.flow.generic.{DeclarationConstantGenerator, ModelConvertible}
+import utopia.vault.database.Connection
+import utopia.vault.sql.{Delete, Insert, SqlSegment, Update, Where}
 
 object Storable
 {
@@ -59,9 +53,15 @@ trait Storable extends ModelConvertible
     def declaration = table.toModelDeclaration
     
     /**
-     * A condition for finding the row for this storable's index
+     * A condition for finding the row for this storable's index (will never use NULL index)
      */
-    def indexCondition = table.primaryColumn.map(_ <=> index)
+    def indexCondition =
+    {
+        val i = index
+        if (i.isDefined)
+            table.primaryColumn.map(_ <=> index)
+        else None
+    }
     
     
     // IMPLEMENTED  ----------------------------------

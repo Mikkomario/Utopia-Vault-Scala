@@ -1,9 +1,7 @@
 package utopia.vault.sql
 
-import utopia.vault.model.Table
-import utopia.vault.model.References
-import utopia.vault.model.Column
-
+import utopia.vault.model.immutable.{Column, Table}
+import utopia.vault.model.mutable.References
 import utopia.vault.sql.JoinType._
 
 /**

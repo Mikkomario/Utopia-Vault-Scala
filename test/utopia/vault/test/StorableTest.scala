@@ -4,10 +4,7 @@ import utopia.flow.generic.DataType
 import utopia.vault.database.Connection
 import utopia.vault.sql.Delete
 
-import utopia.flow.generic.ValueConversions._
-import utopia.flow.datastructure.immutable.Value
 import utopia.vault.sql.Select
-import java.time.Instant
 
 /**
  * This test tests the use of a simple storable trait implementation

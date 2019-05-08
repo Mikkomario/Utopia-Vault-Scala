@@ -1,4 +1,4 @@
-package utopia.vault.model
+package utopia.vault.model.immutable
 
 import utopia.vault.sql.Join
 

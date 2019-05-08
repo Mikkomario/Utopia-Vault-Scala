@@ -1,6 +1,6 @@
 package utopia.vault.sql
 
-import utopia.vault.model.Table
+import utopia.vault.model.immutable.Table
 
 /**
  * This object is used for creating sql statements which delete contents from the database. 

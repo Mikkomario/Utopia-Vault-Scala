@@ -4,7 +4,6 @@ import utopia.flow.generic.DataType
 import utopia.vault.database.Connection
 import utopia.vault.sql.Delete
 import utopia.flow.datastructure.immutable.Model
-import utopia.flow.datastructure.immutable.Value
 import utopia.vault.sql.Insert
 
 import utopia.vault.sql.JoinType._
@@ -37,16 +36,14 @@ object JoinTest extends App
         val bertta = Model(Vector("name" -> "Bertta", "age" -> 8))
         val camilla = Model(Vector("name" -> "Camilla", "age" -> 31))
         
-        val arttuId = connection(Insert(person, arttu).get).generatedKeys.head
+        connection(Insert(person, arttu).get).generatedKeys.head
         val berttaId = connection(Insert(person, bertta).get).generatedKeys.head
         val camillaId = connection(Insert(person, camilla).get).generatedKeys.head
         
         // Adds test powers
-        val berttaPower = Model(Vector("ownerId" -> berttaId, "name" -> "imagination", 
-                "powerLevel" -> 9999));
+        val berttaPower = Model(Vector("ownerId" -> berttaId, "name" -> "imagination", "powerLevel" -> 9999))
         val camillaPower1 = Model(Vector("ownerId" -> camillaId, "name" -> "is teacher"))
-        val camillaPower2 = Model(Vector("ownerId" -> camillaId, "name" -> "discipline", 
-                "powerLevel" -> 172));
+        val camillaPower2 = Model(Vector("ownerId" -> camillaId, "name" -> "discipline", "powerLevel" -> 172))
         val camillaPower3 = Model(Vector("ownerId" -> camillaId, "name" -> "imagination", 
                 "powerLevel" -> 250))
         
@@ -67,8 +64,7 @@ object JoinTest extends App
         assert(result1.rows.head(strength)("name") == "discipline".toValue)
         
         def powersForPerson(personName: String) = connection(
-                Select(person join strength, strength.columns) + 
-                Where(person("name") <=> personName));
+                Select(person join strength, strength.columns) + Where(person("name") <=> personName))
         
         assert(powersForPerson("Arttu").isEmpty)
         assert(powersForPerson("Camilla").rows.size == 3)

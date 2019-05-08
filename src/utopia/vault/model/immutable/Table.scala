@@ -1,14 +1,13 @@
-package utopia.vault.model
+package utopia.vault.model.immutable
 
 import utopia.flow.datastructure.immutable.ModelDeclaration
-import utopia.vault.sql.SqlTarget
-import utopia.vault.sql.SqlSegment
+import utopia.vault.sql.JoinType.JoinType
+import utopia.vault.sql.{SqlSegment, SqlTarget}
+
 import scala.collection.immutable.HashSet
 
-import utopia.vault.sql.JoinType._
-
 /**
- * A table represents a table in the database. Each table has a set of columns, one of which is 
+ * A table represents a table in the database. Each table has a set of columns, one of which is
  * usually the primary column. Tables may reference other tables through columns too.
  * @author Mikko Hilpinen
  * @since 9.3.2017
@@ -43,7 +42,7 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
     // OPERATORS    ----------------------------
     
     /**
-     * Finds a column with the provided property name associated with it. If you are unsure whether 
+     * Finds a column with the provided property name associated with it. If you are unsure whether
      * such a column exists in the table, use find instead
      */
     def apply(propertyName: String) = find(propertyName).get
@@ -63,7 +62,7 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
     // OTHER METHODS    ------------------------
     
     /**
-     * Finds a column with the provided property name. Returns None if no such column exists in 
+     * Finds a column with the provided property name. Returns None if no such column exists in
      * this table
      */
     def find(propertyName: String) = columns.find { _.name == propertyName }
@@ -74,7 +73,7 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
     def findColumnWithColumnName(columnName: String) = columns.find { _.columnName == columnName }
     
     /**
-     * Finds a column with the specified column name. If you are unsure whether such a column 
+     * Finds a column with the specified column name. If you are unsure whether such a column
      * exists, please used findColumnWithColumnName instead
      */
     def columnWithColumnName(columnName: String) = findColumnWithColumnName(columnName).get
@@ -91,9 +90,9 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
     
     /**
      * Joins a new table, creating a new sql target.
-     * @param propertyName the name of a property matching a column in this table, which makes a 
+     * @param propertyName the name of a property matching a column in this table, which makes a
      * reference to another table
      */
-    def joinFrom(propertyName: String, joinType: JoinType): SqlTarget = 
+    def joinFrom(propertyName: String, joinType: JoinType): SqlTarget =
             find(propertyName).map { joinFrom(_, joinType) }.getOrElse(this)
 }

@@ -1,19 +1,15 @@
 package utopia.vault.database
 
 import utopia.flow.generic.ValueConversions._
-
-import utopia.vault.model.Table
-import utopia.vault.model.Column
 import utopia.flow.generic.StringType
 import utopia.vault.sql.Select
 import utopia.vault.sql.Where
-
 import utopia.vault.sql.Extensions._
 import utopia.vault.sql.ConditionElement
 import utopia.flow.datastructure.template.Model
 import utopia.flow.datastructure.template.Property
-import utopia.vault.model.References
-import utopia.vault.model.Reference
+import utopia.vault.model.immutable.{Column, Reference, Table}
+import utopia.vault.model.mutable.References
 
 /**
  * This object can be used for reading and setting up table references by reading them directly 

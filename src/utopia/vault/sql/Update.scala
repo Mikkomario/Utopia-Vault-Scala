@@ -1,11 +1,13 @@
 package utopia.vault.sql
 
-import utopia.vault.model.Table
 import utopia.flow.datastructure.template.Model
 import utopia.flow.datastructure.template.Property
+
 import scala.collection.immutable.HashSet
 import utopia.flow.datastructure.immutable.Value
 import utopia.flow.datastructure.immutable
+import utopia.vault.model.immutable.Table
+
 import scala.collection.immutable.HashMap
 
 /**

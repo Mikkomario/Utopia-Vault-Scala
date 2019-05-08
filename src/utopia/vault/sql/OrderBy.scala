@@ -1,6 +1,6 @@
 package utopia.vault.sql
 
-import utopia.vault.model.Column
+import utopia.vault.model.immutable.Column
 
 /**
  * This object is used for generating sql segments that determine how the results will be ordered

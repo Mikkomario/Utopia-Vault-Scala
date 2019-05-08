@@ -1,13 +1,10 @@
-package utopia.vault.model
+package utopia.vault.model.immutable
 
 import utopia.flow.datastructure.immutable.Value
 import utopia.flow.datastructure.template.{Model, Property}
-import utopia.vault.database.Connection
-import utopia.vault.sql.SelectAll
-import utopia.vault.sql.Where
-import utopia.vault.sql.Condition
-import utopia.vault.sql.Limit
 import utopia.flow.generic.FromModelFactory
+import utopia.vault.database.Connection
+import utopia.vault.sql.{Condition, Limit, SelectAll, Where}
 
 object StorableFactory
 {

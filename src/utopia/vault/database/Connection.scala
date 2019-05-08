@@ -4,20 +4,22 @@ import utopia.flow.generic.EnvironmentNotSetupException
 import java.sql.DriverManager
 import java.sql.Statement
 import java.sql.SQLException
+
 import utopia.flow.datastructure.immutable.Value
 import java.sql.PreparedStatement
+
 import utopia.flow.parse.ValueConverterManager
 import java.sql.Types
 import java.sql.ResultSet
-import utopia.vault.model.Table
+
 import utopia.flow.datastructure.immutable.Model
 import utopia.flow.datastructure.immutable.Constant
+
 import scala.collection.immutable.HashSet
-import utopia.vault.model.Result
-import utopia.vault.model.Row
 import scala.util.Try
 import utopia.flow.generic.IntType
 import utopia.flow.generic.ValueConversions._
+import utopia.vault.model.immutable.{Result, Row, Table}
 import utopia.vault.sql.SqlSegment
 
 object Connection

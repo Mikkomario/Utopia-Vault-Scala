@@ -1,11 +1,10 @@
-package utopia.vault.model
+package utopia.vault.model.mutable
 
+import utopia.flow.datastructure.mutable.{Model, Variable}
 import utopia.flow.datastructure.template
-
-import utopia.flow.datastructure.mutable.Model
-import utopia.flow.datastructure.mutable.Variable
-import utopia.flow.generic.DeclarationVariableGenerator
 import utopia.flow.datastructure.template.Property
+import utopia.flow.generic.DeclarationVariableGenerator
+import utopia.vault.model.immutable.{Storable, StorableFactory, Table}
 
 object DBModel
 {
