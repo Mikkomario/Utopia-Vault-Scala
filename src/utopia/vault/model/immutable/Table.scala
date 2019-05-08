@@ -38,6 +38,11 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
      */
     def usesAutoIncrement = primaryColumn.exists { _.usesAutoIncrement }
     
+    /**
+      * @return A factory for storable instances from this table
+      */
+    def toFactory = StorableFactory(this)
+    
     
     // OPERATORS    ----------------------------
     
