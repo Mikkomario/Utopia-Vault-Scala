@@ -84,6 +84,9 @@ v1.1  ------------------------------------
             - model divided into model.immutable and model.mutable
             - test package moved under a separate source
 
+        Added `backticks` around column and table names within sql statements to avoid errors concerning reserved
+        workds in MySQL
+
 
     Fixes
     -----
