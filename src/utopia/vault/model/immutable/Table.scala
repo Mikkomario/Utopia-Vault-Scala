@@ -26,8 +26,13 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
  
     override def toString = name
     
-    override def toSqlSegment = SqlSegment(name, Vector(), Some(databaseName), HashSet(this))
-    
+    override def toSqlSegment = SqlSegment(sqlName, Vector(), Some(databaseName), HashSet(this))
+
+    /**
+      * @return The name of this table in sql format (same as original name but surrounded with `backticks`)
+      */
+    def sqlName = s"`$name`"
+
     /**
      * The primary column for this table. Not all tables do have primary columns though.
      */

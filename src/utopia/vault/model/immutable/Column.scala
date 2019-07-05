@@ -20,11 +20,16 @@ case class Column(propertyName: String, columnName: String, tableName: String, o
      * Whether a value is required in this column when data is inserted to the database
      */
     def isRequiredInInsert = !allowsNull && !usesAutoIncrement && defaultValue.isEmpty
-    
+
     /**
-     * The name of the column, including the table name for disambiguity
+      * @return The name of this column surrounded by `backticks`
+      */
+    def sqlColumnName = s"`$columnName`"
+
+    /**
+     * Returns the name of this column, including table name for disambiguity. Also includes backticks.
      */
-    def columnNameWithTable = tableName + "." + columnName
+    def columnNameWithTable = s"`$tableName`.`$columnName`"
     
     /**
      * Creates a condition that checks whether the column value in the database is null

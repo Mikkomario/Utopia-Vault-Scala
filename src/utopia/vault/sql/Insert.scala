@@ -33,12 +33,12 @@ object Insert
             None
         else 
         {
-            val columnNames = insertedPropertyNames.map { table(_).columnName }.mkString(", ")
+            val columnNames = insertedPropertyNames.map { table(_).sqlColumnName }.mkString(", ")
             val singleValueSql = "(?" + ", ?" * (insertedPropertyNames.size - 1) + ")"
             val valuesSql = singleValueSql + (", " + singleValueSql) * (rows.size - 1)
             val values = rows.flatMap { model => insertedPropertyNames.map { model(_) } }
             
-            val segment = SqlSegment(s"INSERT INTO ${table.name} ($columnNames) VALUES $valuesSql", values,
+            val segment = SqlSegment(s"INSERT INTO ${table.sqlName} ($columnNames) VALUES $valuesSql", values,
                 Some(table.databaseName), HashSet(table), false, table.usesAutoIncrement)
             
             Some(segment)
