@@ -1,8 +1,9 @@
 package utopia.vault.model.immutable
 
 import utopia.flow.datastructure.immutable.ModelDeclaration
+import utopia.vault.database.Connection
 import utopia.vault.sql.JoinType.JoinType
-import utopia.vault.sql.{SqlSegment, SqlTarget}
+import utopia.vault.sql.{Condition, Limit, Select, SqlSegment, SqlTarget, Where}
 
 import scala.collection.immutable.HashSet
 
@@ -105,4 +106,26 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
      */
     def joinFrom(propertyName: String, joinType: JoinType): SqlTarget =
             find(propertyName).map { joinFrom(_, joinType) }.getOrElse(this)
+
+    /**
+      * Finds the first index from this table where specified condition is met
+      * @param where A search condition
+      * @param connection The database connection used
+      * @return The first index in this table that matches the specified condition
+      */
+    def index(where: Condition)(implicit connection: Connection) =
+    {
+        connection(Select.index(this) + Where(where) + Limit(1)).rows.headOption.flatMap { _.index(this) }
+    }
+
+    /**
+      * Finds indices in this table for rows where specified condition is met
+      * @param where A search condition
+      * @param connection The database connection used
+      * @return Indices in this table for rows matching the condition
+      */
+    def indices(where: Condition)(implicit connection: Connection) =
+    {
+        connection(Select.index(this) + Where(where)).rows.flatMap { _.index(this) }
+    }
 }

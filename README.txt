@@ -72,6 +72,8 @@ v1.1  ------------------------------------
 
         ConnectionPool class for reusing connections and for connection sharing
 
+        index(...) & indices(...) methods in Table allow to easily search for specific row indices
+
 
     Changes & Updates
     -----------------
