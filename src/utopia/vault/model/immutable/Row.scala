@@ -1,6 +1,6 @@
 package utopia.vault.model.immutable
 
-import utopia.flow.datastructure.immutable.{Constant, Model}
+import utopia.flow.datastructure.immutable.{Constant, Model, Value}
 
 /**
  * A row represents a single row in a query result set. A row can contain columns from multiple
@@ -34,6 +34,12 @@ case class Row(columnData: Map[Table, Model[Constant]])
     def indices = columnData.flatMap { case (table, model) => table.primaryColumn.flatMap { column =>
             model.findExisting(column.name).map { constant => (table, constant.value) } } }
     
+    /**
+      * @return An index from this row. If this row contains data from multiple tables, please use index(Table) or
+      *         indices instead.
+      */
+    def index = indices.headOption.map { _._2 } getOrElse Value.empty()
+    
     
     // OPERATORS    ---------------------------
     
@@ -49,11 +55,19 @@ case class Row(columnData: Map[Table, Model[Constant]])
      */
     def apply(propertyName: String) = toModel(propertyName)
     
+    /**
+      * @param column Target column
+      * @return The value for the specified column
+      */
+    def apply(column: Column) = columnData.find { _._1.contains(column) }.map { _._2(column.name) }
+        .getOrElse(Value.empty(column.dataType))
+    
     
     // OTHER METHODS    ----------------------
     
     /**
      * Finds the index of the row in the specified table
      */
-    def index(table: Table) = table.primaryColumn.map { column => apply(table)(column.name) }
+    def indexForTable(table: Table) = table.primaryColumn.map { column => apply(table)(column.name) }
+        .getOrElse(Value.empty())
 }

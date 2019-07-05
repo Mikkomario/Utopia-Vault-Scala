@@ -48,6 +48,16 @@ case class Result(rows: Vector[Row], generatedKeys: Vector[Value] = Vector())
      */
     def generatedLongKeys = generatedKeys.flatMap { _.long }
     
+    /**
+      * @return All indices within this result. Won't work properly when rows contain indices from multiple tables.
+      */
+    def indices = rows.map { _.index }
+    
+    /**
+      * @return The index of the first result row
+      */
+    def firstIndex = rows.headOption.map { _.index } getOrElse Value.empty()
+    
     
     // OTHER METHODS    ------------------
     
@@ -56,4 +66,16 @@ case class Result(rows: Vector[Row], generatedKeys: Vector[Value] = Vector())
      * @param table The table whose data is returned
      */
     def rowsForTable(table: Table) = rows.map { _(table) }
+    
+    /**
+      * @param table Target table
+      * @return Index results for specified table
+      */
+    def indicesForTable(table: Table) = rows.map { _.indexForTable(table) }
+    
+    /**
+      * @param table Target table
+      * @return The first row index for the specified table
+      */
+    def firstIndexForTable(table: Table) = rows.headOption.map { _.indexForTable(table) } getOrElse Value.empty()
 }

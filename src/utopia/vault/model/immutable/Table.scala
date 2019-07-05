@@ -115,7 +115,7 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
       */
     def index(where: Condition)(implicit connection: Connection) =
     {
-        connection(Select.index(this) + Where(where) + Limit(1)).rows.headOption.flatMap { _.index(this) }
+        connection(Select.index(this) + Where(where) + Limit(1)).firstIndexForTable(this)
     }
 
     /**
@@ -126,6 +126,6 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
       */
     def indices(where: Condition)(implicit connection: Connection) =
     {
-        connection(Select.index(this) + Where(where)).rows.flatMap { _.index(this) }
+        connection(Select.index(this) + Where(where)).indicesForTable(this)
     }
 }

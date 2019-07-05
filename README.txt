@@ -74,6 +74,8 @@ v1.1  ------------------------------------
 
         index(...) & indices(...) methods in Table allow to easily search for specific row indices
 
+        Utility index methods added to Result and Row classes
+
 
     Changes & Updates
     -----------------
@@ -88,6 +90,9 @@ v1.1  ------------------------------------
 
         Added `backticks` around column and table names within sql statements to avoid errors concerning reserved
         workds in MySQL
+
+        Result and row index methods updated. Row index doesn't take parameters anymore and returns first index. Also,
+        instead of returning Option[Value], the index methods now return Value (which may be empty)
 
 
     Fixes

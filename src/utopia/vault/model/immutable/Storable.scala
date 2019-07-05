@@ -5,7 +5,7 @@ import utopia.flow.datastructure.template
 import utopia.flow.datastructure.template.Property
 import utopia.flow.generic.{DeclarationConstantGenerator, ModelConvertible}
 import utopia.vault.database.Connection
-import utopia.vault.sql.{Delete, Insert, SqlSegment, Update, Where}
+import utopia.vault.sql.{Delete, Insert, Select, SqlSegment, Update, Where}
 
 object Storable
 {
@@ -79,6 +79,17 @@ trait Storable extends ModelConvertible
         }
     
         conditions.head && conditions.drop(1)
+    }
+    
+    /**
+      * @return A select statement based on which properties are defined in this storable instance. If none of the
+      *         properties are defined, creates an empty select (Select None)
+      */
+    def toSelect =
+    {
+        val model = toModel
+        val selectedColumns = table.columns.filter { c => model(c.name).isDefined }
+        Select(table, selectedColumns)
     }
     
     
