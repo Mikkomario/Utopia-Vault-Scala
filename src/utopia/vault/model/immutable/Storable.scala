@@ -63,6 +63,24 @@ trait Storable extends ModelConvertible
         else None
     }
     
+    /**
+      * @return A condition based on this storable instance. All DEFINED properties are included in the condition.
+      * @throws NoSuchElementException If this instance didn't have a single defined property
+      */
+    def toCondition =
+    {
+        val model = toModel
+        val columns = table.columns
+        val conditions = columns.flatMap
+        {
+            c =>
+                val value = model(c.name)
+                if (value.isEmpty) None else Some(c <=> value)
+        }
+    
+        conditions.head && conditions.drop(1)
+    }
+    
     
     // IMPLEMENTED  ----------------------------------
     
@@ -74,12 +92,15 @@ trait Storable extends ModelConvertible
     /**
      * Converts this storable instance's properties into a condition. The condition checks that 
      * each of the instances DEFINED properties match their value in the database. Does not include 
-     * any null / empty properties.
+     * any null / empty properties and will only include specified properties.
+      * @param firstLimitKey The first key that is used
+      * @param moreLimitKeys More keys used in the condition
      * @return a condition based on this storable instance. None if the instance didn't contain 
      * any properties that could be used for forming a condition
      */
-    def toCondition(limitKeys: String*) = 
+    def toConditionWith(firstLimitKey: String, moreLimitKeys: String*) =
     {
+        val limitKeys = firstLimitKey +: moreLimitKeys
         val model = toModel
         val columns = if (limitKeys.isEmpty) table.columns else table.columns.filter {
             c => limitKeys.exists(c.name.equalsIgnoreCase) }

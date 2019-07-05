@@ -17,8 +17,7 @@ import scala.util.Try
   * @author Mikko Hilpinen
   * @since 7.5.2019, v1.1+
   */
-class ConnectionPool(maxConnections: Int, maxClientsPerConnection: Int, val connectionKeepAlive: Duration,
-					 val errorHandler: Exception => Unit = e => e.printStackTrace())
+class ConnectionPool(maxConnections: Int, maxClientsPerConnection: Int, val connectionKeepAlive: Duration)
 {
 	// ATTRIBUTES	----------------------
 	
