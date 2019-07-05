@@ -41,4 +41,20 @@ object OrderBy
      */
     def apply(ascending: Boolean, first: Column, second: Column, more: Column*): SqlSegment = 
             apply((Vector(first, second) ++ more).map { (_, ascending) })
+    
+    /**
+      * Orders by specified column(s), ascending (= smallest to largest)
+      * @param first The first order column
+      * @param more More order columns
+      * @return An order by segment
+      */
+    def ascending(first: Column, more: Column*) = apply((first +: more).map { _ -> true })
+    
+    /**
+      * Orders by specified column(s), descending (= largest to smallest)
+      * @param first The first order column
+      * @param more More order columns
+      * @return An order by segment
+      */
+    def descending(first: Column, more: Column*) = apply((first +: more).map { _ -> false })
 }

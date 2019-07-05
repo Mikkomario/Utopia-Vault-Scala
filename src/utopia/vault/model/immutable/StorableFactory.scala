@@ -4,7 +4,7 @@ import utopia.flow.datastructure.immutable.Value
 import utopia.flow.datastructure.template.{Model, Property}
 import utopia.flow.generic.FromModelFactory
 import utopia.vault.database.Connection
-import utopia.vault.sql.{Condition, Limit, Select, SelectAll, Where}
+import utopia.vault.sql.{Condition, Limit, SelectAll, Where}
 
 object StorableFactory
 {

@@ -76,6 +76,8 @@ v1.1  ------------------------------------
 
         Utility index methods added to Result and Row classes
 
+        ascending and descending methods added to OrderBy
+
 
     Changes & Updates
     -----------------
