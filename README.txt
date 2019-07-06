@@ -1,5 +1,11 @@
 UTOPIA VAULT --------------------------------
 
+Required Libraries
+------------------
+    - Utopia Flow
+    - Maria DB or MySQL client (used mariadb-java-client-1.5.9.jar in development)
+
+
 Purpose
 -------
 
@@ -101,3 +107,9 @@ v1.1  ------------------------------------
     -----
 
         Fixed an error in DatabaseTableReader where table description syntax had changed
+
+
+    Required Libraries
+    ------------------
+        - Utopia Flow 1.5+
+        - MariaDB or MySQL client

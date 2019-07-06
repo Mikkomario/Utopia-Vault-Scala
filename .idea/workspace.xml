@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="92da042d-32a6-4c2c-9a07-bca99577ad71" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/utopia/vault/sql/Select.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/sql/Select.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.txt" beforeDir="false" afterPath="$PROJECT_DIR$/README.txt" afterDir="false" />
     </list>
     <ignored path="out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -15,15 +16,24 @@
     <option name="isMigrated" value="true" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file pinned="false" current-in-tab="true">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/utopia/vault/sql/Select.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="839">
+            <state relative-caret-position="1040">
               <caret line="52" column="1" selection-start-line="52" selection-start-column="1" selection-end-line="52" selection-end-column="1" />
               <folding>
                 <element signature="e#26#77#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/README.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="100">
+              <caret line="5" column="81" selection-start-line="5" selection-start-column="81" selection-end-line="5" selection-end-column="81" />
             </state>
           </provider>
         </entry>
@@ -114,12 +124,12 @@
         <option value="$PROJECT_DIR$/test/utopia/vault/test/StorableTest.scala" />
         <option value="$PROJECT_DIR$/src/utopia/vault/model/immutable/Storable.scala" />
         <option value="$PROJECT_DIR$/src/utopia/vault/model/immutable/Table.scala" />
-        <option value="$PROJECT_DIR$/README.txt" />
         <option value="$PROJECT_DIR$/src/utopia/vault/sql/Select.scala" />
+        <option value="$PROJECT_DIR$/README.txt" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-12" />
     <option name="width" value="2628" />
     <option name="height" value="2112" />
@@ -143,20 +153,7 @@
             <path>
               <item name="Utopia-Vault-Scala" type="b2602c69:ProjectViewProjectNode" />
               <item name="Utopia-Vault-Scala" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Utopia-Vault-Scala" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Utopia-Vault-Scala" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="vault" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Utopia-Vault-Scala" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Utopia-Vault-Scala" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="vault" type="462c0819:PsiDirectoryNode" />
-              <item name="sql" type="462c0819:PsiDirectoryNode" />
+              <item name="lib" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -199,7 +196,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.InsertTest">
     <configuration name="InsertTest" type="Application" factoryName="Application" temporary="true">
       <option name="MAIN_CLASS_NAME" value="utopia.vault.test.InsertTest" />
       <module name="Utopia-Vault-Scala" />
@@ -342,12 +339,12 @@
       <window_info id="Favorites" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32943925" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.2151208" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.2151208" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.23286605" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Version Control" order="7" weight="0.32969603" />
+      <window_info anchor="bottom" id="Version Control" order="7" weight="0.2314887" />
       <window_info anchor="bottom" id="Terminal" order="8" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Dependency Viewer" order="10" weight="0.32943925" />
@@ -660,13 +657,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="9" column="13" lean-forward="true" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/utopia/vault/sql/Extensions.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
@@ -747,11 +737,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/utopia/vault/sql/Select.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="839">
+        <state relative-caret-position="1040">
           <caret line="52" column="1" selection-start-line="52" selection-start-column="1" selection-end-line="52" selection-end-column="1" />
           <folding>
             <element signature="e#26#77#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="100">
+          <caret line="5" column="81" selection-start-line="5" selection-start-column="81" selection-end-line="5" selection-end-column="81" />
         </state>
       </provider>
     </entry>
