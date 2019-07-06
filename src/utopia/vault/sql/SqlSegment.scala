@@ -1,9 +1,10 @@
 package utopia.vault.sql
 
 import utopia.flow.datastructure.immutable.Value
-import utopia.vault.model.Table
+
 import scala.collection.immutable.HashSet
-import scala.Vector
+import utopia.vault.database.Connection
+import utopia.vault.model.immutable.Table
 
 object SqlSegment
 {
@@ -40,14 +41,15 @@ object SqlSegment
  * Sql Segments can be combined to form sql statements. Some may contain value assignments too.
  * @author Mikko Hilpinen
  * @since 12.3.2017
+  * @constructor Creates a new sql segment from specified sql with proper metadata (values, database name,
+  *              tables and whether this sql represents a selection statement)
  * @param sql The sql string representing the segment. Each of the segment's values is indicated with a 
  * '?' character.
  * @param values The values that will be inserted to this segment when it is used. Each '?' in the sql will 
  * be replaced with a single value. Empty values will be interpreted as NULL.
  */
-case class SqlSegment(val sql: String, val values: Seq[Value] = Vector(), 
-        val databaseName: Option[String] = None, val targetTables: Set[Table] = HashSet(), 
-        val isSelect: Boolean = false, val generatesKeys: Boolean = false)
+case class SqlSegment(sql: String, values: Seq[Value] = Vector(), databaseName: Option[String] = None,
+                      targetTables: Set[Table] = HashSet(), isSelect: Boolean = false, generatesKeys: Boolean = false)
 {
     // COMPUTED PROPERTIES    -----------
     
@@ -62,7 +64,7 @@ case class SqlSegment(val sql: String, val values: Seq[Value] = Vector(),
     /**
      * Whether the segment is considered to be empty (no-op)
      */
-    def isEmpty = sql.isEmpty()
+    def isEmpty = sql.isEmpty
     
     
     // OPERATORS    ---------------------
@@ -73,7 +75,7 @@ case class SqlSegment(val sql: String, val values: Seq[Value] = Vector(),
      */
     def +(other: SqlSegment) = SqlSegment(sql + " " + other.sql, values ++ other.values, 
             databaseName orElse other.databaseName, targetTables ++ other.targetTables, 
-            isSelect || other.isSelect, generatesKeys || other.generatesKeys);
+            isSelect || other.isSelect, generatesKeys || other.generatesKeys)
     
     /**
      * Appends this sql segment with an sql string. 
@@ -87,4 +89,12 @@ case class SqlSegment(val sql: String, val values: Seq[Value] = Vector(),
      * of this segment. A whitespace character is added between the two segments.
      */
     def prepend(sql: String) = copy(sql = sql + " " + this.sql)
+    
+    
+    // OTHER METHODS    ----------------
+    
+    /**
+     * Runs this sql segment / statement over a database connection
+     */
+    def execute()(implicit connection: Connection) = connection(this)
 }

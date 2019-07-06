@@ -1,6 +1,6 @@
 package utopia.vault.sql
 
-import utopia.vault.model.Table
+import utopia.vault.model.immutable.Table
 
 /**
  * This object is used for creating sql statements which delete contents from the database. 
@@ -15,12 +15,12 @@ object Delete
      * tables must be included in the provided target.
      * @param target The target for the delete operation, may be a single table or join, but must 
      * contain all deleted tables.
-     * @param deletedTables The tables from which rows are deleted
+     * @param deletedTables The tables from which rows are deleted (shouldn't be empty)
      */
     def apply(target: SqlTarget, deletedTables: Seq[Table]) = 
             if (deletedTables.isEmpty) SqlSegment.empty else SqlSegment(
-            s"DELETE ${ deletedTables.tail.foldLeft(deletedTables.head.name) {_ + ", " + _.name } } FROM") + 
-            target.toSqlSegment;
+            s"DELETE ${ deletedTables.drop(1).foldLeft(deletedTables.head.sqlName) {_ + ", " + _.sqlName } } FROM") +
+            target.toSqlSegment
     
     /**
      * Creates an sql segment that deletes rows from a single table. This segment is often followed 

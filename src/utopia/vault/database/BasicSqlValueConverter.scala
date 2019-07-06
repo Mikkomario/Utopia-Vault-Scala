@@ -13,6 +13,10 @@ import utopia.flow.generic.FloatType
 import utopia.flow.generic.DoubleType
 import java.sql.Types
 import java.sql.Timestamp
+import utopia.flow.generic.LocalDateType
+import java.sql.Date
+import utopia.flow.generic.LocalTimeType
+import java.sql.Time
 
 /**
  * This value converter is able to convert some data types into sql compatible object types. The 
@@ -25,7 +29,7 @@ import java.sql.Timestamp
 object BasicSqlValueConverter extends ValueConverter[Tuple2[Any, Int]]
 {
     override val supportedTypes: Set[DataType] = HashSet(StringType, InstantType, BooleanType, 
-            IntType, LongType, FloatType, DoubleType)
+            IntType, LongType, FloatType, DoubleType, LocalDateType, LocalTimeType)
     
     override def apply(value: Value, dataType: DataType) = 
     {
@@ -38,6 +42,8 @@ object BasicSqlValueConverter extends ValueConverter[Tuple2[Any, Int]]
             case IntType => (value.intOr(), Types.INTEGER)
             case BooleanType => (value.booleanOr(), Types.BOOLEAN)
             case InstantType => (Timestamp.from(value.instantOr()), Types.TIMESTAMP)
+            case LocalDateType => (Date.valueOf(value.localDateOr()), Types.DATE)
+            case LocalTimeType => (Time.valueOf(value.localTimeOr()), Types.TIME)
             case _ => (value.stringOr(), Types.VARCHAR)
         }
     }

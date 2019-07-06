@@ -13,7 +13,7 @@ trait SqlTypeInterpreter
 {
     /**
      * Interpretes an sql type string into an actual data type, if possible.
-     * @param The sql type string. For example: 'int(11)', 'varchar(32)' or 'timestamp'
+     * @param typeString The sql type string. For example: 'int(11)', 'varchar(32)' or 'timestamp'
      * @return the interpreted data type or none if the type couldn't be recognised
      */
     def apply(typeString: String): Option[DataType]

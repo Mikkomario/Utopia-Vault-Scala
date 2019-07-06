@@ -7,6 +7,8 @@ import utopia.flow.generic.InstantType
 import utopia.flow.generic.LongType
 import utopia.flow.generic.FloatType
 import utopia.flow.generic.DoubleType
+import utopia.flow.generic.LocalDateType
+import utopia.flow.generic.LocalTimeType
 
 /**
  * This interpreter is able to interpret the basic sql type cases into the basic data types 
@@ -30,7 +32,9 @@ object BasicSqlTypeInterpreter extends SqlTypeInterpreter
             case "varchar" | "char" | "character" => Some(StringType)
             case "tinyint" => Some(if (typeString.endsWith("(1)") || typeString.toLowerCase == "tinyint") BooleanType else IntType)
             case "timestamp" | "datetime" => Some(InstantType)
-            case s if (s.endsWith("text") || s.endsWith("blob")) => Some(StringType)
+            case "date" => Some(LocalDateType)
+            case "time" => Some(LocalTimeType)
+            case s if s.endsWith("text") || s.endsWith("blob") => Some(StringType)
             case _ => None
         }
     }

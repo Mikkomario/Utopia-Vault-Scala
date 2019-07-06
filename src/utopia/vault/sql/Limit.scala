@@ -1,6 +1,5 @@
 package utopia.vault.sql
 
-import utopia.flow.datastructure.immutable.Value
 import utopia.flow.generic.ValueConversions._
 
 /**

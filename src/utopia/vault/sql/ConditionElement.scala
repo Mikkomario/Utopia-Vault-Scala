@@ -56,7 +56,7 @@ trait ConditionElement
      * provided values (inclusive)
      */
     def isBetween(min: ConditionElement, max: ConditionElement) = Condition(toSqlSegment + "BETWEEN" + 
-            min.toSqlSegment + "AND" + max.toSqlSegment);
+            min.toSqlSegment + "AND" + max.toSqlSegment)
     
     /**
      * Creates an in condition that returns true if one of the provided element values matches 
@@ -70,6 +70,5 @@ trait ConditionElement
         Condition(toSqlSegment + "IN" + inSegment)
     }
     
-    private def makeCondition(operator: String, other: ConditionElement) = Condition(
-            toSqlSegment + operator + other.toSqlSegment);
+    private def makeCondition(operator: String, other: ConditionElement) = Condition(toSqlSegment + operator + other.toSqlSegment)
 }

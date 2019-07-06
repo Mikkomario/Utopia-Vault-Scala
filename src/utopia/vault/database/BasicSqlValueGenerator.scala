@@ -11,6 +11,7 @@ import utopia.flow.generic.IntType
 import java.sql.Date
 import java.sql.Timestamp
 import utopia.flow.generic.ValueConversions._
+import java.sql.Time
 
 /**
  * This generator handles value generation for the basic data types introduced in the Flow project. 
@@ -27,6 +28,8 @@ object BasicSqlValueGenerator extends SqlValueGenerator
         {
             case Types.TIMESTAMP | Types.TIMESTAMP_WITH_TIMEZONE => 
                 Some(value.asInstanceOf[Timestamp].toInstant())
+            case Types.DATE => Some(value.asInstanceOf[Date].toLocalDate())
+            case Types.TIME => Some(value.asInstanceOf[Time].toLocalTime())
             case Types.CHAR => Some(value.toString)
             
             case Types.INTEGER | Types.SMALLINT | Types.TINYINT => wrap(value, IntType)

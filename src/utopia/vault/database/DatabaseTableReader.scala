@@ -1,10 +1,8 @@
 package utopia.vault.database
 
-import utopia.vault.model.Table
-import utopia.vault.model.Column
 import utopia.flow.generic.AnyType
-import utopia.flow.datastructure.immutable.Value
 import utopia.flow.generic.ValueConversions._
+import utopia.vault.model.immutable.{Column, Table}
 
 /**
  * This object is able to read table / column data from the database itself
@@ -35,18 +33,17 @@ object DatabaseTableReader
             val isPrimary = "pri" == data.getOrElse("COLUMN_KEY", data("Key")).toLowerCase
             val usesAutoIncrement = "auto_increment" == data.getOrElse("EXTRA", data("Extra")).toLowerCase
             val dataType = SqlTypeInterpreterManager(data.getOrElse("COLUMN_TYPE", data("Type"))).getOrElse(AnyType)
-            // val nullAllowed = "yes" == data("Null").toLowerCase
+            val nullAllowed = "yes" == data.getOrElse("IS_NULLABLE", data("Null")).toLowerCase
             
             val defaultString = data.getOrElse("COLUMN_DEFAULT", data.getOrElse("Default", "null"))
-            val defaultValue = if (defaultString.toLowerCase == "null" || 
-                    defaultString.toLowerCase == "current_timestamp") None 
-                    else defaultString.castTo(dataType);
+            val defaultValue = if (defaultString.toLowerCase == "null") None else defaultString.castTo(dataType)
+            // Used to have:  || defaultString.toLowerCase == "current_timestamp"
             
-            new Column(columnNameToPropertyName(columnName), columnName, tableName, dataType, 
-                    defaultValue, isPrimary, usesAutoIncrement)
+            Column(columnNameToPropertyName(columnName), columnName, tableName, dataType,
+                    nullAllowed, defaultValue, isPrimary, usesAutoIncrement)
         } )
         
-        new Table(tableName, databaseName, columns)
+        Table(tableName, databaseName, columns)
     }
     
     // Converts underscrore naming style strings to camelcase naming style strings

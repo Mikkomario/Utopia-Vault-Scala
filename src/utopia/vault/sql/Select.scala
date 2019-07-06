@@ -1,7 +1,7 @@
 package utopia.vault.sql
 
-import utopia.vault.model.Table
-import utopia.vault.model.Column
+import utopia.vault.model.immutable.{Column, Table}
+
 import scala.collection.immutable.HashSet
 
 /**
@@ -18,9 +18,8 @@ object Select
      * Creates an sql segment that selects a number of columns from a table
      */
     def apply(target: SqlTarget, columns: Seq[Column]) = SqlSegment(s"SELECT ${ 
-            if (columns.isEmpty) "NULL" else columns.view.map { 
-            _.columnNameWithTable }.reduceLeft { _ + ", " + _ } } FROM", Vector(), None, HashSet(), 
-            true) + target.toSqlSegment;
+        if (columns.isEmpty) "NULL" else columns.view.map { _.columnNameWithTable }.reduceLeft { _ + ", " + _ } } FROM",
+        Vector(), None, HashSet(), true) + target.toSqlSegment
     
     /**
      * Creates an sql segment that selects a single column from a table
@@ -31,18 +30,13 @@ object Select
      * Creates an sql segment that selects a number of columns from a table
      */
     def apply(target: SqlTarget, first: Column, second: Column, more: Column*): SqlSegment = 
-            apply(target, Vector(first, second) ++ more);
+            apply(target, Vector(first, second) ++ more)
     
     /**
-     * Creates an sql segment that selects a column with a matching property name from a table
+     * Creates an sql segment that selects one or multiple properties from a single table
      */
-    def apply(table: Table, propertyName: String): SqlSegment = apply(table, table.find(propertyName).toSeq);
-    
-    /**
-     * Creates an sql segment that selects multiple columns matching property names from a table
-     */
-    def apply(table: Table, first: String, second: String, more: String*): SqlSegment = 
-            apply(table, (Vector(first, second) ++ more).flatMap { table(_) });
+    def apply(table: Table, firstName: String, moreNames: String*): SqlSegment = 
+            apply(table, table(firstName +: moreNames))
     
     
     // OTHER METHODS    -------------

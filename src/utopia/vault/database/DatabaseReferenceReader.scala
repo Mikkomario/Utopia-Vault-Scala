@@ -1,19 +1,15 @@
 package utopia.vault.database
 
-import utopia.vault.model.Table
-import utopia.vault.model.Column
+import utopia.flow.generic.ValueConversions._
 import utopia.flow.generic.StringType
 import utopia.vault.sql.Select
 import utopia.vault.sql.Where
-import utopia.flow.datastructure.immutable.Value
-
 import utopia.vault.sql.Extensions._
 import utopia.vault.sql.ConditionElement
 import utopia.flow.datastructure.template.Model
 import utopia.flow.datastructure.template.Property
-import utopia.vault.model.References
-import utopia.flow.generic.ValueConversions._
-import utopia.vault.sql.ConditionValue
+import utopia.vault.model.immutable.{Column, Reference, Table}
+import utopia.vault.model.mutable.References
 
 /**
  * This object can be used for reading and setting up table references by reading them directly 
@@ -23,12 +19,12 @@ import utopia.vault.sql.ConditionValue
  */
 object DatabaseReferenceReader
 {
-    private val keys = new Table("KEY_COLUMN_USAGE", "INFORMATION_SCHEMA", Vector(
-            new Column("schema", "TABLE_SCHEMA", "KEY_COLUMN_USAGE", StringType), 
-            new Column("tableName", "TABLE_NAME", "KEY_COLUMN_USAGE", StringType), 
-            new Column("columnName", "COLUMN_NAME", "KEY_COLUMN_USAGE", StringType), 
-            new Column("referencedTableName", "REFERENCED_TABLE_NAME", "KEY_COLUMN_USAGE", StringType), 
-            new Column("referencedColumnName", "REFERENCED_COLUMN_NAME", "KEY_COLUMN_USAGE", StringType)))
+    private val keys = Table("KEY_COLUMN_USAGE", "INFORMATION_SCHEMA", Vector(
+            Column("schema", "TABLE_SCHEMA", "KEY_COLUMN_USAGE", StringType, false),
+            Column("tableName", "TABLE_NAME", "KEY_COLUMN_USAGE", StringType),
+            Column("columnName", "COLUMN_NAME", "KEY_COLUMN_USAGE", StringType),
+            Column("referencedTableName", "REFERENCED_TABLE_NAME", "KEY_COLUMN_USAGE", StringType),
+            Column("referencedColumnName", "REFERENCED_COLUMN_NAME", "KEY_COLUMN_USAGE", StringType)))
     
     /**
      * Reads all references between the provided tables
@@ -45,14 +41,14 @@ object DatabaseReferenceReader
         else 
         {
             val databaseName = tables.head.databaseName
-            // TODO: Consider making this easier using proper implicit conversions
-            val tableOptions = tables.map { table => new ConditionValue(table.name) }.toSeq
+            val tableOptions = tables.map(_.name: ConditionElement).toSeq
             val results = connection(Select(keys, keys.columns) + Where(
                     keys("schema") <=> databaseName && 
                     keys("tableName").in(tableOptions) && 
-                    keys("referencedTableName").in(tableOptions))).rows.map { _.toModel }
+                    keys("referencedTableName").in(tableOptions))).rows.map(_.toModel)
             
-            def findTable(keyName: String, row: Model[Property]) = tables.find { _.name == row(keyName).stringOr() }.get
+            def findTable(keyName: String, row: Model[Property]) = tables.find(
+                    _.name == row(keyName).stringOr()).get
             def findColumn(table: Table, keyName: String, row: Model[Property]) = 
                     table.columnWithColumnName(row(keyName).stringOr())
             
@@ -63,7 +59,7 @@ object DatabaseReferenceReader
                 val targetTable = findTable("referencedTableName", row)
                 val targetColumn = findColumn(targetTable, "referencedColumnName", row)
                 
-                (sourceTable, sourceColumn, targetTable, targetColumn)
+                Reference(sourceTable, sourceColumn, targetTable, targetColumn)
             } )
         }
     }
@@ -77,8 +73,7 @@ object DatabaseReferenceReader
      */
     def setupReferences(tables: Set[Table])(implicit connection: Connection) = 
     {
-        val tablesForDatabase = tables.groupBy { _.databaseName }
-        tablesForDatabase.foreach { case (dbName, tables) => 
-                References.setup(dbName, apply(tables)(connection).toSet) }
+        val tablesForDatabase = tables.groupBy(_.databaseName)
+        tablesForDatabase.foreach { case (dbName, dbTables) => References.setup(dbName, apply(dbTables)(connection).toSet) }
     }
 }
