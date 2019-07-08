@@ -71,6 +71,23 @@ Available Extensions
         - Usually works in combination with utopia.flow.generic.ValueConversions
 
 
+v1.1.1  ----------------------------------
+
+    New Features
+    ------------
+
+        FromResultFactory trait to support StorableFactory-like features when a model is constructed from data between
+        multiple joined tables.
+
+        Added apply(Storable) to Where for easier conversion from storable to where clause
+
+
+    Required Libraries
+        ------------------
+            - Utopia Flow 1.5+
+            - MariaDB or MySQL client
+
+
 v1.1  ------------------------------------
 
     New Features

@@ -1,10 +1,7 @@
 package utopia.vault.model.immutable
 
-import utopia.flow.datastructure.immutable.Value
 import utopia.flow.datastructure.template.{Model, Property}
 import utopia.flow.generic.FromModelFactory
-import utopia.vault.database.Connection
-import utopia.vault.sql.{Condition, Limit, SelectAll, Where}
 
 object StorableFactory
 {
@@ -22,56 +19,15 @@ object StorableFactory
  * @author Mikko Hilpinen
  * @since 18.6.2017
  */
-trait StorableFactory[+T] extends FromModelFactory[T]
+trait StorableFactory[+T] extends FromResultFactory[T] with FromModelFactory[T]
 {
-    // ABSTRACT METHODS    --------------------
+    // IMPLEMENTED  ----------------------------
     
-    /**
-     * The table which resembles the generated storable structure
-     */
-    def table: Table
+    override val joinedTables = Vector()
     
+    override def parseSingle(result: Result) = result.rows.headOption.map { _.toModel }.flatMap(apply)
     
-    // OTHER METHODS    -----------------------
-    
-    /**
-     * Retrieves an object's data from the database and parses it to a proper instance
-     * @param index the index / primary key with which the data is read
-     * @return database data parsed into an instance. None if there was no data available.
-     */
-    def get(index: Value)(implicit connection: Connection): Option[T] = 
-    {
-        table.primaryColumn.flatMap { column => get(column <=> index) }
-    }
-    
-    /**
-     * Retrieves an object's data from the database and parses it to a proper instance
-     * @param where The condition with which the row is found from the database (will be limited to 
-     * the first result row)
-     * @return database data parsed into an instance. None if no data was found with the provided 
-     * condition
-     */
-    def get(where: Condition)(implicit connection: Connection) = 
-    {
-        connection(SelectAll(table) + Where(where) + Limit(1)).rows.headOption.map { _.toModel }.flatMap(apply)
-    }
-    
-    /**
-     * Finds possibly multiple instances from the database
-     * @param where the condition with which the instances are filtered
-     * @return Parsed instance data
-     */
-    def getMany(where: Condition)(implicit connection: Connection) = 
-    {
-        connection(SelectAll(table) + Where(where)).rowModels.flatMap(apply)
-    }
-    
-    /**
-     * Finds every single instance of this type from the database. This method should only be 
-     * used in case of somewhat small tables.
-     * @see #getMany(Condition)
-     */
-    def getAll()(implicit connection: Connection) = connection(SelectAll(table)).rowModels.flatMap(apply)
+    override def parseMany(result: Result) = result.rowModels.flatMap(apply)
 }
 
 private class ImmutableStorableFactory(override val table: Table) extends StorableFactory[Storable]
