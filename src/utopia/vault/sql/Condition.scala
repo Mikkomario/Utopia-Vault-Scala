@@ -1,5 +1,7 @@
 package utopia.vault.sql
 
+import utopia.vault.model.immutable.Storable
+
 object Where
 {
     /**
@@ -7,6 +9,14 @@ object Where
      * same as condition.toWhereClause
      */
     def apply(condition: Condition) = condition.toWhereClause
+    
+    /**
+      * A utility method for converting a storable instance into a where clause. Same as calling
+      * storable.toCondition.toWhereClause
+      * @param conditionModel A storable model representing a condition
+      * @return A where clause based on the model
+      */
+    def apply(conditionModel: Storable) = conditionModel.toCondition.toWhereClause
 }
 
 /**
