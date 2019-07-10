@@ -47,6 +47,10 @@ object SqlSegment
  * '?' character.
  * @param values The values that will be inserted to this segment when it is used. Each '?' in the sql will 
  * be replaced with a single value. Empty values will be interpreted as NULL.
+  * @param databaseName The name of the targeted database
+  * @param targetTables The tables data is <b>read</b> from
+  * @param isSelect Whether this segment represents a select query
+  * @param generatesKeys Whether this statement will generate new keys (= rows with auto-increment index) to the database
  */
 case class SqlSegment(sql: String, values: Seq[Value] = Vector(), databaseName: Option[String] = None,
                       targetTables: Set[Table] = HashSet(), isSelect: Boolean = false, generatesKeys: Boolean = false)

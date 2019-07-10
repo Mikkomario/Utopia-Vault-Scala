@@ -34,9 +34,14 @@ case class Result(rows: Vector[Row], generatedKeys: Vector[Value] = Vector())
     def firstModel = rows.headOption.map { _.toModel }
     
     /**
-     * Whether this result is empty and doesn't contain any meaningful data
+     * Whether this result is empty and doesn't contain any rows or generated keys
      */
-    def isEmpty = generatedKeys.isEmpty && rows.forall { _.isEmpty }
+    def isEmpty = generatedKeys.isEmpty && rows.isEmpty
+    
+    /**
+      * @return Whether this result contains rows or generated keys
+      */
+    def nonEmpty = !isEmpty
     
     /**
      * The generated keys in integer format

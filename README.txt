@@ -71,6 +71,33 @@ Available Extensions
         - Usually works in combination with utopia.flow.generic.ValueConversions
 
 
+v1.2    ----------------------------------
+
+    New Features
+    ------------
+
+        FromRowFactory trait for converting (joined) database rows to object data.
+
+        Exists object for checking whether any results can be found for a query. Also added two exists methods to
+        FromResultFactory to see whether there would be any object data for specified query / index.
+
+        search(...) and searchMany(...) methods added to Storable. Also addded StorableWithFactory trait that provides
+        search() and searchMany() without parameters.
+
+
+    Updates & Changes
+    -----------------
+
+        FromResultFactory now only has getMany(...) and getAll() methods because Limit(1) couldn't be used with all
+        join styles. FromRowFactory now handles cases where data can be represented using a single row, which also
+        supports Limit(1).
+
+        Result.isEmpty now only checks whether there are any rows or generated keys available (empty rows now count).
+        Also added nonEmpty that behaves exactly like !isEmpty.
+
+        Storable(...) now produces a StorableWithFactory instead of just Storable
+
+
 v1.1.1  ----------------------------------
 
     New Features

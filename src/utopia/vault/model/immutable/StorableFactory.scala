@@ -19,15 +19,13 @@ object StorableFactory
  * @author Mikko Hilpinen
  * @since 18.6.2017
  */
-trait StorableFactory[+T] extends FromResultFactory[T] with FromModelFactory[T]
+trait StorableFactory[+A] extends FromRowFactory[A] with FromModelFactory[A]
 {
     // IMPLEMENTED  ----------------------------
     
     override val joinedTables = Vector()
     
-    override def parseSingle(result: Result) = result.rows.headOption.map { _.toModel }.flatMap(apply)
-    
-    override def parseMany(result: Result) = result.rowModels.flatMap(apply)
+    override def apply(row: Row) = apply(row(table))
 }
 
 private class ImmutableStorableFactory(override val table: Table) extends StorableFactory[Storable]
