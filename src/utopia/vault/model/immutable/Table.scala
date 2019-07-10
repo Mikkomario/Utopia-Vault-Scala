@@ -18,6 +18,11 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
     // ATTRIBUTES    ---------------------------
     
     /**
+      * The primary column for this table. Not all tables do have primary columns though.
+      */
+    val primaryColumn = columns.find { _.isPrimary }
+    
+    /**
      * A model declaration based on this table
      */
     lazy val toModelDeclaration = new ModelDeclaration(columns)
@@ -33,11 +38,11 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
       * @return The name of this table in sql format (same as original name but surrounded with `backticks`)
       */
     def sqlName = s"`$name`"
-
+    
     /**
-     * The primary column for this table. Not all tables do have primary columns though.
-     */
-    def primaryColumn = columns.find { _.isPrimary }
+      * @return Whether this table has a primary column
+      */
+    def hasPrimaryColumn = primaryColumn.isDefined
     
     /**
      * Whether the table has an index (primary key) that uses auto-increment

@@ -2,7 +2,7 @@ package utopia.vault.model.immutable
 
 import utopia.flow.datastructure.immutable.Value
 import utopia.vault.database.Connection
-import utopia.vault.sql.{Condition, JoinType, Limit, SelectAll, SqlTarget, Where}
+import utopia.vault.sql.{Condition, Exists, JoinType, SelectAll, SqlTarget, Where}
 
 /**
   * These factories are used for constructing object data from database results
@@ -24,48 +24,22 @@ trait FromResultFactory[+A]
 	def joinedTables: Seq[Table]
 	
 	/**
-	  * Parses a result into a single object
-	  * @param result The result to be parsed
-	  * @return Parsed object. None if the result couldn't be parsed into an object.
-	  */
-	def parseSingle(result: Result): Option[A]
-	
-	/**
-	  * Parses a result into multiple objects
-	  * @param result The result to be parsed
+	  * Parses a result into one or multiple (or zero) objects
+	  * @param result A database query result to be parsed
 	  * @return Parsed objects
 	  */
-	def parseMany(result: Result): Vector[A]
+	def apply(result: Result): Vector[A]
 	
 	
 	// COMPUTED	---------------
 	
-	private def target = joinedTables.foldLeft(table: SqlTarget) { (r, t) => r.join(t, JoinType.Left) }
+	/**
+	  * @return This factory's target that includes the primary table and possible joined tables
+	  */
+	protected def target = joinedTables.foldLeft(table: SqlTarget) { (r, t) => r.join(t, JoinType.Left) }
 	
 	
 	// OTHER	---------------
-	
-	/**
-	  * Retrieves an object's data from the database and parses it to a proper instance
-	  * @param index the index / primary key with which the data is read
-	  * @return database data parsed into an instance. None if there was no data available.
-	  */
-	def get(index: Value)(implicit connection: Connection): Option[A] =
-	{
-		table.primaryColumn.flatMap { column => get(column <=> index) }
-	}
-	
-	/**
-	  * Retrieves an object's data from the database and parses it to a proper instance
-	  * @param where The condition with which the row is found from the database (will be limited to
-	  * the first result row)
-	  * @return database data parsed into an instance. None if no data was found with the provided
-	  * condition
-	  */
-	def get(where: Condition)(implicit connection: Connection) =
-	{
-		parseSingle(connection(SelectAll(target) + Where(where) + Limit(1)))
-	}
 	
 	/**
 	  * Finds possibly multiple instances from the database
@@ -74,7 +48,7 @@ trait FromResultFactory[+A]
 	  */
 	def getMany(where: Condition)(implicit connection: Connection) =
 	{
-		parseMany(connection(SelectAll(target) + Where(where)))
+		apply(connection(SelectAll(target) + Where(where)))
 	}
 	
 	/**
@@ -82,5 +56,21 @@ trait FromResultFactory[+A]
 	  * used in case of somewhat small tables.
 	  * @see #getMany(Condition)
 	  */
-	def getAll()(implicit connection: Connection) = parseMany(connection(SelectAll(table)))
+	def getAll()(implicit connection: Connection) = apply(connection(SelectAll(table)))
+	
+	/**
+	  * Checks whether an object exists for the specified query
+	  * @param where A search condition
+	  * @param connection Database connection (implicit)
+	  * @return Whether there exists data in the DB for specified condition
+	  */
+	def exists(where: Condition)(implicit connection: Connection) = Exists(target, where)
+	
+	/**
+	  * Checks whether there exists data for the specified index
+	  * @param index An index in this factory's primary table
+	  * @param connection Database connection (implicit)
+	  * @return Whether there exists data for the specified index
+	  */
+	def exists(index: Value)(implicit connection: Connection) = Exists.index(table, index)
 }
