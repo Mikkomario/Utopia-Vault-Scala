@@ -71,6 +71,16 @@ Available Extensions
         - Usually works in combination with utopia.flow.generic.ValueConversions
 
 
+v1.2.1  ----------------------------------
+
+    Updates & Changes
+    -----------------
+
+        New utility methods (firstValue) in Result & Row
+
+        StorableWithFactory now accepts FromRowFactories instead of just StorableFactories
+
+
 v1.2    ----------------------------------
 
     New Features
@@ -96,6 +106,12 @@ v1.2    ----------------------------------
         Also added nonEmpty that behaves exactly like !isEmpty.
 
         Storable(...) now produces a StorableWithFactory instead of just Storable
+
+
+    Required Libraries
+    ------------------
+        - Utopia Flow 1.5+
+        - MariaDB or MySQL client
 
 
 v1.1.1  ----------------------------------

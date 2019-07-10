@@ -14,7 +14,7 @@ trait StorableWithFactory[+Repr] extends Storable
 	/**
 	  * @return A factory used by this storable instance
 	  */
-	def factory: StorableFactory[Repr]
+	def factory: FromRowFactory[Repr]
 	
 	
 	// IMPLEMENTED	---------------
