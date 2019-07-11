@@ -34,6 +34,12 @@ case class Result(rows: Vector[Row], generatedKeys: Vector[Value] = Vector())
     def firstModel = rows.headOption.map { _.toModel }
     
     /**
+      * @return The first value in this result. Should only be used when a single column is selected and query is
+      *         limited to 1 row
+      */
+    def firstValue = rows.headOption.map { _.value } getOrElse Value.empty()
+    
+    /**
      * Whether this result is empty and doesn't contain any rows or generated keys
      */
     def isEmpty = generatedKeys.isEmpty && rows.isEmpty
