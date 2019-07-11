@@ -81,6 +81,12 @@ v1.2.1  ----------------------------------
         StorableWithFactory now accepts FromRowFactories instead of just StorableFactories
 
 
+    Required Libraries
+    ------------------
+        - Utopia Flow 1.5+
+        - MariaDB or MySQL client
+
+
 v1.2    ----------------------------------
 
     New Features
