@@ -249,9 +249,29 @@ trait Storable extends ModelConvertible
      * method does nothing
      */
     def delete()(implicit connection: Connection) = indexCondition.map { Delete(table) + Where(_) }.foreach { _.execute() }
+    
+    /**
+      * Searches for a row by using this storable instance as the search condition
+      * @param factory A factory for producing the result object
+      * @param connection A database connection (implicit)
+      * @tparam B Type of resulting object
+      * @return An object from the database, if one could be found
+      */
+    def search[B](factory: FromRowFactory[B])(implicit connection: Connection) = factory.get(toCondition)
+    
+    /**
+      * Searches for multiple rows using this storable instance as the search condition
+      * @param factory A factory for producing the result objects
+      * @param connection A database connection (implicit)
+      * @tparam B Type of resulting object
+      * @return Objects from the database matching this condition
+      */
+    def searchMany[B](factory: FromRowFactory[B])(implicit connection: Connection) = factory.getMany(toCondition)
 }
 
-private class StorableWrapper(override val table: Table, val model: template.Model[Property]) extends Storable
+private class StorableWrapper(override val table: Table, val model: template.Model[Property]) extends StorableWithFactory[Storable]
 {
+    override lazy val factory = StorableFactory(table)
+    
     override def valueProperties = model.attributes.map { c => c.name -> c.value }
 }

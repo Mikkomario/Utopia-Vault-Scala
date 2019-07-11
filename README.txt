@@ -1,5 +1,11 @@
 UTOPIA VAULT --------------------------------
 
+Required Libraries
+------------------
+    - Utopia Flow
+    - Maria DB or MySQL client (used mariadb-java-client-1.5.9.jar in development)
+
+
 Purpose
 -------
 
@@ -65,6 +71,66 @@ Available Extensions
         - Usually works in combination with utopia.flow.generic.ValueConversions
 
 
+v1.2.1  ----------------------------------
+
+    Updates & Changes
+    -----------------
+
+        New utility methods (firstValue) in Result & Row
+
+        StorableWithFactory now accepts FromRowFactories instead of just StorableFactories
+
+
+v1.2    ----------------------------------
+
+    New Features
+    ------------
+
+        FromRowFactory trait for converting (joined) database rows to object data.
+
+        Exists object for checking whether any results can be found for a query. Also added two exists methods to
+        FromResultFactory to see whether there would be any object data for specified query / index.
+
+        search(...) and searchMany(...) methods added to Storable. Also addded StorableWithFactory trait that provides
+        search() and searchMany() without parameters.
+
+
+    Updates & Changes
+    -----------------
+
+        FromResultFactory now only has getMany(...) and getAll() methods because Limit(1) couldn't be used with all
+        join styles. FromRowFactory now handles cases where data can be represented using a single row, which also
+        supports Limit(1).
+
+        Result.isEmpty now only checks whether there are any rows or generated keys available (empty rows now count).
+        Also added nonEmpty that behaves exactly like !isEmpty.
+
+        Storable(...) now produces a StorableWithFactory instead of just Storable
+
+
+    Required Libraries
+    ------------------
+        - Utopia Flow 1.5+
+        - MariaDB or MySQL client
+
+
+v1.1.1  ----------------------------------
+
+    New Features
+    ------------
+
+        FromResultFactory trait to support StorableFactory-like features when a model is constructed from data between
+        multiple joined tables.
+
+        Added apply(Storable) to Where for easier conversion from storable to where clause
+
+
+    Required Libraries
+        ------------------
+            - Utopia Flow 1.5+
+            - MariaDB or MySQL client
+
+
 v1.1  ------------------------------------
 
     New Features
@@ -101,3 +167,9 @@ v1.1  ------------------------------------
     -----
 
         Fixed an error in DatabaseTableReader where table description syntax had changed
+
+
+    Required Libraries
+    ------------------
+        - Utopia Flow 1.5+
+        - MariaDB or MySQL client

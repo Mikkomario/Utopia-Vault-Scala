@@ -40,6 +40,12 @@ case class Row(columnData: Map[Table, Model[Constant]])
       */
     def index = indices.headOption.map { _._2 } getOrElse Value.empty()
     
+    /**
+      * @return The first value found from this row. Should only be used when just a single value is requested
+      */
+    def value = columnData.values.find { !_.isEmpty }.flatMap {
+        _.attributesWithValue.headOption.map { _.value } } getOrElse Value.empty()
+    
     
     // OPERATORS    ---------------------------
     
@@ -70,4 +76,11 @@ case class Row(columnData: Map[Table, Model[Constant]])
      */
     def indexForTable(table: Table) = table.primaryColumn.map { column => apply(table)(column.name) }
         .getOrElse(Value.empty())
+    
+    /**
+      * Checks whether this row contains any data for the specified table
+      * @param table Targeted table
+      * @return Whether this row contains any data for that table
+      */
+    def containsDataForTable(table: Table) = columnData.get(table).exists { !_.isEmpty }
 }
