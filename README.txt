@@ -79,6 +79,9 @@ v1.2.2  ----------------------------------
         Connection now throws DBExceptions instead of SQLExceptions on failure. Storable also throws more detailed
         DBExceptions on failure.
 
+        Insert & push methods in storable now work on tables without auto-increment indexing when the model has a
+        specified index.
+
 
     Required Libraries
     ------------------

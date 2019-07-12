@@ -128,28 +128,20 @@ trait Storable extends ModelConvertible
     /**
      * Pushes the storable instance's data to the database using either insert or update. In case 
      * the instance doesn't have a specified index AND it's table uses indexing that is not 
-     * auto-increment, cannot push data and returns None.
+     * auto-increment, cannot push data and returns an empty value.
      * @param writeNulls Whether empty / null values should be pushed to the database (on update). 
      * False by default, which means that columns will never be specifically set to null. Use 
      * true if you specifically want to set a column to null.
-     * @return The (new) index of the instance. In case of auto-increment table, this index was 
-     * just generated. None if no push was made due to lack of index / identification.
+     * @return The existing or generated index of the instance. In case of auto-increment table, this index was
+     * just generated.
      */
     def push(writeNulls: Boolean = false)(implicit connection: Connection) = 
     {
         // Either inserts as a new row or updates an existing row
         if (update(writeNulls))
             index
-        else if (table.usesAutoIncrement)
-            Insert(table, toModel).flatMap { _.execute().generatedKeys.headOption }.getOrElse(Value.empty())
-        else if (table.primaryColumn.isEmpty)
-        {
-            // If the table doesn't have an index, just inserts every time
-            Insert(table, toModel).foreach { _.execute() }
-            Value.empty()
-        }
         else
-            Value.empty()
+            insert()
     }
     
     /**
@@ -243,26 +235,29 @@ trait Storable extends ModelConvertible
     
     /**
      * Pushes storable data to the database, but will always insert the instance as a new row 
-     * instead of updating an existing row. This will only work for tables that use auto-increment 
-     * indexing or no indexing at all.
-     * @return The generated index, if an insertion was made and one was generated. Empty value otherwise.
+     * instead of updating an existing row.
+     * @return The generated index, if an insertion was made and one was generated or provided.
      */
     def insert()(implicit connection: Connection) = 
     {
         try
         {
             val primaryColumn = table.primaryColumn
-            // Only works with tables that use auto-increment indexing or no indices at all
+            // If table uses auto-increment index or no index at all, inserts without index
+            // Otherwise requires a specified index
             if (primaryColumn.isDefined)
             {
                 if (table.usesAutoIncrement)
-                    Insert(table, toModel - primaryColumn.get.name).flatMap
-                    {
-                        _.execute().generatedKeys.headOption
-                    } getOrElse
-                        Value.empty(primaryColumn.get.dataType)
+                    Insert(table, toModel - primaryColumn.get.name).flatMap {
+                        _.execute().generatedKeys.headOption } getOrElse Value.empty(primaryColumn.get.dataType)
                 else
-                    Value.empty(primaryColumn.get.dataType)
+                {
+                    val i = index
+                    if (i.isDefined)
+                        Insert(table, toModel)
+                    
+                    i
+                }
             }
             else
             {
