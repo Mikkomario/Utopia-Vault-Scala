@@ -154,19 +154,18 @@ trait Storable extends ModelConvertible
     {
         val update = indexCondition.flatMap { cond => toUpdateStatement(writeNulls).map { _ + Where(cond) } }
         
-        update.foreach
+        update.exists
         {
             statement =>
                 try
                 {
-                     statement.execute()
+                    statement.execute().updatedRows
                 }
                 catch
                 {
                     case e: DBException => e.rethrow(s"Failed to update storable: $toJSON")
                 }
         }
-        update.isDefined
     }
     
     /**

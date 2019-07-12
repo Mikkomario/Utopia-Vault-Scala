@@ -7,7 +7,7 @@ object Result
     /**
       * An empty result
       */
-    val empty = Result(Vector())
+    val empty = Result()
 }
 
 /**
@@ -16,8 +16,11 @@ object Result
  * statement, the generated indices are also available.
  * @author Mikko Hilpinen
  * @since 25.4.2017
+  * @param rows The retrieved data rows (on select)
+  * @param generatedKeys Primary keys of newly generated rows (on insert)
+  * @param updatedRowCount Number of updated rows (on update)
  */
-case class Result(rows: Vector[Row], generatedKeys: Vector[Value] = Vector())
+case class Result(rows: Vector[Row] = Vector(), generatedKeys: Vector[Value] = Vector(), updatedRowCount: Int = 0)
 {
     // COMPUTED PROPERTIES    ------------
     
@@ -68,6 +71,11 @@ case class Result(rows: Vector[Row], generatedKeys: Vector[Value] = Vector())
       * @return The index of the first result row
       */
     def firstIndex = rows.headOption.map { _.index } getOrElse Value.empty()
+    
+    /**
+      * @return Whether the query updated any rows
+      */
+    def updatedRows = updatedRowCount > 0
     
     
     // OTHER METHODS    ------------------

@@ -73,6 +73,12 @@ Available Extensions
 
 v1.2.2  ----------------------------------
 
+    New Features
+    ------------
+
+        Number of updated rows can now be retrieved from a Result instance (on update).
+
+
     Updates & Changes
     -----------------
 
