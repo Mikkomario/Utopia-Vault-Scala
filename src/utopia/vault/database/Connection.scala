@@ -142,7 +142,9 @@ class Connection(initialDBName: Option[String] = None) extends AutoCloseable
      * @return The results of the query, containing the read rows and keys. If 'selectedTables' 
      * parameter was empty, no rows are included. If 'returnGeneratedKeys' parameter was false, 
      * no keys are included
+      * @throws DBException If query failed for some reason
      */
+    @throws(classOf[DBException])
     def apply(sql: String, values: Seq[Value], selectedTables: Set[Table] = HashSet(), 
             returnGeneratedKeys: Boolean = false) = 
     {
@@ -169,6 +171,10 @@ class Connection(initialDBName: Option[String] = None) extends AutoCloseable
                 // May skip some data in case it is not requested
                 Result(if (selectedTables.isEmpty) Vector() else rowsFromResult(results.get, selectedTables),
                         if (returnGeneratedKeys) generatedKeysFromResult(statement.get, selectedTables) else Vector())
+            }
+            catch
+            {
+                case e: SQLException => throw new DBException(s"DB query failed.\nSql: $sql\nValues:[${values.mkString(", ")}]", e)
             }
             finally
             {

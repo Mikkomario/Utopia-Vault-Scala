@@ -71,6 +71,21 @@ Available Extensions
         - Usually works in combination with utopia.flow.generic.ValueConversions
 
 
+v1.2.2  ----------------------------------
+
+    Updates & Changes
+    -----------------
+
+        Connection now throws DBExceptions instead of SQLExceptions on failure. Storable also throws more detailed
+        DBExceptions on failure.
+
+
+    Required Libraries
+    ------------------
+        - Utopia Flow 1.5+
+        - MariaDB or MySQL client
+
+
 v1.2.1  ----------------------------------
 
     Updates & Changes

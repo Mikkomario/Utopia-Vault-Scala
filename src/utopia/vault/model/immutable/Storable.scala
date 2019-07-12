@@ -4,7 +4,7 @@ import utopia.flow.datastructure.immutable.{Model, Value}
 import utopia.flow.datastructure.template
 import utopia.flow.datastructure.template.Property
 import utopia.flow.generic.{DeclarationConstantGenerator, ModelConvertible}
-import utopia.vault.database.Connection
+import utopia.vault.database.{Connection, DBException}
 import utopia.vault.sql.{Delete, Insert, Select, SqlSegment, Update, Where}
 
 object Storable
@@ -162,7 +162,18 @@ trait Storable extends ModelConvertible
     {
         val update = indexCondition.flatMap { cond => toUpdateStatement(writeNulls).map { _ + Where(cond) } }
         
-        update.foreach { _.execute() }
+        update.foreach
+        {
+            statement =>
+                try
+                {
+                     statement.execute()
+                }
+                catch
+                {
+                    case e: DBException => e.rethrow(s"Failed to update storable: $toJSON")
+                }
+        }
         update.isDefined
     }
     
@@ -191,7 +202,18 @@ trait Storable extends ModelConvertible
     def updateProperties(propertyNames: Traversable[String])(implicit connection: Connection) = 
     {
         val update = indexCondition.flatMap { cond => updateStatementForProperties(propertyNames).map { _ + Where(cond) } }
-        update.foreach { _.execute() }
+        update.foreach
+        {
+            statement =>
+                try
+                {
+                    statement.execute()
+                }
+                catch
+                {
+                    case e: DBException => e.rethrow(s"Failed to update storable: $toJSON")
+                }
+        }
         update.isDefined
     }
     
@@ -227,20 +249,33 @@ trait Storable extends ModelConvertible
      */
     def insert()(implicit connection: Connection) = 
     {
-        val primaryColumn = table.primaryColumn
-        // Only works with tables that use auto-increment indexing or no indices at all
-        if (primaryColumn.isDefined)
+        try
         {
-            if (table.usesAutoIncrement)
-                Insert(table, toModel - primaryColumn.get.name).flatMap {_.execute().generatedKeys.headOption } getOrElse
+            val primaryColumn = table.primaryColumn
+            // Only works with tables that use auto-increment indexing or no indices at all
+            if (primaryColumn.isDefined)
+            {
+                if (table.usesAutoIncrement)
+                    Insert(table, toModel - primaryColumn.get.name).flatMap
+                    {
+                        _.execute().generatedKeys.headOption
+                    } getOrElse
                         Value.empty(primaryColumn.get.dataType)
+                else
+                    Value.empty(primaryColumn.get.dataType)
+            }
             else
-                Value.empty(primaryColumn.get.dataType)
+            {
+                Insert(table, toModel).foreach
+                {
+                    _.execute()
+                }
+                Value.empty()
+            }
         }
-        else
+        catch
         {
-            Insert(table, toModel).foreach { _.execute() }
-            Value.empty()
+            case e: DBException => e.rethrow(s"Failed to insert storable: $toJSON")
         }
     }
     
