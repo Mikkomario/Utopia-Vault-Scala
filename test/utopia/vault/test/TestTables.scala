@@ -14,7 +14,6 @@ import utopia.vault.model.mutable.References
  */
 object TestTables
 {
-    // TODO: Make it so that default values are generated only when asked?
     val person = Table("person", "vault_test", Vector(
             Column("rowId", "row_id", "person", IntType, false, None, true, true),
             Column("name", "name", "person", StringType, false),
@@ -27,6 +26,12 @@ object TestTables
             Column("ownerId", "owner_id", "strength", IntType, false),
             Column("name", "name", "strength", StringType, false),
             Column("powerLevel", "power_level", "strength", IntType)))
+    
+    val indexTest = Table("index_test", "vault_test", Vector
+    (
+        Column("id", "id", "index_test", IntType, allowsNull = false, isPrimary = true),
+        Column("text", "text", "index_test", StringType)
+    ))
     
     // Also records references
     References.setup((strength, "ownerId", person, "rowId"))

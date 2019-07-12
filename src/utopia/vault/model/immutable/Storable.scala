@@ -253,17 +253,14 @@ trait Storable extends ModelConvertible
                 {
                     val i = index
                     if (i.isDefined)
-                        Insert(table, toModel)
+                        Insert(table, toModel).foreach { _.execute() }
                     
                     i
                 }
             }
             else
             {
-                Insert(table, toModel).foreach
-                {
-                    _.execute()
-                }
+                Insert(table, toModel).foreach { _.execute() }
                 Value.empty()
             }
         }
