@@ -78,6 +78,8 @@ v1.2.2  ----------------------------------
 
         Number of updated rows can now be retrieved from a Result instance (on update).
 
+        getMin & getMax methods added to FromRowFactory
+
 
     Updates & Changes
     -----------------

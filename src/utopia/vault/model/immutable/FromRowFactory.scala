@@ -1,8 +1,9 @@
 package utopia.vault.model.immutable
 
+import utopia.flow.util.CollectionExtensions._
 import utopia.flow.datastructure.immutable.Value
 import utopia.vault.database.Connection
-import utopia.vault.sql.{Condition, Limit, SelectAll, Where}
+import utopia.vault.sql.{Condition, Limit, OrderBy, SelectAll, SqlSegment, Where}
 
 /**
   * These factories are used for converting database row data into objects. These factories are able to parse an object
@@ -50,4 +51,42 @@ trait FromRowFactory[+A] extends FromResultFactory[A]
 	{
 		connection(SelectAll(target) + Where(where) + Limit(1)).rows.headOption.flatMap(apply)
 	}
+	
+	/**
+	  * Finds the top / max row / model based on provided ordering column
+	  * @param orderColumn A column based on which ordering is made
+	  * @param connection Database connection
+	  */
+	def getMax(orderColumn: Column)(implicit  connection: Connection) = getWithOrder(OrderBy.descending(orderColumn))
+	
+	/**
+	  * Finds top / max row / model based on provided ordering property. Uses primary table's columns by default but may
+	  * use columns from other tables if such property couldn't be found from the primary table.
+	  * @param orderProperty The name of the ordering property
+	  * @param connection Database connection
+	  */
+	def getMax(orderProperty: String)(implicit connection: Connection): Option[A] = findColumn(orderProperty).flatMap(getMax)
+	
+	/**
+	  * Finds the bottom / min row / model based on provided ordering column
+	  * @param orderColumn A column based on which ordering is made
+	  * @param connection Database connection
+	  */
+	def getMin(orderColumn: Column)(implicit connection: Connection) = getWithOrder(OrderBy.ascending(orderColumn))
+	
+	/**
+	  * Finds bottom / min row / model based on provided ordering property. Uses primary table's columns by default but may
+	  * use columns from other tables if such property couldn't be found from the primary table.
+	  * @param orderProperty The name of the ordering property
+	  * @param connection Database connection
+	  */
+	def getMin(orderProperty: String)(implicit connection: Connection): Option[A] = findColumn(orderProperty).flatMap(getMin)
+	
+	private def getWithOrder(orderBy: SqlSegment)(implicit connection: Connection) =
+	{
+		connection(SelectAll(target) + orderBy + Limit(1)).rows.headOption.flatMap(apply)
+	}
+	
+	private def findColumn(propertyName: String) = table.find(propertyName).orElse {
+		joinedTables.findMap { _.find(propertyName) } }
 }
