@@ -36,7 +36,12 @@ trait FromResultFactory[+A]
 	/**
 	  * @return This factory's target that includes the primary table and possible joined tables
 	  */
-	protected def target = joinedTables.foldLeft(table: SqlTarget) { (r, t) => r.join(t, JoinType.Left) }
+	def target = joinedTables.foldLeft(table: SqlTarget) { (r, t) => r.join(t, JoinType.Left) }
+	
+	/**
+	  * @return The table(s) used by this factory (never empty)
+	  */
+	def tables = table +: joinedTables
 	
 	
 	// OTHER	---------------

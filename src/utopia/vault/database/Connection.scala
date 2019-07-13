@@ -70,6 +70,12 @@ object Connection
      * success / failure state of the operation
      */
     def tryTransaction[T](f: Connection => T) = doTransaction(connection => { Try(f(connection)) })
+    
+    /**
+      * Modifies the settings used in database connections
+      * @param mod A function that modifies settings
+      */
+    def modifySettings(mod: ConnectionSettings => ConnectionSettings) = settings = mod(settings)
 }
 
 /**
@@ -367,7 +373,7 @@ class Connection(initialDBName: Option[String] = None) extends AutoCloseable
             // The models are mapped to each table separately
             // NB: view.force is added in order to create a concrete map
             rowBuffer += Row(columnIndices.mapValues { data =>
-                Model.withConstants(data.map { case (column, sqlType, index) => new Constant(column.name,
+                Model.withConstants(data.map { case (column, sqlType, index) => Constant(column.name,
                 Connection.sqlValueGenerator(resultSet.getObject(index), sqlType)) }) }.view.force)
         }
         
