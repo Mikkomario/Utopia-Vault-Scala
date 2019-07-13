@@ -22,19 +22,29 @@ object Tables
 	  * @param tableName Table name
 	  * @return That table's data
 	  */
-	def apply(dbName: String, tableName: String) =
+	def apply(dbName: String, tableName: String) = reader(dbName)(tableName.toLowerCase)
+	
+	
+	// OTHER	-----------------------
+	
+	/**
+	  * @param dbName Targeted database name
+	  * @return All tables in the specified database
+	  */
+	def all(dbName: String) = reader(dbName).tables.values
+	
+	private def reader(dbName: String) =
 	{
 		val lowerDbName = dbName.toLowerCase
-		val lowerTableName = tableName.toLowerCase
 		
 		if (dbs.contains(lowerDbName))
-			dbs(lowerDbName)(lowerTableName)
+			dbs(lowerDbName)
 		else
 		{
 			// May have to initialize new databases
 			val db = new TablesReader(dbName)
 			dbs += lowerDbName -> db
-			db(lowerTableName)
+			db
 		}
 	}
 }

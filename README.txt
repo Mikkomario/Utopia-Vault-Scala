@@ -107,6 +107,15 @@ v1.3  ---------------------------------------
 
         FromResultFactory.target changed from protected to public
 
+        A failed join will now throw an exception
+
+
+    Fixes
+    -----
+
+        References.columnsBetween(Table, Table) had a programming error in it and didn't work. This caused all reference
+        joins to fail as well. Fixed the error.
+
 
     Required Libraries
     ------------------

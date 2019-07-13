@@ -12,6 +12,9 @@ import scala.collection.immutable.HashSet
  * usually the primary column. Tables may reference other tables through columns too.
  * @author Mikko Hilpinen
  * @since 9.3.2017
+  * @param name This table's name in the database
+  * @param databaseName The name of the database that contains this table
+  * @param columns The columns that belong to this table
  */
 case class Table(name: String, databaseName: String, columns: Vector[Column]) extends SqlTarget
 {
@@ -35,7 +38,8 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
     override def toSqlSegment = SqlSegment(sqlName, Vector(), Some(databaseName), HashSet(this))
 
     /**
-      * @return The name of this table in sql format (same as original name but surrounded with `backticks`)
+      * @return The name of this table in sql format (same as original name but surrounded with `backticks`). If this
+      *         table has an alias, includes that.
       */
     def sqlName = s"`$name`"
     
@@ -109,8 +113,7 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
      * @param propertyName the name of a property matching a column in this table, which makes a
      * reference to another table
      */
-    def joinFrom(propertyName: String, joinType: JoinType): SqlTarget =
-            find(propertyName).map { joinFrom(_, joinType) }.getOrElse(this)
+    def joinFrom(propertyName: String, joinType: JoinType): SqlTarget = joinFrom(apply(propertyName), joinType)
 
     /**
       * Finds the first index from this table where specified condition is met

@@ -147,15 +147,35 @@ object References
      */
     def columnsBetween(left: Table, right: Table) =
     {
-       checkIsSetup(left.databaseName)
-       val sameOrderMatches = referenceData(left.databaseName).filter(
-               ref => ref.from.table == left && ref.from.table == right).map(
-               ref => ref.from.column -> ref.to.column)
-       val oppositeOrderMatches = referenceData(left.databaseName).filter(
-               ref => ref.from.table == right && ref.to.table == left).map(
-               ref => ref.to.column -> ref.from.column)
-               
+        Set(left.databaseName, right.databaseName).foreach(checkIsSetup)
+        
+        val sameOrderMatches = referenceData(left.databaseName).filter {
+            ref => ref.from.table == left && ref.to.table == right }.map { ref => ref.from.column -> ref.to.column }
+        
+        val oppositeOrderMatches = referenceData(right.databaseName).filter {
+            ref => ref.from.table == right && ref.to.table == left }.map { ref => ref.to.column -> ref.from.column }
+            
        sameOrderMatches ++ oppositeOrderMatches
+    }
+    
+    /**
+      * Finds a single connection between the two tables
+      * @param left Left side table
+      * @param right Right side table
+      * @return Left side column -> right side column. None if there wasn't a connection between the two tables
+      */
+    def connectionBetween(left: Table, right: Table) =
+    {
+        checkIsSetup(left.databaseName)
+        referenceData(left.databaseName).find { ref => ref.from.table == left && ref.to.table == right }.map {
+            ref => ref.from.column -> ref.to.column }.orElse
+            {
+                if (right.databaseName != left.databaseName)
+                    checkIsSetup(right.databaseName)
+                
+                referenceData(right.databaseName).find { ref => ref.from.table == right && ref.to.table == left }.map {
+                    ref => ref.to.column -> ref.from.column }
+            }
     }
     
     /**
