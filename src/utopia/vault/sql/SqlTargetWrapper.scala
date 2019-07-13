@@ -11,4 +11,6 @@ case class SqlTargetWrapper(private val segment: SqlSegment) extends SqlTarget
     // IMPLEMENTED METHODS    --------------
     
     def toSqlSegment = segment
+    
+    override def toString = toSqlSegment.toString
 }

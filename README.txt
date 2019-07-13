@@ -71,7 +71,7 @@ Available Extensions
         - Usually works in combination with utopia.flow.generic.ValueConversions
 
 
-v1.2.2  ----------------------------------
+v1.3  ---------------------------------------
 
     New Features
     ------------
@@ -89,6 +89,10 @@ v1.2.2  ----------------------------------
 
         Insert & push methods in storable now work on tables without auto-increment indexing when the model has a
         specified index.
+
+        Referencess.setup(...) now preserves existing data.
+
+        Insert.apply now executes the insert statement instead of just creating one. Return type changed to Result.
 
 
     Required Libraries

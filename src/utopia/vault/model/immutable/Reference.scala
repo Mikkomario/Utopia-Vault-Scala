@@ -49,4 +49,9 @@ case class Reference(from: ReferencePoint, to: ReferencePoint)
      * The columns that are used by this reference
      */
     def columns = Vector(from.column, to.column)
+    
+    
+    // IMPLEMENTED  ---------------------
+    
+    override def toString = s"$from -> $to"
 }

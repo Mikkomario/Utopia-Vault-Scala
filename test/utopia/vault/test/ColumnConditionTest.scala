@@ -38,7 +38,7 @@ object ColumnConditionTest extends App
             val test3 = Model(Vector("name" -> "test 3", "age" -> 3))
             val test4 = Model(Vector("name" -> "test 4"))
             
-            Insert(table, test1, test2, test3, test4).foreach(_.execute())
+            Insert(table, test1, test2, test3, test4)
             
             def countRows(condition: Condition) = connection(SelectAll(table) + Where(condition)).rows.size
             

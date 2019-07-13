@@ -247,20 +247,19 @@ trait Storable extends ModelConvertible
             if (primaryColumn.isDefined)
             {
                 if (table.usesAutoIncrement)
-                    Insert(table, toModel - primaryColumn.get.name).flatMap {
-                        _.execute().generatedKeys.headOption } getOrElse Value.empty(primaryColumn.get.dataType)
+                    Insert(table, toModel - primaryColumn.get.name).generatedKeys.headOption
+                        .getOrElse(Value.empty(primaryColumn.get.dataType))
                 else
                 {
                     val i = index
                     if (i.isDefined)
-                        Insert(table, toModel).foreach { _.execute() }
-                    
+                        Insert(table, toModel)
                     i
                 }
             }
             else
             {
-                Insert(table, toModel).foreach { _.execute() }
+                Insert(table, toModel)
                 Value.empty()
             }
         }

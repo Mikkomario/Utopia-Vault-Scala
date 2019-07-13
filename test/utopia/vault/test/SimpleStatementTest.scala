@@ -23,7 +23,7 @@ object SimpleStatementTest extends App
     val table = TestTables.person
     
     // Uses a single connection
-    val connection = new Connection()
+    implicit val connection: Connection = new Connection()
     try
     {
         def countRows = connection(SelectAll(table)).rows.size
@@ -33,7 +33,7 @@ object SimpleStatementTest extends App
         assert(countRows == 0)
         
         val testModel = Model(Vector("name" -> "SimpleStatementTest"))
-        connection(Insert(table, Vector(testModel, testModel, testModel)).get)
+        Insert(table, Vector(testModel, testModel, testModel))
         
         assert(countRows == 3)
         assert(connection(Select.nothing(table)).rows.size == 3)
@@ -47,7 +47,7 @@ object SimpleStatementTest extends App
         connection(Update(table, "age", 22).get)
         assert(connection(Select(table, "age")).rows.head.toModel("age") == 22.toValue)
         
-        connection(Insert(table, Model(Vector("name" -> "Last", "age" -> 2, "isAdmin" -> true))).get)
+        Insert(table, Model(Vector("name" -> "Last", "age" -> 2, "isAdmin" -> true)))
         assert(connection(SelectAll(table) + OrderBy(table("age")) + Limit(1)).rows.head.toModel("name") == "Last".toValue)
         
         val result2 = connection(Select(table, "isAdmin")).rowModels

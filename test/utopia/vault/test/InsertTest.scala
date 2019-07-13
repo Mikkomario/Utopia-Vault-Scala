@@ -31,19 +31,17 @@ object InsertTest extends App
         val arttu = Model(Vector("name" -> "Arttu", "age" -> 18))
         val belinda = Model(Vector("name" -> "Belinda", "age" -> 22))
         
-        val insert1 = Insert(table, Vector(arttu, belinda)).get
-        println(insert1.description)
-        assert(connection(insert1).generatedKeys.size == 2)
+        assert(Insert(table, Vector(arttu, belinda))(connection).generatedKeys.size == 2)
         
         // Inserts cases where all values are not provided
         val cecilia = Model(Vector("name" -> "Cecilia", "age" -> 25))
         val daavid = Model(Vector("name" -> "Daavid"))
         
-        assert(connection(Insert(table, Vector(cecilia, daavid)).get).generatedKeys.size == 2)
+        assert(Insert(table, Vector(cecilia, daavid))(connection).generatedKeys.size == 2)
         
         // Inserts a row that would include a row id
         val elias = Model(Vector("name" -> "Elias", "rowId" -> 22))
-        assert(connection(Insert(table, elias).get).generatedKeys.size == 1)
+        assert(Insert(table, elias)(connection).generatedKeys.size == 1)
         
         println("Success!")
     }
