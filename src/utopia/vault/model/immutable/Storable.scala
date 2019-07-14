@@ -81,17 +81,6 @@ trait Storable extends ModelConvertible
         conditions.head && conditions.drop(1)
     }
     
-    /**
-      * @return A select statement based on which properties are defined in this storable instance. If none of the
-      *         properties are defined, creates an empty select (Select None)
-      */
-    def toSelect =
-    {
-        val model = toModel
-        val selectedColumns = table.columns.filter { c => model(c.name).isDefined }
-        Select(table, selectedColumns)
-    }
-    
     
     // IMPLEMENTED  ----------------------------------
     
