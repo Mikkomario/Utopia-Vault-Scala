@@ -27,7 +27,7 @@ Main Features
         under the hood.
 
     Template Statements that make database interactions much simpler and less prone to errors
-        - Insert, Update, Delete, Select, SelectAll, Limit, OrderBy and Exists statements
+        - Insert, Update, Delete, Select, SelectAll, SelectDistinct, Limit, OrderBy and Exists statements
         - Easy to write conditions with Where and Extensions
         - You don't need to know specific syntax for these statements. All you need to know is what they do and
         in which order to chain them.
@@ -90,6 +90,8 @@ v1.3  ---------------------------------------
 
         Connection object now contains modifySettings(...) method for cases when you simply wish to modify a couple
         of settings and not the whole thing.
+
+        SelectDistinct object was added to create select distinct -queries
 
 
     Updates & Changes

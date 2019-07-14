@@ -19,7 +19,7 @@ object Select
      */
     def apply(target: SqlTarget, columns: Seq[Column]) = SqlSegment(s"SELECT ${ 
         if (columns.isEmpty) "NULL" else columns.view.map { _.columnNameWithTable }.reduceLeft { _ + ", " + _ } } FROM",
-        Vector(), None, HashSet(), true) + target.toSqlSegment
+        isSelect = true) + target.toSqlSegment
     
     /**
      * Creates an sql segment that selects a single column from a table
