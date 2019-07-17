@@ -28,7 +28,12 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
     /**
      * A model declaration based on this table
      */
-    lazy val toModelDeclaration = new ModelDeclaration(columns)
+    lazy val toModelDeclaration = ModelDeclaration(columns)
+    
+    /**
+      * A model declaration based on the required (not null) columns in this table
+      */
+    lazy val requirementDeclaration = ModelDeclaration(columns.filterNot { _.allowsNull })
     
     
     // COMPUTED PROPERTIES    ------------------
@@ -57,6 +62,12 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
       * @return A factory for storable instances from this table
       */
     def toFactory = StorableFactory(this)
+    
+    /**
+      * @param connection Database connection
+      * @return All defined indices for this table in database
+      */
+    def allIndices(implicit connection: Connection) = Select.index(this).execute().indicesForTable(this)
     
     
     // OPERATORS    ----------------------------

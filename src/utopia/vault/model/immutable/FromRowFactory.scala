@@ -55,9 +55,26 @@ trait FromRowFactory[+A] extends FromResultFactory[A]
 	/**
 	  * Finds the top / max row / model based on provided ordering column
 	  * @param orderColumn A column based on which ordering is made
+	  * @param where Additional search condition (optional)
 	  * @param connection Database connection
 	  */
-	def getMax(orderColumn: Column)(implicit  connection: Connection) = getWithOrder(OrderBy.descending(orderColumn))
+	def getMax(orderColumn: Column, where: Option[Condition])(implicit  connection: Connection) =
+		getWithOrder(OrderBy.descending(orderColumn), where)
+	
+	/**
+	  * Finds the top / max row / model based on provided ordering column
+	  * @param orderColumn A column based on which ordering is made
+	  * @param connection Database connection
+	  */
+	def getMax(orderColumn: Column)(implicit  connection: Connection): Option[A] = getMax(orderColumn, None)
+	
+	/**
+	  * Finds the top / max row / model based on provided ordering column
+	  * @param orderColumn A column based on which ordering is made
+	  * @param where Additional search condition (optional)
+	  * @param connection Database connection
+	  */
+	def getMax(orderColumn: Column, where: Condition)(implicit  connection: Connection): Option[A] = getMax(orderColumn, Some(where))
 	
 	/**
 	  * Finds top / max row / model based on provided ordering property. Uses primary table's columns by default but may
@@ -68,11 +85,36 @@ trait FromRowFactory[+A] extends FromResultFactory[A]
 	def getMax(orderProperty: String)(implicit connection: Connection): Option[A] = findColumn(orderProperty).flatMap(getMax)
 	
 	/**
+	  * Finds top / max row / model based on provided ordering property. Uses primary table's columns by default but may
+	  * use columns from other tables if such property couldn't be found from the primary table.
+	  * @param orderProperty The name of the ordering property
+	  * @param where Additional search condition (optional)
+	  * @param connection Database connection
+	  */
+	def getMax(orderProperty: String, where: Condition)(implicit connection: Connection): Option[A] =
+		findColumn(orderProperty).flatMap { getMax(_, where) }
+	
+	/**
 	  * Finds the bottom / min row / model based on provided ordering column
 	  * @param orderColumn A column based on which ordering is made
 	  * @param connection Database connection
 	  */
-	def getMin(orderColumn: Column)(implicit connection: Connection) = getWithOrder(OrderBy.ascending(orderColumn))
+	def getMin(orderColumn: Column, where: Option[Condition])(implicit connection: Connection) =
+		getWithOrder(OrderBy.ascending(orderColumn), where)
+	
+	/**
+	  * Finds the bottom / min row / model based on provided ordering column
+	  * @param orderColumn A column based on which ordering is made
+	  * @param connection Database connection
+	  */
+	def getMin(orderColumn: Column)(implicit connection: Connection): Option[A] = getMin(orderColumn, None)
+	
+	/**
+	  * Finds the bottom / min row / model based on provided ordering column
+	  * @param orderColumn A column based on which ordering is made
+	  * @param connection Database connection
+	  */
+	def getMin(orderColumn: Column, where: Condition)(implicit connection: Connection): Option[A] = getMin(orderColumn, Some(where))
 	
 	/**
 	  * Finds bottom / min row / model based on provided ordering property. Uses primary table's columns by default but may
@@ -82,9 +124,22 @@ trait FromRowFactory[+A] extends FromResultFactory[A]
 	  */
 	def getMin(orderProperty: String)(implicit connection: Connection): Option[A] = findColumn(orderProperty).flatMap(getMin)
 	
-	private def getWithOrder(orderBy: SqlSegment)(implicit connection: Connection) =
+	/**
+	  * Finds bottom / min row / model based on provided ordering property. Uses primary table's columns by default but may
+	  * use columns from other tables if such property couldn't be found from the primary table.
+	  * @param orderProperty The name of the ordering property
+	  * @param connection Database connection
+	  */
+	def getMin(orderProperty: String, where: Condition)(implicit connection: Connection): Option[A] =
+		findColumn(orderProperty).flatMap { getMin(_, where) }
+	
+	private def getWithOrder(orderBy: SqlSegment, where: Option[Condition] = None)(implicit connection: Connection) =
 	{
-		connection(SelectAll(target) + orderBy + Limit(1)).rows.headOption.flatMap(apply)
+		val beginning = SelectAll(target)
+		val end = orderBy + Limit(1)
+		val statement = where.map { beginning + Where(_) + end }.getOrElse { beginning + end }
+		
+		connection(statement).rows.headOption.flatMap(apply)
 	}
 	
 	private def findColumn(propertyName: String) = table.find(propertyName).orElse {

@@ -93,6 +93,8 @@ v1.3  ---------------------------------------
 
         SelectDistinct object was added to create select distinct -queries
 
+        StorableWithFactory now contains searchMin(String) & searchMax(String) -methods
+
 
     Updates & Changes
     -----------------
