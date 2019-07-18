@@ -9,9 +9,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="92da042d-32a6-4c2c-9a07-bca99577ad71" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../Utopia-Flow-Scala/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Utopia-Flow-Scala/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.txt" beforeDir="false" afterPath="$PROJECT_DIR$/README.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utopia/vault/database/BasicSqlValueGenerator.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/database/BasicSqlValueGenerator.scala" afterDir="false" />
     </list>
     <ignored path="out/" />
@@ -39,8 +37,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/utopia/vault/database/BasicSqlValueGenerator.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="17" column="55" lean-forward="true" selection-start-line="17" selection-start-column="55" selection-end-line="17" selection-end-column="55" />
+            <state relative-caret-position="682">
+              <caret line="31" column="87" lean-forward="true" selection-start-line="31" selection-start-column="87" selection-end-line="31" selection-end-column="87" />
               <folding>
                 <element signature="e#31#52#0" expanded="true" />
               </folding>
@@ -342,7 +340,7 @@
     <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.Scala" />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Ignored.Files" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -543,14 +541,21 @@
       <option name="project" value="LOCAL" />
       <updated>1562931673933</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Fixed / modified some BasicSqlValueGenerator cases">
+      <created>1563459025367</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1563459025367</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="0" width="1534" height="1567" extended-state="0" />
+    <frame x="-8" y="-8" width="2576" height="1576" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24762551" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.14507154" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -593,7 +598,8 @@
     <MESSAGE value="Fixed storable insert &amp; update" />
     <MESSAGE value="Result now contains information of how many rows were updated" />
     <MESSAGE value="Tested and debugged storable insert &amp; push in table without auto-increment" />
-    <option name="LAST_COMMIT_MESSAGE" value="Tested and debugged storable insert &amp; push in table without auto-increment" />
+    <MESSAGE value="Fixed / modified some BasicSqlValueGenerator cases" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed / modified some BasicSqlValueGenerator cases" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/utopia/vault/model/mutable/Readable.scala">
@@ -984,8 +990,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/utopia/vault/database/BasicSqlValueGenerator.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="17" column="55" lean-forward="true" selection-start-line="17" selection-start-column="55" selection-end-line="17" selection-end-column="55" />
+        <state relative-caret-position="682">
+          <caret line="31" column="87" lean-forward="true" selection-start-line="31" selection-start-column="87" selection-end-line="31" selection-end-column="87" />
           <folding>
             <element signature="e#31#52#0" expanded="true" />
           </folding>

@@ -35,7 +35,7 @@ object BasicSqlValueGenerator extends SqlValueGenerator
             case Types.BOOLEAN | Types.BIT => wrap(value, BooleanType)
             case Types.BIGINT => wrap(value, LongType)
             case Types.REAL => wrap(value, FloatType)
-            case Types.NUMERIC | Types.DECIMAL => wrap(value.asInstanceOf[java.math.BigDecimal].doubleValue(), DoubleType)
+            case Types.NUMERIC | Types.DECIMAL => Some(value.asInstanceOf[java.math.BigDecimal].doubleValue())
             
             case _ => None
         }
