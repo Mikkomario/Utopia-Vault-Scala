@@ -4,11 +4,13 @@ import utopia.flow.datastructure.template.{Model, Property}
 import utopia.flow.generic.ValueConversions._
 import utopia.vault.model.immutable.{StorableFactory, StorableWithFactory}
 
+import scala.util.Success
+
 object IndexStorable extends StorableFactory[IndexStorable]
 {
 	override def table = TestTables.indexTest
 	
-	override def apply(model: Model[Property]) = Some(IndexStorable(model("id").int, model("text").string))
+	override def apply(model: Model[Property]) = Success(IndexStorable(model("id").int, model("text").string))
 	
 	def apply(id: Int, text: String): IndexStorable = IndexStorable(Some(id), Some(text))
 }

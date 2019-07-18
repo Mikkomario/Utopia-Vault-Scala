@@ -6,6 +6,8 @@ import utopia.flow.datastructure.template.Property
 import utopia.flow.generic.DeclarationVariableGenerator
 import utopia.vault.model.immutable.{Storable, StorableFactory, Table}
 
+import scala.util.Success
+
 object DBModel
 {
     /**
@@ -49,6 +51,6 @@ class DBModelFactory(val table: Table) extends StorableFactory[DBModel]
         val storable = new DBModel(table)
         storable ++= model.attributes.map { p => new Variable(p.name, p.value) }
         
-        Some(storable)
+        Success(storable)
     }
 }

@@ -7,6 +7,8 @@ import utopia.flow.datastructure.template.Property
 import utopia.flow.generic.ValueConversions._
 import utopia.vault.model.immutable.{StorableFactory, StorableWithFactory}
 
+import scala.util.Success
+
 object Person extends StorableFactory[Person]
 {
     // ATTRIBUTES    ----------------
@@ -16,7 +18,7 @@ object Person extends StorableFactory[Person]
     
     // IMPLEMENTED METHODS    -------
     
-    override def apply(model: Model[Property]) = Some(new Person(model("name").stringOr(), 
+    override def apply(model: Model[Property]) = Success(new Person(model("name").stringOr(),
             model("age").int, model("isAdmin").booleanOr(), model("created").instantOr(Instant.now()), 
             model("rowId").int))
 }

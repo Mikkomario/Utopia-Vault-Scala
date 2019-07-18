@@ -65,6 +65,8 @@ Usage Notes
     to your build path / classpath. If not, you need to specify the name of the class you wish to use and make
     sure that class is included in the classpath.
 
+    If you want to log errors or make all parsing errors fatal, please change ErrorHandling.defaultPrinciple.
+
 
 Available Extensions
 --------------------
@@ -94,6 +96,9 @@ v1.3  ---------------------------------------
         SelectDistinct object was added to create select distinct -queries
 
         StorableWithFactory now contains searchMin(String) & searchMax(String) -methods
+
+        StorableFactory parsing failures may now be handled through ErrorHandling object. By default the handler ignores
+        all errors.
 
 
     Updates & Changes
