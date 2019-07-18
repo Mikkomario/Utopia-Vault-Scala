@@ -120,6 +120,8 @@ v1.3  ---------------------------------------
         References.columnsBetween(Table, Table) had a programming error in it and didn't work. This caused all reference
         joins to fail as well. Fixed the error.
 
+        Added value parsing from DOUBLE columns, which was missing for some reason. Fixed other parsings as well.
+
 
     Required Libraries
     ------------------
