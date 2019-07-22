@@ -102,6 +102,8 @@ v1.3  ---------------------------------------
         StorableFactory parsing failures may now be handled through ErrorHandling object. By default the handler ignores
         all errors.
 
+        Result now allows one to group rows based on two or more tables (grouped(...) methods).
+
 
     Updates & Changes
     -----------------
