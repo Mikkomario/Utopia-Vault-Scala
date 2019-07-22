@@ -27,7 +27,7 @@ Main Features
         under the hood.
 
     Template Statements that make database interactions much simpler and less prone to errors
-        - Insert, Update, Delete, Select, SelectAll, SelectDistinct, Limit, OrderBy and Exists statements
+        - Insert, Update, Delete, Select, SelectAll, SelectDistinct, Limit, OrderBy, MaxBy, MinBy and Exists statements
         - Easy to write conditions with Where and Extensions
         - You don't need to know specific syntax for these statements. All you need to know is what they do and
         in which order to chain them.
@@ -95,6 +95,8 @@ v1.3  ---------------------------------------
 
         SelectDistinct object was added to create select distinct -queries
 
+        MaxBy and MinBy objects were added for easier orderBy ... Limit 1 syntax.
+
         StorableWithFactory now contains searchMin(String) & searchMax(String) -methods
 
         StorableFactory parsing failures may now be handled through ErrorHandling object. By default the handler ignores
@@ -117,6 +119,8 @@ v1.3  ---------------------------------------
         FromResultFactory.target changed from protected to public
 
         A failed join will now throw an exception
+
+        .in(...) (when creating conditions) will now accept any traversable group and not just seqs
 
 
     Fixes

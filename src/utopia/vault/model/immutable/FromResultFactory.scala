@@ -61,7 +61,7 @@ trait FromResultFactory[+A]
 	  * used in case of somewhat small tables.
 	  * @see #getMany(Condition)
 	  */
-	def getAll()(implicit connection: Connection) = apply(connection(SelectAll(table)))
+	def getAll()(implicit connection: Connection) = apply(connection(SelectAll(target)))
 	
 	/**
 	  * Checks whether an object exists for the specified query

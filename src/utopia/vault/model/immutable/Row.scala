@@ -47,6 +47,11 @@ case class Row(columnData: Map[Table, Model[Constant]])
         _.attributesWithValue.headOption.map { _.value } } getOrElse Value.empty()
     
     
+    // IMPLEMENTED  ---------------------------
+    
+    override def toString = s"[${columnData.toVector.map { case (table, data) => s"${table.name}: $data" }.mkString(", ")}]"
+    
+    
     // OPERATORS    ---------------------------
     
     /**

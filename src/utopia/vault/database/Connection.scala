@@ -128,11 +128,15 @@ class Connection(initialDBName: Option[String] = None) extends AutoCloseable
      */
     def apply(statement: SqlSegment): Result = 
     {
+        printIfDebugging("Executing statement: " + statement.toString)
         val selectedTables: Set[Table] = if (statement.isSelect) statement.targetTables else HashSet()
         
         // Changes database if necessary
         statement.databaseName.foreach { dbName = _ }
-        apply(statement.sql, statement.values, selectedTables, statement.generatesKeys)
+        val result = apply(statement.sql, statement.values, selectedTables, statement.generatesKeys)
+        
+        printIfDebugging(s"Received result: $result")
+        result
     }
     
     /**
@@ -335,6 +339,8 @@ class Connection(initialDBName: Option[String] = None) extends AutoCloseable
             }
         }
     }
+    
+    private def printIfDebugging(message: => String) = if (Connection.settings.debugPrintsEnabled) println(message)
     
     private def setValues(statement: PreparedStatement, values: Seq[Value]) = 
     {

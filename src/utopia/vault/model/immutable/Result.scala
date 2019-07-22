@@ -78,6 +78,21 @@ case class Result(rows: Vector[Row] = Vector(), generatedKeys: Vector[Value] = V
     def updatedRows = updatedRowCount > 0
     
     
+    // IMPLEMENTED  ----------------------
+    
+    override def toString =
+    {
+        if (generatedKeys.nonEmpty)
+            s"Generated keys: [${ generatedKeys.map { _.getString }.mkString(", ") }]"
+        else if (updatedRowCount > 0)
+            s"Updated $updatedRowCount row(s)"
+        else if (rows.nonEmpty)
+            s"${rows.size} Row(s): \n${rows.map { "\t" + _ }.mkString("\n")}"
+        else
+            "Empty result"
+    }
+    
+    
     // OTHER METHODS    ------------------
     
     /**
