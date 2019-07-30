@@ -54,9 +54,9 @@ object ColumnConditionTest extends App
             assert(countRows(ageColumn <> 31) == 2)
             
             assert(countRows(ageColumn.isNull) == 1)
-            assert(countRows(ageColumn <=> Value.empty()) == 1)
+            assert(countRows(ageColumn <=> Value.empty) == 1)
             assert(countRows(ageColumn.isNotNull) == 3)
-            assert(countRows(ageColumn <> Value.empty()) == 3)
+            assert(countRows(ageColumn <> Value.empty) == 3)
             
             assert(countRows(isAdminColumn <=> true || (ageColumn < 5)) == 2)
             assert(countRows(ageColumn > 5 && (ageColumn < 32)) == 1)

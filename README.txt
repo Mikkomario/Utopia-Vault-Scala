@@ -124,6 +124,9 @@ v1.3  ---------------------------------------
 
         .in(...) (when creating conditions) will now accept any traversable group and not just seqs
 
+        StorableFactory now uses model validation based on table required columns -schema. Existing implementations
+        must be refactored accordingly.
+
 
     Fixes
     -----

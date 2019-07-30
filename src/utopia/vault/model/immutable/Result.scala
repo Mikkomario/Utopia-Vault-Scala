@@ -41,7 +41,7 @@ case class Result(rows: Vector[Row] = Vector(), generatedKeys: Vector[Value] = V
       * @return The first value in this result. Should only be used when a single column is selected and query is
       *         limited to 1 row
       */
-    def firstValue = rows.headOption.map { _.value } getOrElse Value.empty()
+    def firstValue = rows.headOption.map { _.value } getOrElse Value.empty
     
     /**
      * Whether this result is empty and doesn't contain any rows or generated keys
@@ -71,7 +71,7 @@ case class Result(rows: Vector[Row] = Vector(), generatedKeys: Vector[Value] = V
     /**
       * @return The index of the first result row
       */
-    def firstIndex = rows.headOption.map { _.index } getOrElse Value.empty()
+    def firstIndex = rows.headOption.map { _.index } getOrElse Value.empty
     
     /**
       * @return Whether the query updated any rows
@@ -112,7 +112,7 @@ case class Result(rows: Vector[Row] = Vector(), generatedKeys: Vector[Value] = V
       * @param table Target table
       * @return The first row index for the specified table
       */
-    def firstIndexForTable(table: Table) = rows.headOption.map { _.indexForTable(table) } getOrElse Value.empty()
+    def firstIndexForTable(table: Table) = rows.headOption.map { _.indexForTable(table) } getOrElse Value.empty
     
     /**
       * Groups the rows to groups by tables

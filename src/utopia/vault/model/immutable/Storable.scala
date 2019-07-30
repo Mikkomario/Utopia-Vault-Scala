@@ -5,7 +5,7 @@ import utopia.flow.datastructure.template
 import utopia.flow.datastructure.template.Property
 import utopia.flow.generic.{DeclarationConstantGenerator, ModelConvertible}
 import utopia.vault.database.{Connection, DBException}
-import utopia.vault.sql.{Delete, Insert, Select, SqlSegment, Update, Where}
+import utopia.vault.sql.{Delete, Insert, SqlSegment, Update, Where}
 
 object Storable
 {
@@ -45,7 +45,7 @@ trait Storable extends ModelConvertible
      * instance in database context.
      */
     def index = table.primaryColumn.flatMap { column => valueProperties.find { case (name, _) => 
-            name.equalsIgnoreCase(column.name) }.map { case (_, value) => value } }.getOrElse(Value.empty())
+            name.equalsIgnoreCase(column.name) }.map { case (_, value) => value } }.getOrElse(Value.empty)
     
     /**
      * A declaration that describes this instance. The declaration is based on the instance's table
@@ -237,7 +237,7 @@ trait Storable extends ModelConvertible
             {
                 if (table.usesAutoIncrement)
                     Insert(table, toModel - primaryColumn.get.name).generatedKeys.headOption
-                        .getOrElse(Value.empty(primaryColumn.get.dataType))
+                        .getOrElse(Value.emptyWithType(primaryColumn.get.dataType))
                 else
                 {
                     val i = index
@@ -249,7 +249,7 @@ trait Storable extends ModelConvertible
             else
             {
                 Insert(table, toModel)
-                Value.empty()
+                Value.empty
             }
         }
         catch
