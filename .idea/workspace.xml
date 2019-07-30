@@ -8,16 +8,9 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="92da042d-32a6-4c2c-9a07-bca99577ad71" name="Default Changelist" comment="Added id access traits">
-      <change afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/IdAccess.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/ManyAccessWithIds.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/ManyIdAccess.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/SingleAccessWithIds.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/SingleIdAccess.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Utopia-Flow-Scala/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Utopia-Flow-Scala/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="92da042d-32a6-4c2c-9a07-bca99577ad71" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.txt" beforeDir="false" afterPath="$PROJECT_DIR$/README.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/SingleAccess.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/SingleAccess.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/Id.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/Id.scala" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -305,7 +298,13 @@
       <option name="presentableId" value="LOCAL−00016" />
       <updated>1564480402772</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL−00017" summary="Added id access traits">
+      <created>1564484964626</created>
+      <option name="number" value="LOCAL−00017" />
+      <option name="presentableId" value="LOCAL−00017" />
+      <updated>1564484964626</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -337,7 +336,8 @@
     <MESSAGE value="Fixed / modified some BasicSqlValueGenerator cases" />
     <MESSAGE value="Flow: Added FromModelFactoryWithSchema&#10;Vault: StorableFactory now extends FromModelFactoryWithSchema instead" />
     <MESSAGE value="Package structure updated. Added Access traits" />
-    <option name="LAST_COMMIT_MESSAGE" value="Package structure updated. Added Access traits" />
+    <MESSAGE value="Added id access traits" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added id access traits" />
   </component>
   <component name="masterDetails">
     <states>

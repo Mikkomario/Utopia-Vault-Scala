@@ -25,7 +25,7 @@ class Id[+A](value: Value, factory: FromResultFactory[A])
 	 * @param connection Database connection (implicit)
 	 * @return Whether this id exists in the database
 	 */
-	def isValid(implicit connection: Connection) = factory.table.containsIndex(value)
+	def exists(implicit connection: Connection) = factory.table.containsIndex(value)
 	
 	/**
 	 * Reads model data from table
