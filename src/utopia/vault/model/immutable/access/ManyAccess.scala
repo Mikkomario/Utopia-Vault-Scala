@@ -2,7 +2,6 @@ package utopia.vault.model.immutable.access
 
 import utopia.vault.sql.Extensions._
 import utopia.vault.database.Connection
-import utopia.vault.model.immutable.factory.FromResultFactory
 import utopia.vault.sql.{Condition, ConditionElement}
 
 /**
@@ -12,8 +11,17 @@ import utopia.vault.sql.{Condition, ConditionElement}
  * @tparam I Type of used index
  * @tparam A Type of read model
  */
-trait ManyAccess[-I, +A] extends Access[I, A, FromResultFactory[A]]
+trait ManyAccess[-I, +A] extends Access[I, A]
 {
+	// COMPUTED	-----------------------
+	
+	/**
+	 * @param connection Database connection (implicit)
+	 * @return All accessible items
+	 */
+	def all(implicit connection: Connection) = factory.getAll()
+	
+	
 	// OPERATORS	-------------------
 	
 	/**

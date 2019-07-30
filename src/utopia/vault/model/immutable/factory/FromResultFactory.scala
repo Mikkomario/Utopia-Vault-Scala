@@ -79,4 +79,26 @@ trait FromResultFactory[+A]
 	  * @return Whether there exists data for the specified index
 	  */
 	def exists(index: Value)(implicit connection: Connection) = Exists.index(table, index)
+	
+	/**
+	 * Retrieves an object's data from the database and parses it to a proper instance
+	 * @param index the index / primary key with which the data is read
+	 * @return database data parsed into an instance. None if there was no data available.
+	 */
+	def get(index: Value)(implicit connection: Connection): Option[A] =
+	{
+		table.primaryColumn.flatMap { column => get(column <=> index) }
+	}
+	
+	/**
+	 * Retrieves an object's data from the database and parses it to a proper instance
+	 * @param where The condition with which the row is found from the database (will be limited to
+	 * the first result row)
+	 * @return database data parsed into an instance. None if no data was found with the provided
+	 * condition
+	 */
+	def get(where: Condition)(implicit connection: Connection) =
+	{
+		apply(connection(SelectAll(target) + Where(where))).headOption
+	}
 }

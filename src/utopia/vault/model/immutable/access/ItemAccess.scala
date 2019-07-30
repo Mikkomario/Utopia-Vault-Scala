@@ -32,7 +32,7 @@ class ItemAccess[+A](value: Value, factory: FromResultFactory[A])
 	 * @param connection Database connection (implicit)
 	 * @return Model read for this id
 	 */
-	def get(implicit connection: Connection) = factory.getMany(toCondition).headOption
+	def get(implicit connection: Connection) = factory.get(value)
 	
 	/**
 	 * Deletes this id from database

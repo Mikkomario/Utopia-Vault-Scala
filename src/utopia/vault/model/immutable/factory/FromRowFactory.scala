@@ -36,7 +36,7 @@ trait FromRowFactory[+A] extends FromResultFactory[A]
 	  * @param index the index / primary key with which the data is read
 	  * @return database data parsed into an instance. None if there was no data available.
 	  */
-	def get(index: Value)(implicit connection: Connection): Option[A] =
+	override def get(index: Value)(implicit connection: Connection): Option[A] =
 	{
 		table.primaryColumn.flatMap { column => get(column <=> index) }
 	}
@@ -48,7 +48,7 @@ trait FromRowFactory[+A] extends FromResultFactory[A]
 	  * @return database data parsed into an instance. None if no data was found with the provided
 	  * condition
 	  */
-	def get(where: Condition)(implicit connection: Connection) =
+	override def get(where: Condition)(implicit connection: Connection) =
 	{
 		connection(SelectAll(target) + Where(where) + Limit(1)).rows.headOption.flatMap(apply)
 	}

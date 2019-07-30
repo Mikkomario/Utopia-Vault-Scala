@@ -1,7 +1,6 @@
 package utopia.vault.model.immutable.access
 
 import utopia.vault.database.Connection
-import utopia.vault.model.immutable.factory.FromRowFactory
 import utopia.vault.sql.Condition
 
 /**
@@ -11,7 +10,7 @@ import utopia.vault.sql.Condition
  * @tparam I Type of used index
  * @tparam A Type of read model
  */
-trait SingleAccess[-I, +A] extends Access[I, A, FromRowFactory[A]]
+trait SingleAccess[-I, +A] extends Access[I, A]
 {
 	// OPERATORS	--------------------
 	

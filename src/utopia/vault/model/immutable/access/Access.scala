@@ -10,7 +10,7 @@ import utopia.vault.model.immutable.factory.FromResultFactory
  * @tparam I Type of used index
  * @tparam A Type of read model
  */
-trait Access[-I, +A, +Factory <: FromResultFactory[A]]
+trait Access[-I, +A]
 {
 	// ABSTRACT	-----------------------
 	
@@ -24,7 +24,7 @@ trait Access[-I, +A, +Factory <: FromResultFactory[A]]
 	/**
 	 * @return Factory used by this access
 	 */
-	def factory: Factory
+	def factory: FromResultFactory[A]
 	
 	
 	// COMPUTED	-----------------------

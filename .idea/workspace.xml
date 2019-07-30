@@ -9,12 +9,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="92da042d-32a6-4c2c-9a07-bca99577ad71" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/IntIdAccess.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/Access.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/Access.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/Id.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/ItemAccess.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/IdAccess.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/IdAccess.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/ItemAccess.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/ItemAccess.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/ManyAccess.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/ManyAccess.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/SingleAccess.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/SingleAccess.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/factory/FromResultFactory.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/factory/FromResultFactory.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/factory/FromRowFactory.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/factory/FromRowFactory.scala" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -314,7 +316,13 @@
       <option name="presentableId" value="LOCAL−00018" />
       <updated>1564486048052</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL−00019" summary="Refactored access classes a little">
+      <created>1564488946255</created>
+      <option name="number" value="LOCAL−00019" />
+      <option name="presentableId" value="LOCAL−00019" />
+      <updated>1564488946255</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -348,7 +356,8 @@
     <MESSAGE value="Package structure updated. Added Access traits" />
     <MESSAGE value="Added id access traits" />
     <MESSAGE value="Changed Id.isValid to Id.exists" />
-    <option name="LAST_COMMIT_MESSAGE" value="Changed Id.isValid to Id.exists" />
+    <MESSAGE value="Refactored access classes a little" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactored access classes a little" />
   </component>
   <component name="masterDetails">
     <states>

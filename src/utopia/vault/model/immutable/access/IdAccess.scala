@@ -18,6 +18,11 @@ trait IdAccess[+I]
 	def table: Table
 	
 	/**
+	 * @return The index column used by this access
+	 */
+	def index = table.primaryColumn.get
+	
+	/**
 	 * Converts a value to specified index type
 	 * @param value Value to convert
 	 * @return Converted value
