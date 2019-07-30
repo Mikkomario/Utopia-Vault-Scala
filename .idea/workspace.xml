@@ -9,8 +9,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="92da042d-32a6-4c2c-9a07-bca99577ad71" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/IntIdAccess.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/Id.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/Id.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/Access.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/Access.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/Id.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/ItemAccess.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/ManyAccess.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/ManyAccess.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/SingleAccess.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/SingleAccess.scala" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -304,7 +308,13 @@
       <option name="presentableId" value="LOCAL−00017" />
       <updated>1564484964626</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL−00018" summary="Changed Id.isValid to Id.exists">
+      <created>1564486048052</created>
+      <option name="number" value="LOCAL−00018" />
+      <option name="presentableId" value="LOCAL−00018" />
+      <updated>1564486048052</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -337,7 +347,8 @@
     <MESSAGE value="Flow: Added FromModelFactoryWithSchema&#10;Vault: StorableFactory now extends FromModelFactoryWithSchema instead" />
     <MESSAGE value="Package structure updated. Added Access traits" />
     <MESSAGE value="Added id access traits" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added id access traits" />
+    <MESSAGE value="Changed Id.isValid to Id.exists" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changed Id.isValid to Id.exists" />
   </component>
   <component name="masterDetails">
     <states>

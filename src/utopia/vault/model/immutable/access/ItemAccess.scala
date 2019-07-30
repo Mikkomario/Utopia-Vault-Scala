@@ -6,14 +6,14 @@ import utopia.vault.model.immutable.factory.FromResultFactory
 import utopia.vault.sql.{Delete, Where}
 
 /**
- * Represents a single possible id in a database
+ * Provides access to a single possible id / row in a database
  * @author Mikko Hilpinen
  * @since 30.7.2019, v1.3+
  * @tparam A Type of model read from table
  * @param value Value of this id
  * @param factory Factory used for reading model data from table
  */
-class Id[+A](value: Value, factory: FromResultFactory[A])
+class ItemAccess[+A](value: Value, factory: FromResultFactory[A])
 {
 	/**
 	 * @return A condition based on this id

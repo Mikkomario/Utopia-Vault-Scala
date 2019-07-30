@@ -21,7 +21,14 @@ trait SingleAccess[-I, +A] extends Access[I, A, FromRowFactory[A]]
 	 * @param connection Database connection (implicit)
 	 * @return Search results
 	 */
-	def apply(condition: Condition)(implicit connection: Connection) = factory.get(condition)
+	def find(condition: Condition)(implicit connection: Connection) = factory.get(condition)
+	
+	/**
+	 * Accesses a single item
+	 * @param id Targeted id-value
+	 * @return An item accessor
+	 */
+	def apply(id: I) = new ItemAccess(idValue(id), factory)
 	
 	
 	// OTHER	------------------------

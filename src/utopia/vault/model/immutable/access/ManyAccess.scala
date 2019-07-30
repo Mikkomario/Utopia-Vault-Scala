@@ -22,7 +22,7 @@ trait ManyAccess[-I, +A] extends Access[I, A, FromResultFactory[A]]
 	 * @param connection Database connection (implicit)
 	 * @return Read item(s)
 	 */
-	protected def apply(condition: Condition)(implicit connection: Connection) = factory.getMany(condition)
+	protected def find(condition: Condition)(implicit connection: Connection) = factory.getMany(condition)
 	
 	
 	// OTHER	-----------------------

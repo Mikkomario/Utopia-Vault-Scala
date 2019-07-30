@@ -38,14 +38,4 @@ trait Access[-I, +A, +Factory <: FromResultFactory[A]]
 	 * @return The primary column of the (primary) table used by this access
 	 */
 	def index = table.primaryColumn.get
-	
-	
-	// OPERATORS	-------------------
-	
-	/**
-	 * Accesses a single id
-	 * @param id Targeted id-value
-	 * @return An id instance
-	 */
-	def apply(id: I) = new Id(idValue(id), factory)
 }
