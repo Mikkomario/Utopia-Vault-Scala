@@ -1,8 +1,9 @@
-package utopia.vault.model.immutable
+package utopia.vault.model.immutable.factory
 
 import utopia.flow.util.CollectionExtensions._
 import utopia.flow.datastructure.immutable.Value
 import utopia.vault.database.Connection
+import utopia.vault.model.immutable.{Column, Result, Row}
 import utopia.vault.sql.{Condition, Limit, OrderBy, SelectAll, SqlSegment, Where}
 
 /**

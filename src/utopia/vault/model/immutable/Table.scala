@@ -1,9 +1,10 @@
 package utopia.vault.model.immutable
 
-import utopia.flow.datastructure.immutable.ModelDeclaration
+import utopia.flow.datastructure.immutable.{ModelDeclaration, Value}
 import utopia.vault.database.Connection
+import utopia.vault.model.immutable.factory.StorableFactory
 import utopia.vault.sql.JoinType.JoinType
-import utopia.vault.sql.{Condition, Limit, Select, SqlSegment, SqlTarget, Where}
+import utopia.vault.sql.{Condition, Exists, Limit, Select, SqlSegment, SqlTarget, Where}
 
 import scala.collection.immutable.HashSet
 
@@ -147,4 +148,12 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
     {
         connection(Select.index(this) + Where(where)).indicesForTable(this)
     }
+    
+    /**
+     * Checks whether the specified index exists in this table in database
+     * @param index Searched index
+     * @param connection Database connection (implicit)
+     * @return Whether specified index exists in this table in the database
+     */
+    def containsIndex(index: Value)(implicit connection: Connection) = Exists.index(this, index)
 }

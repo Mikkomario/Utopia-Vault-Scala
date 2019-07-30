@@ -43,12 +43,15 @@ Main Features
         together without specifying any columns or conditions. Vault will fill in all the blanks for you.
         - If you wish to manually specify joined columns, that is also possible
 
-    Storable and Readable traits for object-oriented database interactions
-        - This includes Storable, StorableWithFactory, Readable, FromResultFactory, FromRowFactory and StorableFactory
+    Storable, Readable and Access traits for object-oriented database interactions
+        - This includes Storable, StorableWithFactory, Readable, FromResultFactory, FromRowFactory, StorableFactory,
+        SingleAccess and ManyAccess
         - Storable trait allows you to push (update or insert) model data to database with minimum syntax
         - Readable trait allows you to pull (read) up to date data from database to your model
         - Mutable DBModel class implements both of these traits
         - Factory traits can be used for transforming database row data into your object models
+        - Access traits allow you to create simple interfaces into database contents and to hide the actual sql-based
+        implementation
         - These traits allow you to use a MariaDB / MySQL server in a noSQL, object-oriented manner
 
 
@@ -104,6 +107,8 @@ v1.3  ---------------------------------------
 
         Result now allows one to group rows based on two or more tables (grouped(...) methods).
 
+        Access, SingleAccess and ManyAccess traits were added for model access interfaces
+
 
     Updates & Changes
     -----------------
@@ -126,6 +131,8 @@ v1.3  ---------------------------------------
 
         StorableFactory now uses model validation based on table required columns -schema. Existing implementations
         must be refactored accordingly.
+
+        FromResultFactory, FromRowFactory and StorableFactory were moved to utopia.vault.model.immutable.factory
 
 
     Fixes

@@ -8,23 +8,24 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="92da042d-32a6-4c2c-9a07-bca99577ad71" name="Default Changelist" comment="Fixed / modified some BasicSqlValueGenerator cases">
-      <change afterPath="$PROJECT_DIR$/../Utopia-Flow-Scala/src/utopia/flow/generic/FromModelFactoryWithSchema.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Utopia-Flow-Scala/README.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../Utopia-Flow-Scala/README.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Utopia-Flow-Scala/src/utopia/flow/generic/FromModelFactory.scala" beforeDir="false" afterPath="$PROJECT_DIR$/../Utopia-Flow-Scala/src/utopia/flow/generic/FromModelFactory.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+    <list default="true" id="92da042d-32a6-4c2c-9a07-bca99577ad71" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/Access.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/Id.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/ManyAccess.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/access/SingleAccess.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/factory/FromResultFactory.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/factory/FromRowFactory.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.txt" beforeDir="false" afterPath="$PROJECT_DIR$/README.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/Result.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/Result.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/Row.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/Row.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/FromResultFactory.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/FromRowFactory.scala" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/Storable.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/Storable.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/StorableFactory.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/StorableFactory.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/StorableFactory.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/factory/StorableFactory.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/StorableWithFactory.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/StorableWithFactory.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/Table.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/Table.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/mutable/DBModel.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/mutable/DBModel.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/utopia/vault/test/ColumnConditionTest.scala" beforeDir="false" afterPath="$PROJECT_DIR$/test/utopia/vault/test/ColumnConditionTest.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/utopia/vault/test/IndexStorable.scala" beforeDir="false" afterPath="$PROJECT_DIR$/test/utopia/vault/test/IndexStorable.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/utopia/vault/test/Person.scala" beforeDir="false" afterPath="$PROJECT_DIR$/test/utopia/vault/test/Person.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/utopia/vault/test/RawStatementTest.scala" beforeDir="false" afterPath="$PROJECT_DIR$/test/utopia/vault/test/RawStatementTest.scala" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -42,8 +43,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Scala Class" />
-        <option value="Scala Trait" />
         <option value="Scala Object" />
+        <option value="Scala Trait" />
       </list>
     </option>
   </component>
@@ -93,15 +94,17 @@
     <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Ignored.Files" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\Mikko\IdeaProjects\Utopia-Vault-Scala\test" />
-    </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
-      <recent name="utopia.vault.model.mutable" />
+      <recent name="utopia.vault.model.immutable.factory" />
+      <recent name="utopia.vault.model.immutable.access" />
       <recent name="utopia.vault.model.immutable" />
+      <recent name="utopia.vault.model.mutable" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Mikko\IdeaProjects\Utopia-Flow-Scala\src\utopia\flow\util" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Mikko\IdeaProjects\Utopia-Vault-Scala\test" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -298,7 +301,13 @@
       <option name="project" value="LOCAL" />
       <updated>1563459025367</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL−00015" summary="Flow: Added FromModelFactoryWithSchema&#10;Vault: StorableFactory now extends FromModelFactoryWithSchema instead">
+      <created>1564475470636</created>
+      <option name="number" value="LOCAL−00015" />
+      <option name="presentableId" value="LOCAL−00015" />
+      <updated>1564475470636</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -326,7 +335,8 @@
     <MESSAGE value="Result now contains information of how many rows were updated" />
     <MESSAGE value="Tested and debugged storable insert &amp; push in table without auto-increment" />
     <MESSAGE value="Fixed / modified some BasicSqlValueGenerator cases" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed / modified some BasicSqlValueGenerator cases" />
+    <MESSAGE value="Flow: Added FromModelFactoryWithSchema&#10;Vault: StorableFactory now extends FromModelFactoryWithSchema instead" />
+    <option name="LAST_COMMIT_MESSAGE" value="Flow: Added FromModelFactoryWithSchema&#10;Vault: StorableFactory now extends FromModelFactoryWithSchema instead" />
   </component>
   <component name="masterDetails">
     <states>

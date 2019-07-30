@@ -1,6 +1,7 @@
 package utopia.vault.model.immutable
 
 import utopia.vault.database.Connection
+import utopia.vault.model.immutable.factory.FromRowFactory
 
 /**
   * These storable instances have a StorableFactory associated with them

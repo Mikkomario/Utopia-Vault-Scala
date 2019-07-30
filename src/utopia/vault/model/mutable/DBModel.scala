@@ -5,7 +5,8 @@ import utopia.flow.datastructure.mutable.{Model, Variable}
 import utopia.flow.datastructure.{immutable, template}
 import utopia.flow.datastructure.template.Property
 import utopia.flow.generic.DeclarationVariableGenerator
-import utopia.vault.model.immutable.{Storable, StorableFactory, Table}
+import utopia.vault.model.immutable.factory.StorableFactory
+import utopia.vault.model.immutable.{Storable, Table}
 
 object DBModel
 {

@@ -1,9 +1,10 @@
-package utopia.vault.model.immutable
+package utopia.vault.model.immutable.factory
 
+import utopia.flow.util.CollectionExtensions._
 import utopia.flow.datastructure.immutable
 import utopia.flow.datastructure.immutable.Constant
-import utopia.flow.util.CollectionExtensions._
 import utopia.flow.generic.FromModelFactoryWithSchema
+import utopia.vault.model.immutable.{Row, Storable, Table}
 import utopia.vault.util.ErrorHandling
 
 object StorableFactory
