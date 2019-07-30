@@ -45,7 +45,7 @@ Main Features
 
     Storable, Readable and Access traits for object-oriented database interactions
         - This includes Storable, StorableWithFactory, Readable, FromResultFactory, FromRowFactory, StorableFactory,
-        SingleAccess and ManyAccess
+        SingleAccess, ManyAccess, SingleAccessWithIds and ManyAccessWithIds
         - Storable trait allows you to push (update or insert) model data to database with minimum syntax
         - Readable trait allows you to pull (read) up to date data from database to your model
         - Mutable DBModel class implements both of these traits
@@ -107,7 +107,8 @@ v1.3  ---------------------------------------
 
         Result now allows one to group rows based on two or more tables (grouped(...) methods).
 
-        Access, SingleAccess and ManyAccess traits were added for model access interfaces
+        Access, SingleAccess, ManyAccess, SingleAccessWithIds and ManyAccessWithIds -traits were added for model and
+        index access interfaces
 
 
     Updates & Changes
