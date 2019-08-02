@@ -5,7 +5,7 @@ package utopia.vault.model.immutable.access
  * @author Mikko Hilpinen
  * @since 30.7.2019, v1.3+
  */
-trait ManyAccessWithIds[I, +A, Id <: ManyIdAccess[I]]
+trait ManyAccessWithIds[I, +A, Id <: ManyIdAccess[I]] extends ManyAccess[I, A]
 {
 	/**
 	 * @return An access point to ids in the related table

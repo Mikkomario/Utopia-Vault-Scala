@@ -1,11 +1,12 @@
 package utopia.vault.model.immutable.factory
 
 import utopia.flow.util.CollectionExtensions._
-import utopia.flow.datastructure.immutable
-import utopia.flow.datastructure.immutable.Constant
-import utopia.flow.generic.FromModelFactoryWithSchema
+import utopia.flow.datastructure.template.{Model, Property}
+import utopia.flow.generic.FromModelFactory
 import utopia.vault.model.immutable.{Row, Storable, Table}
 import utopia.vault.util.ErrorHandling
+
+import scala.util.Success
 
 object StorableFactory
 {
@@ -23,13 +24,11 @@ object StorableFactory
  * @author Mikko Hilpinen
  * @since 18.6.2017
  */
-trait StorableFactory[+A] extends FromRowFactory[A] with FromModelFactoryWithSchema[A]
+trait StorableFactory[+A] extends FromRowFactory[A] with FromModelFactory[A]
 {
     // IMPLEMENTED  ----------------------------
     
     override val joinedTables = Vector()
-    
-    override def schema = table.requirementDeclaration
     
     // Handles parsing errors
     override def apply(row: Row) =
@@ -42,5 +41,5 @@ trait StorableFactory[+A] extends FromRowFactory[A] with FromModelFactoryWithSch
 
 private class ImmutableStorableFactory(override val table: Table) extends StorableFactory[Storable]
 {
-    override protected def fromValidatedModel(model: immutable.Model[Constant]) = Storable(table, model)
+    override def apply(model: Model[Property]) = Success(Storable(table, model))
 }

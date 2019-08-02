@@ -8,6 +8,8 @@ import utopia.flow.generic.DeclarationVariableGenerator
 import utopia.vault.model.immutable.factory.StorableFactory
 import utopia.vault.model.immutable.{Storable, Table}
 
+import scala.util.Success
+
 object DBModel
 {
     /**
@@ -46,11 +48,11 @@ class DBModel(override val table: Table) extends Model[Variable](
  */
 class DBModelFactory(val table: Table) extends StorableFactory[DBModel]
 {
-    override protected def fromValidatedModel(model: immutable.Model[Constant]) =
+    override def apply(model: template.Model[Property]) =
     {
         val storable = new DBModel(table)
         storable ++= model.attributes.map { p => new Variable(p.name, p.value) }
     
-        storable
+        Success(storable)
     }
 }
