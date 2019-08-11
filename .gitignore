@@ -3,3 +3,5 @@
 .project
 .settings/
 bin/
+out/
+.idea/workspace.xml
