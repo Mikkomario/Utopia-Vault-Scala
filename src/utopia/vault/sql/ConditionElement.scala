@@ -62,9 +62,9 @@ trait ConditionElement
      * Creates an in condition that returns true if one of the provided element values matches 
      * this element's value
      */
-    def in(elements: Seq[ConditionElement]) = 
+    def in(elements: Traversable[ConditionElement]) =
     {
-        val rangeSegment = SqlSegment.combine(elements.map { _.toSqlSegment }, { _ + ", " + _ })
+        val rangeSegment = SqlSegment.combine(elements.map { _.toSqlSegment }.toSeq, { _ + ", " + _ })
         val inSegment = rangeSegment.copy(sql = "(" + rangeSegment.sql + ")")
         
         Condition(toSqlSegment + "IN" + inSegment)

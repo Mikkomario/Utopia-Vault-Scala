@@ -1,10 +1,14 @@
 package utopia.vault.model.mutable
 
+import utopia.flow.datastructure.immutable.Constant
 import utopia.flow.datastructure.mutable.{Model, Variable}
-import utopia.flow.datastructure.template
+import utopia.flow.datastructure.{immutable, template}
 import utopia.flow.datastructure.template.Property
 import utopia.flow.generic.DeclarationVariableGenerator
-import utopia.vault.model.immutable.{Storable, StorableFactory, Table}
+import utopia.vault.model.immutable.factory.StorableFactory
+import utopia.vault.model.immutable.{Storable, Table}
+
+import scala.util.Success
 
 object DBModel
 {
@@ -44,11 +48,11 @@ class DBModel(override val table: Table) extends Model[Variable](
  */
 class DBModelFactory(val table: Table) extends StorableFactory[DBModel]
 {
-    def apply(model: template.Model[Property]) = 
+    override def apply(model: template.Model[Property]) =
     {
         val storable = new DBModel(table)
         storable ++= model.attributes.map { p => new Variable(p.name, p.value) }
-        
-        Some(storable)
+    
+        Success(storable)
     }
 }

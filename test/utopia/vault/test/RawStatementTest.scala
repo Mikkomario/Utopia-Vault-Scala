@@ -48,7 +48,7 @@ object RawStatementTest extends App
         assert(results.size == 3)
         
         // Tries to insert null values
-        connection(s"INSERT INTO ${table.name} (name, age) VALUES (?, ?)", Vector("Test", Value.empty(IntType)))
+        connection(s"INSERT INTO ${table.name} (name, age) VALUES (?, ?)", Vector("Test", Value.emptyWithType(IntType)))
         
         // Also tries inserting a time value
         val creationTime = Instant.now().toValue
@@ -65,7 +65,7 @@ object RawStatementTest extends App
         
         // Tests a bit more tricky version where data types may not be correct
         connection(s"INSERT INTO ${table.name} (name) VALUES (?)", Vector(32))
-        connection(s"INSERT INTO ${table.name} (name, created) VALUES (?, ?)", Vector("Null Test", Value.empty(VectorType)))
+        connection(s"INSERT INTO ${table.name} (name, created) VALUES (?, ?)", Vector("Null Test", Value.emptyWithType(VectorType)))
         
         println("Success!")
     }

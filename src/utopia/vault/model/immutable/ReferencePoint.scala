@@ -19,3 +19,6 @@ object ReferencePoint
   * @param column The column of this reference point
 **/
 case class ReferencePoint(table: Table, column: Column)
+{
+    override def toString = s"${table.name}(${column.name})"
+}

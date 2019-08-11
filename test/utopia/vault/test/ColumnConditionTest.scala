@@ -38,7 +38,7 @@ object ColumnConditionTest extends App
             val test3 = Model(Vector("name" -> "test 3", "age" -> 3))
             val test4 = Model(Vector("name" -> "test 4"))
             
-            Insert(table, test1, test2, test3, test4).foreach(_.execute())
+            Insert(table, test1, test2, test3, test4)
             
             def countRows(condition: Condition) = connection(SelectAll(table) + Where(condition)).rows.size
             
@@ -54,9 +54,9 @@ object ColumnConditionTest extends App
             assert(countRows(ageColumn <> 31) == 2)
             
             assert(countRows(ageColumn.isNull) == 1)
-            assert(countRows(ageColumn <=> Value.empty()) == 1)
+            assert(countRows(ageColumn <=> Value.empty) == 1)
             assert(countRows(ageColumn.isNotNull) == 3)
-            assert(countRows(ageColumn <> Value.empty()) == 3)
+            assert(countRows(ageColumn <> Value.empty) == 3)
             
             assert(countRows(isAdminColumn <=> true || (ageColumn < 5)) == 2)
             assert(countRows(ageColumn > 5 && (ageColumn < 32)) == 1)

@@ -1,6 +1,7 @@
 package utopia.vault.model.immutable
 
 import utopia.vault.database.Connection
+import utopia.vault.model.immutable.factory.FromRowFactory
 
 /**
   * These storable instances have a StorableFactory associated with them
@@ -37,4 +38,18 @@ trait StorableWithFactory[+Repr] extends Storable
 	  * @return Objects from the database matching this condition
 	  */
 	def searchMany()(implicit connection: Connection) = factory.getMany(toCondition)
+	
+	/**
+	  * Returns the 'maximum' row based on the provided order property
+	  * @param orderPropertyName Name of property on which ordering is based
+	  * @param connection Database connection
+	  */
+	def searchMax(orderPropertyName: String)(implicit connection: Connection) = factory.getMax(orderPropertyName)
+	
+	/**
+	  * Returns the 'minimum' row based on the provided order property
+	  * @param orderPropertyName Name of property on which ordering is based
+	  * @param connection Database connection
+	  */
+	def searchMin(orderPropertyName: String)(implicit connection: Connection) = factory.getMin(orderPropertyName)
 }

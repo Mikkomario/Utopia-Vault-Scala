@@ -1,5 +1,6 @@
 package utopia.vault.sql
 
+import utopia.flow.util.CollectionExtensions._
 import utopia.vault.model.immutable.{Column, Table}
 import utopia.vault.model.mutable.References
 import utopia.vault.sql.JoinType._
@@ -36,8 +37,19 @@ trait SqlTarget
     {
         // Finds the first table referencing (or being referenced by) the provided table and uses 
         // that for a join
-        toSqlSegment.targetTables.view.map { left => References.columnsBetween(left, table) }.find {_.nonEmpty }.map {
-            matches => this + Join(matches.head._1, table, matches.head._2, joinType) }.getOrElse(this)
+        val tables = toSqlSegment.targetTables
+        val firstLink = tables.findMap { left => References.connectionBetween(left, table) }
+        if (firstLink.isEmpty)
+        {
+            throw new CannotJoinTableException(s"Cannot find a reference between $toSqlSegment and $table. Only found references: [${
+                (tables + table).flatMap(References.from).mkString(", ")
+            }]")
+        }
+        else
+        {
+            val (leftColumn, rightColumn) = firstLink.get
+            this + Join(leftColumn, table, rightColumn, joinType)
+        }
     }
     
     /**
@@ -51,3 +63,5 @@ trait SqlTarget
                 target => this + Join(column, target.table, target.column, joinType) }.getOrElse(this)
     }
 }
+
+private class CannotJoinTableException(message: String) extends RuntimeException(message)

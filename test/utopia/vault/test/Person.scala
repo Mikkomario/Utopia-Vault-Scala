@@ -2,12 +2,13 @@ package utopia.vault.test
 
 import java.time.Instant
 
-import utopia.flow.datastructure.template.Model
-import utopia.flow.datastructure.template.Property
+import utopia.flow.datastructure.immutable
+import utopia.flow.datastructure.immutable.Constant
 import utopia.flow.generic.ValueConversions._
-import utopia.vault.model.immutable.{StorableFactory, StorableWithFactory}
+import utopia.vault.model.immutable.StorableWithFactory
+import utopia.vault.model.immutable.factory.StorableFactoryWithValidation
 
-object Person extends StorableFactory[Person]
+object Person extends StorableFactoryWithValidation[Person]
 {
     // ATTRIBUTES    ----------------
     
@@ -16,9 +17,8 @@ object Person extends StorableFactory[Person]
     
     // IMPLEMENTED METHODS    -------
     
-    override def apply(model: Model[Property]) = Some(new Person(model("name").stringOr(), 
-            model("age").int, model("isAdmin").booleanOr(), model("created").instantOr(Instant.now()), 
-            model("rowId").int))
+    override protected def fromValidatedModel(model: immutable.Model[Constant]) = new Person(model("name").getString,
+        model("age").int, model("isAdmin").getBoolean, model("created").getInstant, model("rowId").int)
 }
 
 /**

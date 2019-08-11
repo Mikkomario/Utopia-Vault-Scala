@@ -38,13 +38,18 @@ case class Row(columnData: Map[Table, Model[Constant]])
       * @return An index from this row. If this row contains data from multiple tables, please use index(Table) or
       *         indices instead.
       */
-    def index = indices.headOption.map { _._2 } getOrElse Value.empty()
+    def index = indices.headOption.map { _._2 } getOrElse Value.empty
     
     /**
       * @return The first value found from this row. Should only be used when just a single value is requested
       */
     def value = columnData.values.find { !_.isEmpty }.flatMap {
-        _.attributesWithValue.headOption.map { _.value } } getOrElse Value.empty()
+        _.attributesWithValue.headOption.map { _.value } } getOrElse Value.empty
+    
+    
+    // IMPLEMENTED  ---------------------------
+    
+    override def toString = s"[${columnData.toVector.map { case (table, data) => s"${table.name}: $data" }.mkString(", ")}]"
     
     
     // OPERATORS    ---------------------------
@@ -66,7 +71,7 @@ case class Row(columnData: Map[Table, Model[Constant]])
       * @return The value for the specified column
       */
     def apply(column: Column) = columnData.find { _._1.contains(column) }.map { _._2(column.name) }
-        .getOrElse(Value.empty(column.dataType))
+        .getOrElse(Value.emptyWithType(column.dataType))
     
     
     // OTHER METHODS    ----------------------
@@ -75,7 +80,7 @@ case class Row(columnData: Map[Table, Model[Constant]])
      * Finds the index of the row in the specified table
      */
     def indexForTable(table: Table) = table.primaryColumn.map { column => apply(table)(column.name) }
-        .getOrElse(Value.empty())
+        .getOrElse(Value.empty)
     
     /**
       * Checks whether this row contains any data for the specified table

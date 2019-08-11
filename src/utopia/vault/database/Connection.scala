@@ -70,6 +70,12 @@ object Connection
      * success / failure state of the operation
      */
     def tryTransaction[T](f: Connection => T) = doTransaction(connection => { Try(f(connection)) })
+    
+    /**
+      * Modifies the settings used in database connections
+      * @param mod A function that modifies settings
+      */
+    def modifySettings(mod: ConnectionSettings => ConnectionSettings) = settings = mod(settings)
 }
 
 /**
@@ -122,11 +128,15 @@ class Connection(initialDBName: Option[String] = None) extends AutoCloseable
      */
     def apply(statement: SqlSegment): Result = 
     {
+        printIfDebugging("Executing statement: " + statement.toString)
         val selectedTables: Set[Table] = if (statement.isSelect) statement.targetTables else HashSet()
         
         // Changes database if necessary
         statement.databaseName.foreach { dbName = _ }
-        apply(statement.sql, statement.values, selectedTables, statement.generatesKeys)
+        val result = apply(statement.sql, statement.values, selectedTables, statement.generatesKeys)
+        
+        printIfDebugging(s"Received result: $result")
+        result
     }
     
     /**
@@ -141,8 +151,10 @@ class Connection(initialDBName: Option[String] = None) extends AutoCloseable
      * generated during the query
      * @return The results of the query, containing the read rows and keys. If 'selectedTables' 
      * parameter was empty, no rows are included. If 'returnGeneratedKeys' parameter was false, 
-     * no keys are included
+     * no keys are included. On update statements, includes number of updated rows.
+      * @throws DBException If query failed for some reason
      */
+    @throws(classOf[DBException])
     def apply(sql: String, values: Seq[Value], selectedTables: Set[Table] = HashSet(), 
             returnGeneratedKeys: Boolean = false) = 
     {
@@ -163,12 +175,19 @@ class Connection(initialDBName: Option[String] = None) extends AutoCloseable
                 setValues(statement.get, values)
                 
                 // Executes the statement and retrieves the result
-                results = Some(statement.get.executeQuery())
+                val foundResult = statement.get.execute()
+                if (foundResult)
+                    results = Some(statement.get.getResultSet)
                 
                 // Parses data out of the result
                 // May skip some data in case it is not requested
-                Result(if (selectedTables.isEmpty) Vector() else rowsFromResult(results.get, selectedTables),
-                        if (returnGeneratedKeys) generatedKeysFromResult(statement.get, selectedTables) else Vector())
+                Result(if (selectedTables.isEmpty || results.isEmpty) Vector() else rowsFromResult(results.get, selectedTables),
+                    if (returnGeneratedKeys) generatedKeysFromResult(statement.get, selectedTables) else Vector(),
+                    if (foundResult) 0 else statement.get.getUpdateCount)
+            }
+            catch
+            {
+                case e: SQLException => throw new DBException(s"DB query failed.\nSql: $sql\nValues:[${values.mkString(", ")}]", e)
             }
             finally
             {
@@ -321,6 +340,8 @@ class Connection(initialDBName: Option[String] = None) extends AutoCloseable
         }
     }
     
+    private def printIfDebugging(message: => String) = if (Connection.settings.debugPrintsEnabled) println(message)
+    
     private def setValues(statement: PreparedStatement, values: Seq[Value]) = 
     {
         values.indices.foreach
@@ -358,7 +379,7 @@ class Connection(initialDBName: Option[String] = None) extends AutoCloseable
             // The models are mapped to each table separately
             // NB: view.force is added in order to create a concrete map
             rowBuffer += Row(columnIndices.mapValues { data =>
-                Model.withConstants(data.map { case (column, sqlType, index) => new Constant(column.name,
+                Model.withConstants(data.map { case (column, sqlType, index) => Constant(column.name,
                 Connection.sqlValueGenerator(resultSet.getObject(index), sqlType)) }) }.view.force)
         }
         

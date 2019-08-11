@@ -1,15 +1,12 @@
 package utopia.vault.database
 
 import java.sql.Types
+
 import utopia.flow.datastructure.immutable.Value
-import utopia.flow.generic.LongType
-import utopia.flow.generic.DataType
-import utopia.flow.generic.BooleanType
-import utopia.flow.generic.StringType
-import utopia.flow.generic.FloatType
-import utopia.flow.generic.IntType
+import utopia.flow.generic.{BooleanType, DataType, DoubleType, FloatType, IntType, LongType, StringType}
 import java.sql.Date
 import java.sql.Timestamp
+
 import utopia.flow.generic.ValueConversions._
 import java.sql.Time
 
@@ -24,19 +21,21 @@ object BasicSqlValueGenerator extends SqlValueGenerator
     
     override def apply(value: Any, sqlType: Int) = 
     {
+        // Type mappings looked up from:
+        // https://www.service-architecture.com/articles/database/mapping_sql_and_java_data_types.html
         sqlType match 
         {
             case Types.TIMESTAMP | Types.TIMESTAMP_WITH_TIMEZONE => 
                 Some(value.asInstanceOf[Timestamp].toInstant())
             case Types.DATE => Some(value.asInstanceOf[Date].toLocalDate())
             case Types.TIME => Some(value.asInstanceOf[Time].toLocalTime())
-            case Types.CHAR => Some(value.toString)
-            
             case Types.INTEGER | Types.SMALLINT | Types.TINYINT => wrap(value, IntType)
-            case Types.FLOAT => wrap(value, FloatType)
-            case Types.VARCHAR => wrap(value, StringType)
+            case Types.DOUBLE | Types.FLOAT => wrap(value, DoubleType)
+            case Types.VARCHAR | Types.CHAR | Types.LONGNVARCHAR => wrap(value, StringType)
             case Types.BOOLEAN | Types.BIT => wrap(value, BooleanType)
             case Types.BIGINT => wrap(value, LongType)
+            case Types.REAL => wrap(value, FloatType)
+            case Types.NUMERIC | Types.DECIMAL => Some(value.asInstanceOf[java.math.BigDecimal].doubleValue())
             
             case _ => None
         }

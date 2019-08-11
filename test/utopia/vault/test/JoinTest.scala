@@ -26,7 +26,7 @@ object JoinTest extends App
     val strength = TestTables.strength
     
     // Uses a single connection throughout the tests
-    val connection = new Connection()
+    implicit val connection: Connection = new Connection()
     try
     {
         connection(Delete(person))
@@ -36,9 +36,9 @@ object JoinTest extends App
         val bertta = Model(Vector("name" -> "Bertta", "age" -> 8))
         val camilla = Model(Vector("name" -> "Camilla", "age" -> 31))
         
-        connection(Insert(person, arttu).get).generatedKeys.head
-        val berttaId = connection(Insert(person, bertta).get).generatedKeys.head
-        val camillaId = connection(Insert(person, camilla).get).generatedKeys.head
+        Insert(person, arttu)
+        val berttaId = Insert(person, bertta).generatedKeys.head
+        val camillaId = Insert(person, camilla).generatedKeys.head
         
         // Adds test powers
         val berttaPower = Model(Vector("ownerId" -> berttaId, "name" -> "imagination", "powerLevel" -> 9999))
@@ -47,7 +47,7 @@ object JoinTest extends App
         val camillaPower3 = Model(Vector("ownerId" -> camillaId, "name" -> "imagination", 
                 "powerLevel" -> 250))
         
-        connection(Insert(strength, berttaPower, camillaPower1, camillaPower2, camillaPower3).get)
+        Insert(strength, berttaPower, camillaPower1, camillaPower2, camillaPower3)
         
         // Counts the number of rows on each join type
         def countRows(joinType: JoinType) = connection(Select.nothing(person.join(strength, joinType))).rows.size

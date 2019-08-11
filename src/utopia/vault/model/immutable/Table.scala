@@ -1,9 +1,10 @@
 package utopia.vault.model.immutable
 
-import utopia.flow.datastructure.immutable.ModelDeclaration
+import utopia.flow.datastructure.immutable.{ModelDeclaration, Value}
 import utopia.vault.database.Connection
+import utopia.vault.model.immutable.factory.StorableFactory
 import utopia.vault.sql.JoinType.JoinType
-import utopia.vault.sql.{Condition, Limit, Select, SqlSegment, SqlTarget, Where}
+import utopia.vault.sql.{Condition, Exists, Limit, Select, SqlSegment, SqlTarget, Where}
 
 import scala.collection.immutable.HashSet
 
@@ -12,6 +13,9 @@ import scala.collection.immutable.HashSet
  * usually the primary column. Tables may reference other tables through columns too.
  * @author Mikko Hilpinen
  * @since 9.3.2017
+  * @param name This table's name in the database
+  * @param databaseName The name of the database that contains this table
+  * @param columns The columns that belong to this table
  */
 case class Table(name: String, databaseName: String, columns: Vector[Column]) extends SqlTarget
 {
@@ -25,7 +29,12 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
     /**
      * A model declaration based on this table
      */
-    lazy val toModelDeclaration = new ModelDeclaration(columns)
+    lazy val toModelDeclaration = ModelDeclaration(columns)
+    
+    /**
+      * A model declaration based on the required (not null) columns in this table
+      */
+    lazy val requirementDeclaration = ModelDeclaration(columns.filterNot { _.allowsNull })
     
     
     // COMPUTED PROPERTIES    ------------------
@@ -35,7 +44,8 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
     override def toSqlSegment = SqlSegment(sqlName, Vector(), Some(databaseName), HashSet(this))
 
     /**
-      * @return The name of this table in sql format (same as original name but surrounded with `backticks`)
+      * @return The name of this table in sql format (same as original name but surrounded with `backticks`). If this
+      *         table has an alias, includes that.
       */
     def sqlName = s"`$name`"
     
@@ -53,6 +63,12 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
       * @return A factory for storable instances from this table
       */
     def toFactory = StorableFactory(this)
+    
+    /**
+      * @param connection Database connection
+      * @return All defined indices for this table in database
+      */
+    def allIndices(implicit connection: Connection) = Select.index(this).execute().indicesForTable(this)
     
     
     // OPERATORS    ----------------------------
@@ -109,8 +125,7 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
      * @param propertyName the name of a property matching a column in this table, which makes a
      * reference to another table
      */
-    def joinFrom(propertyName: String, joinType: JoinType): SqlTarget =
-            find(propertyName).map { joinFrom(_, joinType) }.getOrElse(this)
+    def joinFrom(propertyName: String, joinType: JoinType): SqlTarget = joinFrom(apply(propertyName), joinType)
 
     /**
       * Finds the first index from this table where specified condition is met
@@ -133,4 +148,12 @@ case class Table(name: String, databaseName: String, columns: Vector[Column]) ex
     {
         connection(Select.index(this) + Where(where)).indicesForTable(this)
     }
+    
+    /**
+     * Checks whether the specified index exists in this table in database
+     * @param index Searched index
+     * @param connection Database connection (implicit)
+     * @return Whether specified index exists in this table in the database
+     */
+    def containsIndex(index: Value)(implicit connection: Connection) = Exists.index(this, index)
 }

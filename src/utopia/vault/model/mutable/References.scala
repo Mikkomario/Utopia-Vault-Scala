@@ -19,14 +19,31 @@ object References
     private var referenceData = HashMap[String, Set[Reference]]()
     
     
+    // IMPLEMENTED  ----------------------
+    
+    override def toString =
+    {
+        if (referenceData.isEmpty)
+            "No references recorded"
+        else
+            referenceData.keys.map { dbName => s"$dbName: [${referenceData(dbName).mkString(", ")}]" }.mkString("\n")
+    }
+    
+    
     // OTHER METHODS    ------------------
     
     /**
-     * Sets up reference data for a single database
+     * Sets up reference data for a single database. Existing data will be preserved.
      * @param databaseName the name of the database
      * @param references a set of references in the database
      */
-    def setup(databaseName: String, references: Set[Reference]) = referenceData += (databaseName -> references)
+    def setup(databaseName: String, references: Set[Reference]) =
+    {
+        if (referenceData.contains(databaseName))
+            referenceData += (databaseName -> (referenceData(databaseName) ++ references))
+        else
+            referenceData += (databaseName -> references)
+    }
     
     /**
       * Sets up reference data for a single database. Each pair should contain 4 elements:
@@ -37,7 +54,7 @@ object References
     {
         // Converts the tuple data into a reference set
         val references = sets.flatMap { case (table1, name1, table2, name2) => Reference(table1, name1, table2, name2) }.toSet
-        referenceData ++= references.groupBy { _.from.table.databaseName }
+        references.groupBy { _.from.table.databaseName }.foreach { case (dbName, refs) => setup(dbName, refs) }
     }
     
     /**
@@ -130,15 +147,35 @@ object References
      */
     def columnsBetween(left: Table, right: Table) =
     {
-       checkIsSetup(left.databaseName)
-       val sameOrderMatches = referenceData(left.databaseName).filter(
-               ref => ref.from.table == left && ref.from.table == right).map(
-               ref => ref.from.column -> ref.to.column)
-       val oppositeOrderMatches = referenceData(left.databaseName).filter(
-               ref => ref.from.table == right && ref.to.table == left).map(
-               ref => ref.to.column -> ref.from.column)
-               
+        Set(left.databaseName, right.databaseName).foreach(checkIsSetup)
+        
+        val sameOrderMatches = referenceData(left.databaseName).filter {
+            ref => ref.from.table == left && ref.to.table == right }.map { ref => ref.from.column -> ref.to.column }
+        
+        val oppositeOrderMatches = referenceData(right.databaseName).filter {
+            ref => ref.from.table == right && ref.to.table == left }.map { ref => ref.to.column -> ref.from.column }
+            
        sameOrderMatches ++ oppositeOrderMatches
+    }
+    
+    /**
+      * Finds a single connection between the two tables
+      * @param left Left side table
+      * @param right Right side table
+      * @return Left side column -> right side column. None if there wasn't a connection between the two tables
+      */
+    def connectionBetween(left: Table, right: Table) =
+    {
+        checkIsSetup(left.databaseName)
+        referenceData(left.databaseName).find { ref => ref.from.table == left && ref.to.table == right }.map {
+            ref => ref.from.column -> ref.to.column }.orElse
+            {
+                if (right.databaseName != left.databaseName)
+                    checkIsSetup(right.databaseName)
+                
+                referenceData(right.databaseName).find { ref => ref.from.table == right && ref.to.table == left }.map {
+                    ref => ref.to.column -> ref.from.column }
+            }
     }
     
     /**
