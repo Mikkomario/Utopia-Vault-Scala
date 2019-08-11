@@ -50,6 +50,8 @@ Main Features
         - Readable trait allows you to pull (read) up to date data from database to your model
         - Mutable DBModel class implements both of these traits
         - Factory traits can be used for transforming database row data into your object models
+            - You will be able to include data from multiple tables, if you wish. Simply use
+            FromResultFactory or FromRowFactory.
         - Access traits allow you to create simple interfaces into database contents and to hide the actual sql-based
         implementation
         - These traits allow you to use a MariaDB / MySQL server in a noSQL, object-oriented manner
@@ -94,16 +96,19 @@ v1.3  ---------------------------------------
             For example, "test_column" is converted to "testColumn"
 
         Connection object now contains modifySettings(...) method for cases when you simply wish to modify a couple
-        of settings and not the whole thing.
+        of settings and not the whole settings instance.
 
-        SelectDistinct object was added to create select distinct -queries
+        SelectDistinct object was added to create queries where you only wish to receive distinct values.
 
-        MaxBy and MinBy objects were added for easier orderBy ... Limit 1 syntax.
+        MaxBy and MinBy objects were added for easier orderBy ... Limit 1 -syntax.
 
         StorableWithFactory now contains searchMin(String) & searchMax(String) -methods
 
         StorableFactory parsing failures may now be handled through ErrorHandling object. By default the handler ignores
         all errors.
+
+        StorableFactoryWithValidation provides an option for easy model creation from database data. The data
+        is automatically validated before model conversion so you don't need to performs any validation yourself.
 
         Result now allows one to group rows based on two or more tables (grouped(...) methods).
 
@@ -120,18 +125,15 @@ v1.3  ---------------------------------------
         Insert & push methods in storable now work on tables without auto-increment indexing when the model has a
         specified index.
 
-        Referencess.setup(...) now preserves existing data.
+        References.setup(...) now preserves existing data.
 
-        Insert.apply now executes the insert statement instead of just creating one. Return type changed to Result.
+        Insert.apply(...) now executes the insert statement instead of just creating one. Return type changed to Result.
 
         FromResultFactory.target changed from protected to public
 
         A failed join will now throw an exception
 
         .in(...) (when creating conditions) will now accept any traversable group and not just seqs
-
-        StorableFactory now uses model validation based on table required columns -schema. Existing implementations
-        must be refactored accordingly.
 
         FromResultFactory, FromRowFactory and StorableFactory were moved to utopia.vault.model.immutable.factory
 
