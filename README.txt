@@ -43,9 +43,7 @@ Main Features
         together without specifying any columns or conditions. Vault will fill in all the blanks for you.
         - If you wish to manually specify joined columns, that is also possible
 
-    Storable, Readable and Access traits for object-oriented database interactions
-        - This includes Storable, StorableWithFactory, Readable, FromResultFactory, FromRowFactory, StorableFactory,
-        SingleAccess, ManyAccess, SingleAccessWithIds and ManyAccessWithIds
+    Storable, Readable, Factory and Access traits for object-oriented database interactions
         - Storable trait allows you to push (update or insert) model data to database with minimum syntax
         - Readable trait allows you to pull (read) up to date data from database to your model
         - Mutable DBModel class implements both of these traits
@@ -79,6 +77,16 @@ Available Extensions
     utopia.vault.sql.Extensions
         - Allows you to use values (or value convertible items) as condition elements
         - Usually works in combination with utopia.flow.generic.ValueConversions
+
+
+v1.3.1  -------------------------------------
+
+    New Features
+    ------------
+
+        LinkedStorableFactory and MultiLinkedStorableFactory added as utility options for converting DB data from
+        two tables into a single model. Cases where you need to link more than 2 tables should still be handled using
+        FromRowFactory or FromResultFactory.
 
 
 v1.3  ---------------------------------------
