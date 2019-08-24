@@ -143,4 +143,15 @@ case class Result(rows: Vector[Row] = Vector(), generatedKeys: Vector[Value] = V
             .mapValues { rows => rows.head -> rows.filter { _.containsDataForTable(secondaryTable) }
                 .distinctBy { _.indexForTable(secondaryTable) } }
     }
+    
+    /**
+     * Divides this result into multiple sub-results based on a table id
+     * @param primaryTable The table based on which the this result is split
+     * @return Sub-results found. Please note that this won't include any results / rows without data from the primary table.
+     */
+    def split(primaryTable: Table) =
+    {
+        val rowsPerId = rows.filter { _.containsDataForTable(primaryTable) }.groupBy { _.indexForTable(primaryTable) }
+        rowsPerId.values.map { rows => copy(rows = rows) }.toVector
+    }
 }

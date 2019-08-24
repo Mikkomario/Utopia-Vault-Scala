@@ -88,6 +88,8 @@ v1.3.1  -------------------------------------
         two tables into a single model. Cases where you need to link more than 2 tables should still be handled using
         FromRowFactory or FromResultFactory.
 
+        Result now contains split(Table) method to be used when working with joined tables and FromResultFactories.
+
 
 v1.3  ---------------------------------------
 
