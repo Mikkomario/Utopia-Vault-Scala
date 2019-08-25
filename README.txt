@@ -90,6 +90,8 @@ v1.3.1  -------------------------------------
 
         Result now contains split(Table) method to be used when working with joined tables and FromResultFactories.
 
+        New max and min methods in SingleIdAccess
+
 
 v1.3  ---------------------------------------
 
