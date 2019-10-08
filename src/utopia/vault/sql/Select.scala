@@ -38,6 +38,14 @@ object Select
     def apply(table: Table, firstName: String, moreNames: String*): SqlSegment = 
             apply(table, table(firstName +: moreNames))
     
+    /**
+     * Creates an sql segment that selects all columns of a single table from a larger selection target
+     * @param target Selection target
+     * @param selectedTable Table whose columns should be included in the final result
+     * @return A new select segment
+     */
+    def apply(target: SqlTarget, selectedTable: Table): SqlSegment = apply(target, selectedTable.columns)
+    
     
     // OTHER METHODS    -------------
     

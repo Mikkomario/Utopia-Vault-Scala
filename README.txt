@@ -90,7 +90,14 @@ v1.3.1  -------------------------------------
 
         Result now contains split(Table) method to be used when working with joined tables and FromResultFactories.
 
+        Result also contains parse and parseSingle methods for easier access with factories
+
+        Result also contains rowValues and rowIntValues methods for easier data access for single value selections
+
         New max and min methods in SingleIdAccess
+
+        ConditionalAccess, ConditionalSingleAccess and ConditionalManyAccess traits/classes allow access to database
+        rows based on a search conditions and can be used to provide sub groups under accesses
 
 
 v1.3  ---------------------------------------

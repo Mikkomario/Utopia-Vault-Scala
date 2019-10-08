@@ -2,6 +2,7 @@ package utopia.vault.model.immutable
 
 import utopia.flow.util.CollectionExtensions._
 import utopia.flow.datastructure.immutable.Value
+import utopia.vault.model.immutable.factory.FromRowFactory
 
 object Result
 {
@@ -30,6 +31,18 @@ case class Result(rows: Vector[Row] = Vector(), generatedKeys: Vector[Value] = V
      * each row contains data from a single table only
      */
     def rowModels = rows.map { _.toModel }
+    
+    /**
+     * @return All rows converted into values. Should only be used for results where each row only contains a single
+     *         value
+     */
+    def rowValues = rows.map { _.value }
+    
+    /**
+     * @return All rows converted into integer values (empty rows excluded). Should only be used for results where each
+     *         row consists of a single integer value.
+     */
+    def rowIntValues = rowValues.flatMap { _.int }
     
     /**
      * The data of the first result row in model format. This should be used only when no joins 
@@ -95,6 +108,24 @@ case class Result(rows: Vector[Row] = Vector(), generatedKeys: Vector[Value] = V
     
     
     // OTHER METHODS    ------------------
+    
+    /**
+     * Parses data from each available row
+     * @param factory Factory used for parsing data
+     * @tparam A Type of parse result per row
+     * @return All successfully parsed models
+     */
+    def parse[A](factory: FromRowFactory[A]) = rows.filter { _.containsDataForTable(factory.table) }
+        .flatMap(factory.apply)
+    
+    /**
+     * Parses data from up to one row
+     * @param factory Factory used for parsing data
+     * @tparam A Type of parse result
+     * @return Parsed result or None if parsing failed or no data was available
+     */
+    def parseSingle[A](factory: FromRowFactory[A]) = rows.view.filter {
+        _.containsDataForTable(factory.table) }.findMap(factory.apply)
     
     /**
      * Retrieves row data concerning a certain table
