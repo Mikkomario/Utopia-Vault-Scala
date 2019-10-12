@@ -79,7 +79,7 @@ Available Extensions
         - Usually works in combination with utopia.flow.generic.ValueConversions
 
 
-v1.3.1  -------------------------------------
+v1.4  -------------------------------------
 
     New Features
     ------------
@@ -98,6 +98,12 @@ v1.3.1  -------------------------------------
 
         ConditionalAccess, ConditionalSingleAccess and ConditionalManyAccess traits/classes allow access to database
         rows based on a search conditions and can be used to provide sub groups under accesses
+
+
+    Updates & Changes
+    -----------------
+
+        Update no longer returns an option
 
 
 v1.3  ---------------------------------------

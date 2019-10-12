@@ -44,7 +44,7 @@ object SimpleStatementTest extends App
         assert(connection(Select(table, table.columns)) == result)
         assert(connection(Select(table, "name")).rows.head.toModel("name") == "SimpleStatementTest".toValue)
         
-        connection(Update(table, "age", 22).get)
+        connection(Update(table, "age", 22))
         assert(connection(Select(table, "age")).rows.head.toModel("age") == 22.toValue)
         
         Insert(table, Model(Vector("name" -> "Last", "age" -> 2, "isAdmin" -> true)))

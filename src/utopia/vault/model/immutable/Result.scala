@@ -116,7 +116,7 @@ case class Result(rows: Vector[Row] = Vector(), generatedKeys: Vector[Value] = V
      * @return All successfully parsed models
      */
     def parse[A](factory: FromRowFactory[A]) = rows.filter { _.containsDataForTable(factory.table) }
-        .flatMap(factory.apply)
+        .flatMap { row => factory(row) }
     
     /**
      * Parses data from up to one row

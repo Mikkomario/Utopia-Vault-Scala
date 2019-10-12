@@ -55,6 +55,13 @@ object Select
     def index(table: Table) = apply(table, table.primaryColumn.toSeq)
     
     /**
+     * @param target Selection target
+     * @param table Table whose indices are selected
+     * @return an sql segment that selects the primary key of a single table
+     */
+    def index(target: SqlTarget, table: Table) = apply(target, table.primaryColumn.toSeq)
+    
+    /**
      * Creates an sql segment that selects nothing from a table
      */
     def nothing(target: SqlTarget) = apply(target, Vector())

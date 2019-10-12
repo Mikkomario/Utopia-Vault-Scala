@@ -17,10 +17,10 @@ object Delete
      * contain all deleted tables.
      * @param deletedTables The tables from which rows are deleted (shouldn't be empty)
      */
-    def apply(target: SqlTarget, deletedTables: Seq[Table]) = 
-            if (deletedTables.isEmpty) SqlSegment.empty else SqlSegment(
-            s"DELETE ${ deletedTables.drop(1).foldLeft(deletedTables.head.sqlName) {_ + ", " + _.sqlName } } FROM") +
-            target.toSqlSegment
+    def apply(target: SqlTarget, deletedTables: Seq[Table]) =
+    {
+        SqlSegment(s"DELETE ${ deletedTables.map { _.sqlName }.mkString(", ") } FROM") + target.toSqlSegment
+    }
     
     /**
      * Creates an sql segment that deletes rows from a single table. This segment is often followed 

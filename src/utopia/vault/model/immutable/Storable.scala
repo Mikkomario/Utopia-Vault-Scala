@@ -142,7 +142,7 @@ trait Storable extends ModelConvertible
      */
     def update(writeNulls: Boolean = false)(implicit connection: Connection) = 
     {
-        val update = indexCondition.flatMap { cond => toUpdateStatement(writeNulls).map { _ + Where(cond) } }
+        val update = indexCondition.map { cond => toUpdateStatement(writeNulls) + Where(cond) }
         
         update.exists
         {
@@ -182,7 +182,7 @@ trait Storable extends ModelConvertible
      */
     def updateProperties(propertyNames: Traversable[String])(implicit connection: Connection) = 
     {
-        val update = indexCondition.flatMap { cond => updateStatementForProperties(propertyNames).map { _ + Where(cond) } }
+        val update = indexCondition.map { cond => updateStatementForProperties(propertyNames) + Where(cond) }
         update.foreach
         {
             statement =>
@@ -219,7 +219,7 @@ trait Storable extends ModelConvertible
     /**
      * Creates an update statement that updates only the specified properties
      */
-    def updateStatementForProperties(name1: String, more: String*): Option[SqlSegment] = 
+    def updateStatementForProperties(name1: String, more: String*): SqlSegment =
             updateStatementForProperties(Vector(name1) ++ more)
     
     /**
