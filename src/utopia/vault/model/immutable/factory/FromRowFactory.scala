@@ -134,6 +134,39 @@ trait FromRowFactory[+A] extends FromResultFactory[A]
 	def getMin(orderProperty: String, where: Condition)(implicit connection: Connection): Option[A] =
 		findColumn(orderProperty).flatMap { getMin(_, where) }
 	
+	/**
+	 * Performs an operation on each of the targeted entities
+	 * @param where A condition for finding target entities
+	 * @param operation An operation performed for each entity
+	 * @param connection DB Connection
+	 */
+	def foreach(where: Condition)(operation: A => Unit)(implicit connection: Connection) =
+		connection.foreach(SelectAll(target) + Where(where)) { apply(_).foreach(operation) }
+	
+	/**
+	 * Folds entities into a single value
+	 * @param where A condition for finding targeted entities
+	 * @param start Starting value
+	 * @param f A function that adds one entity to the final value
+	 * @param connection DB Connection
+	 * @tparam B Type of result
+	 * @return result once all entities have been folded
+	 */
+	def fold[B](where: Condition)(start: B)(f: (B, A) => B)(implicit connection: Connection) =
+		connection.fold(SelectAll(target) + Where(where))(start) { (v, row) => apply(row).map { f(v, _) }.getOrElse(v) }
+	
+	/**
+	 * Maps entities, then reduces mapped values
+	 * @param where A condition for finding targeted entities
+	 * @param map A mapping function
+	 * @param reduce A function that reduces (combines) mapped results
+	 * @param connection DB Connection
+	 * @tparam B Type of map result
+	 * @return Reduce result. None if no entities where found
+	 */
+	def mapReduce[B](where: Condition)(map: A => B)(reduce: (B, B) => B)(implicit connection: Connection) =
+		connection.flatMapReduce(SelectAll(target) + Where(where)) { row => apply(row).map(map) }(reduce)
+	
 	private def getWithOrder(orderBy: SqlSegment, where: Option[Condition] = None)(implicit connection: Connection) =
 	{
 		val beginning = SelectAll(target)

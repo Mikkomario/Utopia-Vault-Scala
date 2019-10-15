@@ -4,7 +4,7 @@ import utopia.flow.generic.ValueConversions._
 
 /**
  * This object is used for creating sql segments that limit the amount of resulting rows. 
- * The limit is usually placed at the end of the sql statement
+ * The limit is usually placed at the end of the sql statement (before possible offset)
  * @author Mikko Hilpinen
  * @since 27.5.2017
  */

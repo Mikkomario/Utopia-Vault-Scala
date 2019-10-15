@@ -9,7 +9,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="92da042d-32a6-4c2c-9a07-bca99577ad71" name="Default Changelist" comment="Refactored access classes a little">
+      <change afterPath="$PROJECT_DIR$/src/utopia/vault/sql/Offset.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.txt" beforeDir="false" afterPath="$PROJECT_DIR$/README.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/database/Connection.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/database/Connection.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/database/ConnectionSettings.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/database/ConnectionSettings.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/factory/FromRowFactory.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/factory/FromRowFactory.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/sql/Limit.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/sql/Limit.scala" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -31,11 +38,6 @@
         <option value="Scala Trait" />
       </list>
     </option>
-  </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>targetTab</find>
-    </findStrings>
   </component>
   <component name="Git.Settings">
     <favorite-branches>

@@ -99,6 +99,14 @@ v1.4  -------------------------------------
         ConditionalAccess, ConditionalSingleAccess and ConditionalManyAccess traits/classes allow access to database
         rows based on a search conditions and can be used to provide sub groups under accesses
 
+        Added support for offset in sql statements (used for skipping n rows from the beginning of results)
+
+        Added foreach, fold, mapReduce and flatMapReduce functions to command to support very large queries. These
+        queries will be split in parts when used. The size of each split may be specified in ConnectionSettings.
+        Default split size is 1000 rows.
+
+        foreach, fold and mapReduce also added to StorableFactory
+
 
     Updates & Changes
     -----------------

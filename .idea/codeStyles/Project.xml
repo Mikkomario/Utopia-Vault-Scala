@@ -1,6 +1,11 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
     <ScalaCodeStyleSettings>
+      <option name="alwaysUsedImports">
+        <array>
+          <option value="utopia.vault.sql.Extensions._" />
+        </array>
+      </option>
       <option name="TYPE_ANNOTATION_PUBLIC_MEMBER" value="false" />
       <option name="TYPE_ANNOTATION_PROTECTED_MEMBER" value="false" />
       <option name="TYPE_ANNOTATION_UNIT_TYPE" value="false" />

@@ -20,7 +20,7 @@ import scala.util.Try
 import utopia.flow.generic.IntType
 import utopia.flow.generic.ValueConversions._
 import utopia.vault.model.immutable.{Result, Row, Table}
-import utopia.vault.sql.SqlSegment
+import utopia.vault.sql.{Limit, Offset, SqlSegment}
 
 object Connection
 {
@@ -201,6 +201,75 @@ class Connection(initialDBName: Option[String] = None) extends AutoCloseable
     // OTHER METHODS    -------------
     
     /**
+     * Performs an operation on each row targeted by specified statement
+     * @param statement a (select) statement. <b>Must not include limit or offset</b>
+     * @param operation Operation performed for each row
+     */
+    def foreach(statement: SqlSegment)(operation: Row => Unit) = readInParts(statement, _.foreach(operation))
+    
+    /**
+     * Maps read rows and reduces them into a single value. This should be used when handling queries which may
+     * yield very large results.
+     * @param statement A (select) statement. <b>Must not include limit or offset</b>
+     * @param map A mapping function for rows
+     * @param reduce A reduce function for mapped rows
+     * @tparam A Type of map result
+     * @return Reduction result. None if no data was read.
+     */
+    def mapReduce[A](statement: SqlSegment)(map: Row => A)(reduce: (A, A) => A) =
+    {
+        var currentResult: Option[A] = None
+        readInParts(statement, rows =>
+        {
+            if (rows.nonEmpty)
+            {
+                val result = rows.map(map).reduce(reduce)
+                currentResult = Some(currentResult.map { reduce(_, result) }.getOrElse(result))
+            }
+        })
+        currentResult
+    }
+    
+    /**
+     * Maps read rows and reduces them into a single value. This should be used when handling queries which may
+     * yield very large results.
+     * @param statement A (select) statement. <b>Must not include limit or offset</b>
+     * @param map A mapping function for rows (may return 0 or multiple values)
+     * @param reduce A reduce function for mapped rows
+     * @tparam A Type of map result
+     * @return Reduction result. None if no data was read.
+     */
+    def flatMapReduce[A](statement: SqlSegment)(map: Row => TraversableOnce[A])(reduce: (A, A) => A) =
+    {
+        var currentResult: Option[A] = None
+        readInParts(statement, rows =>
+        {
+            val mapped = rows.flatMap(map)
+            if (mapped.nonEmpty)
+            {
+                val result = mapped.reduce(reduce)
+                currentResult = Some(currentResult.map { reduce(_, result) }.getOrElse(result))
+            }
+        })
+        currentResult
+    }
+    
+    /**
+     * Folds read rows into a single value. This function may prove useful with very large queries.
+     * @param statement A (select) statement. <b>Must not include limit or offset</b>
+     * @param start Starting value
+     * @param f Folding function (takes previous result and adds one row to it)
+     * @tparam A Result type
+     * @return Fold result
+     */
+    def fold[A](statement: SqlSegment)(start: A)(f: (A, Row) => A) =
+    {
+        var currentResult = start
+        readInParts(statement, rows => currentResult = rows.foldLeft(currentResult)(f))
+        currentResult
+    }
+    
+    /**
      * Tries to execute a statement. Wraps the results in a try
      */
     def tryExec(statement: SqlSegment) = Try(this(statement))
@@ -341,6 +410,21 @@ class Connection(initialDBName: Option[String] = None) extends AutoCloseable
     }
     
     private def printIfDebugging(message: => String) = if (Connection.settings.debugPrintsEnabled) println(message)
+    
+    private def readInParts(statement: SqlSegment, operation: Vector[Row] => Unit) =
+    {
+        val rowsPerIteration = Connection.settings.maximumAmountOfRowsCached
+        var rowsRead = 0
+        var rowsRemain = true
+        // Operates on rows until a non-full set is returned
+        while (rowsRemain)
+        {
+            val rows = apply(statement + Limit(rowsPerIteration) + Offset(rowsRead)).rows
+            operation(rows)
+            rowsRead += rows.size
+            rowsRemain = rows.size >= rowsPerIteration
+        }
+    }
     
     private def setValues(statement: PreparedStatement, values: Seq[Value]) = 
     {
