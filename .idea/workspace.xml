@@ -8,15 +8,8 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="92da042d-32a6-4c2c-9a07-bca99577ad71" name="Default Changelist" comment="Refactored access classes a little">
-      <change afterPath="$PROJECT_DIR$/src/utopia/vault/sql/Offset.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
+    <list default="true" id="92da042d-32a6-4c2c-9a07-bca99577ad71" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.txt" beforeDir="false" afterPath="$PROJECT_DIR$/README.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utopia/vault/database/Connection.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/database/Connection.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utopia/vault/database/ConnectionSettings.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/database/ConnectionSettings.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/immutable/factory/FromRowFactory.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/immutable/factory/FromRowFactory.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utopia/vault/sql/Limit.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/sql/Limit.scala" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -54,12 +47,6 @@
         </map>
       </branch-storage>
     </favorite-branches>
-    <option name="PUSH_TAGS">
-      <GitPushTagMode>
-        <option name="argument" value="--tags" />
-        <option name="title" value="All" />
-      </GitPushTagMode>
-    </option>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
         <entry key="$PROJECT_DIR$" value="master" />
@@ -323,7 +310,13 @@
       <option name="presentableId" value="LOCAL−00019" />
       <updated>1564488946255</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL−00020" summary="Added various tools for handling very large queries">
+      <created>1571171178621</created>
+      <option name="number" value="LOCAL−00020" />
+      <option name="presentableId" value="LOCAL−00020" />
+      <updated>1571171178621</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -358,6 +351,7 @@
     <MESSAGE value="Added id access traits" />
     <MESSAGE value="Changed Id.isValid to Id.exists" />
     <MESSAGE value="Refactored access classes a little" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactored access classes a little" />
+    <MESSAGE value="Added various tools for handling very large queries" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added various tools for handling very large queries" />
   </component>
 </project>
