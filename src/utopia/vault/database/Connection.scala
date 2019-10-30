@@ -128,7 +128,7 @@ class Connection(initialDBName: Option[String] = None) extends AutoCloseable
      */
     def apply(statement: SqlSegment): Result = 
     {
-        printIfDebugging("Executing statement: " + statement.toString)
+        printIfDebugging("Executing statement: " + statement.description)
         val selectedTables: Set[Table] = if (statement.isSelect) statement.targetTables else HashSet()
         
         // Changes database if necessary
