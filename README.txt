@@ -107,6 +107,8 @@ v1.4  -------------------------------------
 
         foreach, fold and mapReduce also added to StorableFactory
 
+        Table name conversion method can now be changed in Tables -object.
+
 
     Updates & Changes
     -----------------

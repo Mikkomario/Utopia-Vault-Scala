@@ -48,7 +48,7 @@ object DatabaseTableReader
     
     // Converts underscrore naming style strings to camelcase naming style strings
     // Eg. day_of_birth => dayOfBirth
-    private def underlineToCamelCase(original: String) = 
+    def underlineToCamelCase(original: String) =
     {
         // whitespaces are considered equal to underscrores, in case someone would use them
         val splits = original.split(" ").flatMap { _.split("_") }

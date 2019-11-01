@@ -8,10 +8,12 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="92da042d-32a6-4c2c-9a07-bca99577ad71" name="Default Changelist" comment="Refactored access classes a little">
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="92da042d-32a6-4c2c-9a07-bca99577ad71" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.txt" beforeDir="false" afterPath="$PROJECT_DIR$/README.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/database/DatabaseTableReader.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/database/DatabaseTableReader.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/database/Tables.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/database/Tables.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/mutable/References.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/mutable/References.scala" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -319,7 +321,13 @@
       <option name="presentableId" value="LOCAL−00020" />
       <updated>1571171178621</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL−00021" summary="Workspace and gitignore updated">
+      <created>1572612347707</created>
+      <option name="number" value="LOCAL−00021" />
+      <option name="presentableId" value="LOCAL−00021" />
+      <updated>1572612347707</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -355,6 +363,7 @@
     <MESSAGE value="Changed Id.isValid to Id.exists" />
     <MESSAGE value="Refactored access classes a little" />
     <MESSAGE value="Added various tools for handling very large queries" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added various tools for handling very large queries" />
+    <MESSAGE value="Workspace and gitignore updated" />
+    <option name="LAST_COMMIT_MESSAGE" value="Workspace and gitignore updated" />
   </component>
 </project>

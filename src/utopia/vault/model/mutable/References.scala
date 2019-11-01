@@ -199,6 +199,12 @@ object References
      */
     def tablesReferencing(table: Table) = to(table).map(_.from.table)
     
+    /**
+     * Clears all reference data concerning a single database
+     * @param databaseName Name of the database whose references should be cleared
+     */
+    def clear(databaseName: String) = referenceData -= databaseName
+    
     private def checkIsSetup(databaseName: String) =
     {
         if (!referenceData.contains(databaseName))
