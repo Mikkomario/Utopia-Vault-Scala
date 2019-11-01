@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
-      <artifact name="utopia-vault" />
-      <artifact name="utopia-vault-with-dependencies" />
       <artifact name="utopia-vault-with-sources" />
     </artifacts-to-build>
   </component>
@@ -11,9 +9,7 @@
     <list default="true" id="92da042d-32a6-4c2c-9a07-bca99577ad71" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.txt" beforeDir="false" afterPath="$PROJECT_DIR$/README.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utopia/vault/database/DatabaseTableReader.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/database/DatabaseTableReader.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utopia/vault/database/Tables.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/database/Tables.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utopia/vault/model/mutable/References.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/utopia/vault/model/mutable/References.scala" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -327,7 +323,13 @@
       <option name="presentableId" value="LOCAL−00021" />
       <updated>1572612347707</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL−00022" summary="Table name conversion method can now be changed in Tables">
+      <created>1572613295743</created>
+      <option name="number" value="LOCAL−00022" />
+      <option name="presentableId" value="LOCAL−00022" />
+      <updated>1572613295743</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -364,6 +366,7 @@
     <MESSAGE value="Refactored access classes a little" />
     <MESSAGE value="Added various tools for handling very large queries" />
     <MESSAGE value="Workspace and gitignore updated" />
-    <option name="LAST_COMMIT_MESSAGE" value="Workspace and gitignore updated" />
+    <MESSAGE value="Table name conversion method can now be changed in Tables" />
+    <option name="LAST_COMMIT_MESSAGE" value="Table name conversion method can now be changed in Tables" />
   </component>
 </project>

@@ -14,25 +14,25 @@ object Tables
 	// ATTRIBUTES	---------------------
 	
 	private var dbs = HashMap[String, TablesReader]()
-	private var _tableNameConversion: String => String = DatabaseTableReader.underlineToCamelCase
+	private var _columnNameConversion: String => String = DatabaseTableReader.underlineToCamelCase
 	
 	
 	// COMPUTED	-------------------------
 	
 	/**
-	 * @return The method used when converting table names in the database to table names in code (by default converts
-	 *         from underscore style to camel case style, eg. "table_name" to "tableName")
+	 * @return The method used when converting column names in the database to column attribute names in code (by default converts
+	 *         from underscore style to camel case style, eg. "column_name" to "columnName")
 	 */
-	def tableNameConversion = _tableNameConversion
+	def columnNameConversion = _columnNameConversion
 	/**
 	 * Specifies a new name conversion style for tables read from the DB
-	 * @param newConversionMethod A new method for table name conversion. Takes the database-originated table name
-	 *                            as parameter and returns the table name used in the code.
+	 * @param newConversionMethod A new method for column name conversion. Takes the database-originated column name
+	 *                            as parameter and returns the column attribute name used in the code.
 	 */
-	def tableNameConversion_=(newConversionMethod: String => String) =
+	def columnNameConversion_=(newConversionMethod: String => String) =
 	{
 		// Has to clear all existing data to use the new method
-		_tableNameConversion = newConversionMethod
+		_columnNameConversion = newConversionMethod
 		dbs.keys.foreach(References.clear)
 		dbs = HashMap()
 	}
@@ -87,7 +87,7 @@ private class TablesReader(val dbName: String)
 			val tableNames = connection.executeQuery("show tables").flatMap { _.values.headOption }
 			
 			// Reads data for each table
-			val tables = tableNames.map { DatabaseTableReader(dbName, _) }
+			val tables = tableNames.map { DatabaseTableReader(dbName, _, Tables.columnNameConversion) }
 			
 			// Sets up references between the tables
 			DatabaseReferenceReader.setupReferences(tables.toSet)
