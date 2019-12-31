@@ -79,7 +79,7 @@ Available Extensions
         - Usually works in combination with utopia.flow.generic.ValueConversions
 
 
-v1.4  -------------------------------------
+v1.4 (beta)  --------------------------------
 
     New Features
     ------------
@@ -114,6 +114,8 @@ v1.4  -------------------------------------
     -----------------
 
         Update no longer returns an option
+
+        ConnectionPool now properly closes connections on jvm exit
 
 
 v1.3  ---------------------------------------

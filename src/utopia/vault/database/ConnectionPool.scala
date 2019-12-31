@@ -2,14 +2,15 @@ package utopia.vault.database
 
 import java.time.{Duration, Instant}
 
+import utopia.flow.async.AsyncExtensions._
 import utopia.flow.util.CollectionExtensions._
 import utopia.flow.util.TimeExtensions._
-import utopia.flow.async.{Volatile, VolatileFlag}
+import utopia.flow.async.{Breakable, NewThreadExecutionContext, Volatile, VolatileFlag}
 import utopia.flow.collection.VolatileList
 import utopia.flow.util.WaitUtils
 
 import scala.collection.immutable.VectorBuilder
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.Try
 
 /**
@@ -18,12 +19,14 @@ import scala.util.Try
   * @since 7.5.2019, v1.1+
   */
 class ConnectionPool(maxConnections: Int, maxClientsPerConnection: Int, val connectionKeepAlive: Duration)
+	extends Breakable
 {
 	// ATTRIBUTES	----------------------
 	
 	private val connections = VolatileList[ReusableConnection]()
 	private val waitLock = new AnyRef()
 	private val timeoutCompletion: Volatile[Future[Any]] = new Volatile(Future.successful(Unit))
+	private val closeFutures = VolatileList[Future[Unit]]()
 	
 	private val maxClientThresholds =
 	{
@@ -50,6 +53,11 @@ class ConnectionPool(maxConnections: Int, maxClientsPerConnection: Int, val conn
 	}
 	
 	
+	// INITIAL CODE	-----------------------
+	
+	registerToStopOnceJVMCloses()
+	
+	
 	// COMPUTED	---------------------------
 	
 	private def connection = connections.pop
@@ -65,6 +73,16 @@ class ConnectionPool(maxConnections: Int, maxClientsPerConnection: Int, val conn
 					val newConnection = new ReusableConnection()
 					newConnection -> (all :+ newConnection)
 				}
+	}
+	
+	
+	// IMPLEMENTED	-----------------------
+	
+	override def stop() =
+	{
+		// Closes all current connections (may have to wait for clients to exit)
+		(connections.map { _.stop() } ++ closeFutures).futureCompletion(
+			new NewThreadExecutionContext("Closing connection pool"))
 	}
 	
 	
@@ -116,16 +134,19 @@ class ConnectionPool(maxConnections: Int, maxClientsPerConnection: Int, val conn
 							WaitUtils.waitUntil(nextWait.get, waitLock)
 							
 							// Updates connection list and determines next close time
-							nextWait = connections.pop
+							val (w, futures) = connections.pop
 							{
 								all =>
 									// Keeps connections that are still open
 									val (closing, open) = all.divideBy { _.isOpen }
-									closing.foreach { _.tryClose() }
+									val closeFutures = closing.map { _.tryClose() }
 									val lastLeaveTime = open.filterNot { _.isInUse }.map { _.lastLeaveTime }.minOption
 									
-									lastLeaveTime.map { _ + connectionKeepAlive } -> open
+									(lastLeaveTime.map { _ + connectionKeepAlive }, closeFutures) -> open
 							}
+							// Keeps track of thread closing futures in order to delay possible system exit
+							closeFutures.update { _.filterNot { _.isCompleted } ++ futures }
+							nextWait = w
 						}
 					}
 				}
@@ -137,12 +158,13 @@ class ConnectionPool(maxConnections: Int, maxClientsPerConnection: Int, val conn
 	
 	// NESTED CLASSES	-------------------
 	
-	private class ReusableConnection
+	private class ReusableConnection extends Breakable
 	{
 		// ATTRIBUTES	-------------------
 		
 		private val closed = new VolatileFlag()
 		private val connection = new Connection()
+		private val connectionClosePromise = Promise[Unit]()
 		private val clientCount = new Volatile(1)
 		
 		private var _lastLeaveTime = Instant.now()
@@ -157,6 +179,11 @@ class ConnectionPool(maxConnections: Int, maxClientsPerConnection: Int, val conn
 		def isInUse = currentClientCount > 0
 		
 		def isOpen = isInUse || (Instant.now < _lastLeaveTime + connectionKeepAlive)
+		
+		
+		// IMPLEMENTED	-------------------
+		
+		override def stop() = tryClose()
 		
 		
 		// OTHER	-----------------------
@@ -193,7 +220,7 @@ class ConnectionPool(maxConnections: Int, maxClientsPerConnection: Int, val conn
 					if (currentCount == 1)
 					{
 						if (closed.isSet)
-							connection.close()
+							closeConnection()
 						else
 							closeUnusedConnections()
 					}
@@ -208,9 +235,22 @@ class ConnectionPool(maxConnections: Int, maxClientsPerConnection: Int, val conn
 			{
 				count =>
 					if (count <= 0)
-						connection.close()
+						closeConnection()
 			}
 			closed.set()
+			connectionClosePromise.future
+		}
+		
+		private def closeConnection() =
+		{
+			connectionClosePromise.synchronized
+			{
+				if (!connectionClosePromise.isCompleted)
+				{
+					connection.close()
+					connectionClosePromise.success(Unit)
+				}
+			}
 		}
 	}
 }
