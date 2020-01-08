@@ -117,6 +117,8 @@ v1.4 (beta)  ----------------------------------
 
         Update no longer returns an option
 
+        ConnectionPool now properly closes connections on jvm exit
+
         ConnectionPool now has default parameters. Also, java.time.Duration was changed to
         scala.concurrent.duration.Duration in ConnectionPool.
 
