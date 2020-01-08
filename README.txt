@@ -79,7 +79,7 @@ Available Extensions
         - Usually works in combination with utopia.flow.generic.ValueConversions
 
 
-v1.4  -------------------------------------
+v1.4 (beta)  ----------------------------------
 
     New Features
     ------------
@@ -109,11 +109,16 @@ v1.4  -------------------------------------
 
         Column name conversion method can now be changed in Tables -object.
 
+        Select.tables added
+
 
     Updates & Changes
     -----------------
 
         Update no longer returns an option
+
+        ConnectionPool now has default parameters. Also, java.time.Duration was changed to
+        scala.concurrent.duration.Duration in ConnectionPool.
 
 
 v1.3  ---------------------------------------

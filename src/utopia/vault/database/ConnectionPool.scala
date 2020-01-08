@@ -1,6 +1,6 @@
 package utopia.vault.database
 
-import java.time.{Duration, Instant}
+import java.time.Instant
 
 import utopia.flow.util.CollectionExtensions._
 import utopia.flow.util.TimeExtensions._
@@ -9,15 +9,21 @@ import utopia.flow.collection.VolatileList
 import utopia.flow.util.WaitUtils
 
 import scala.collection.immutable.VectorBuilder
+import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 /**
   * This pool is used for creating and reusing database connections
   * @author Mikko Hilpinen
-  * @since 7.5.2019, v1.1+
+  * @since 7.5.2019, v1.1
+ *  @param maxConnections Maximum number of simultaneous database connections (default = 100)
+ *  @param maxClientsPerConnection Maximum number of functions sharing a single database connection (default = 6)
+ *  @param connectionKeepAlive How long connections are kept open after they are last used. Open connections are
+ *                             reused if another client requests a connection within that time period. (default = 15 seconds)
   */
-class ConnectionPool(maxConnections: Int, maxClientsPerConnection: Int, val connectionKeepAlive: Duration)
+class ConnectionPool(maxConnections: Int = 100, maxClientsPerConnection: Int = 6,
+					 val connectionKeepAlive: Duration = 15.seconds)
 {
 	// ATTRIBUTES	----------------------
 	
