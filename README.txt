@@ -111,6 +111,8 @@ v1.4 (beta)  ----------------------------------
 
         Select.tables added
 
+        DatabaseCache added. Allows one to temporarily or permanently cache results of simple queries.
+
 
     Updates & Changes
     -----------------
