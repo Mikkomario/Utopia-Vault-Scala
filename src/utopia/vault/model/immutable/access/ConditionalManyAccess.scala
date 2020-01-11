@@ -9,7 +9,7 @@ import utopia.vault.sql.Condition
  * @author Mikko Hilpinen
  * @since 6.10.2019, v1.3.1+
  */
-class ConditionalManyAccess[+A](override val condition: Condition, override val factory: FromResultFactory[A]) extends ConditionalAccess[A]
+trait ConditionalManyAccess[+A] extends ConditionalAccess[A]
 {
 	/**
 	 * Reads items from database
@@ -32,5 +32,27 @@ class ConditionalManyAccess[+A](override val condition: Condition, override val 
 	 * @param additionalCondition An additional search condition
 	 * @return Access to items that fulfill both current and additional search conditions
 	 */
-	def subGroup(additionalCondition: Condition) = new ConditionalManyAccess[A](condition && additionalCondition, factory)
+	def subGroup(additionalCondition: Condition) = ConditionalManyAccess[A](
+		condition && additionalCondition, factory)
+}
+
+object ConditionalManyAccess
+{
+	// OTHER	-------------------------
+	
+	/**
+	 * Creates a new conditional access instance
+	 * @param condition A condition applied to all searches
+	 * @param factory Factory used for instantiating objects
+	 * @tparam A Type of objects returned
+	 * @return A conditional access instance
+	 */
+	def apply[A](condition: Condition, factory: FromResultFactory[A]): ConditionalManyAccess[A] =
+		new Wrapper(condition, factory)
+	
+	
+	// NESTED	-------------------------
+	
+	private class Wrapper[A](override val condition: Condition, override val factory: FromResultFactory[A])
+		extends ConditionalManyAccess[A]
 }

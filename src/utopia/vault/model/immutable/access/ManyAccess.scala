@@ -37,7 +37,7 @@ trait ManyAccess[-I, +A] extends Access[I, A]
 	 * @param condition A search condition
 	 * @return Access to items within that search condition
 	 */
-	protected def subGroup(condition: Condition) = new ConditionalManyAccess[A](condition, factory)
+	protected def subGroup(condition: Condition) = ConditionalManyAccess[A](condition, factory)
 	
 	/**
 	 * Finds models for multiple ids
