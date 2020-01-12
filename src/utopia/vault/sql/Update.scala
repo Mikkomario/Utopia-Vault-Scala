@@ -3,7 +3,6 @@ package utopia.vault.sql
 import utopia.flow.datastructure.template.Model
 import utopia.flow.datastructure.template.Property
 
-import scala.collection.immutable.HashSet
 import utopia.flow.datastructure.immutable.Value
 import utopia.flow.datastructure.immutable
 import utopia.vault.model.immutable.Table
@@ -36,7 +35,7 @@ object Update
             target.toSqlSegment.prepend("SELECT NULL FROM")
         else 
             target.toSqlSegment.prepend("UPDATE") + SqlSegment("SET " +
-                valueSet.view.map { case (column, _) => column.columnNameWithTable + " = ?" }.reduceLeft { _ + ", " + _ },
+                valueSet.view.map { case (column, _) => column.columnNameWithTable + " = ?" }.mkString(", "),
                 valueSet.values.toVector)
     }
     
@@ -50,5 +49,25 @@ object Update
      * Creates an update segment that changes the value of a single column in the table
      * @return an update segment (select nothing segment if there's nothing to update)
      */
-    def apply(table: Table, key: String, value: Value): SqlSegment = apply(table, immutable.Model(Vector((key, value))))
+    def apply(table: Table, key: String, value: Value): SqlSegment = apply(table, immutable.Model(Vector(key -> value)))
+    
+    /**
+     * Creates an update segment that changes multiple values in a table
+     * @param target Update target (includes table & other tables used in conditions etc.)
+     * @param table Table that is being updated
+     * @param set Set of changes for the table
+     * @return An update segment (select nothing segment if there's nothing to update)
+     */
+    def apply(target: SqlTarget, table: Table, set: Model[Property]): SqlSegment = apply(target, HashMap(table -> set))
+    
+    /**
+     * Creates an update segment that changes a single value in a table
+     * @param target Update target (includes table & other tables used in conditions etc.)
+     * @param table Table that is being updated
+     * @param key Name of updated attribute
+     * @param value New value for the attribute
+     * @return An update segment (select nothing segment if there's nothing to update)
+     */
+    def apply(target: SqlTarget, table: Table, key: String, value: Value): SqlSegment = apply(target, table,
+        immutable.Model(Vector(key -> value)))
 }

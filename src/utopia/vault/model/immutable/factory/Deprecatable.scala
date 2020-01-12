@@ -10,6 +10,8 @@ import utopia.vault.sql.Condition
  */
 trait Deprecatable
 {
+	// ABSTRACT	---------------------
+	
 	/**
 	 * @return A condition that determines whether a row is deprecated
 	 */
