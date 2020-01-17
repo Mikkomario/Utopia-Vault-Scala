@@ -125,6 +125,13 @@ v1.4 (beta)  ----------------------------------
         scala.concurrent.duration.Duration in ConnectionPool.
 
 
+    Bug Fixes
+    ---------
+
+        Result.grouped(...) didn't work correctly when secondary table had empty rows. Now empty rows are no longer
+        included in the resulting map.
+
+
 v1.3  ---------------------------------------
 
     New Features
