@@ -125,11 +125,13 @@ v1.4 (beta)  ----------------------------------
         scala.concurrent.duration.Duration in ConnectionPool.
 
 
-    Bug Fixes
-    ---------
+    Fixes
+    -----
 
         Result.grouped(...) didn't work correctly when secondary table had empty rows. Now empty rows are no longer
         included in the resulting map.
+
+        Insert couldn't previously insert empty rows to a database. This is now possible.
 
 
 v1.3  ---------------------------------------
