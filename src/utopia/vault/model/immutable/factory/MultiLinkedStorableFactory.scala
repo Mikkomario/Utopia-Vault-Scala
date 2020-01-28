@@ -18,7 +18,7 @@ trait MultiLinkedStorableFactory[+Parent, Child] extends FromResultFactory[Paren
 	/**
 	 * @return Factory used for parsing child model data
 	 */
-	def childFactory: StorableFactory[Child]
+	def childFactory: FromRowFactory[Child]
 	
 	/**
 	 * Parses a parent
@@ -39,7 +39,7 @@ trait MultiLinkedStorableFactory[+Parent, Child] extends FromResultFactory[Paren
 		result.grouped(table, childFactory.table).toVector.flatMap { case (id, data) =>
 			val (myRow, childRows) = data
 			val model = myRow(table)
-			val children = childRows.flatMap(childFactory.apply)
+			val children = childRows.flatMap { row => childFactory(row) }
 			apply(id, model, children) match
 			{
 				case Success(parent) => Some(parent)

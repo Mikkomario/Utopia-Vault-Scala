@@ -127,6 +127,8 @@ v1.4 (beta)  ----------------------------------
         Tables object was converted to a class. Uses a ConnectionPool for reading class data instead of using an
         individual DB connection.
 
+        MultiLinkedStorableFactory now accepts any FromRowFactory as the child factory
+
 
     Fixes
     -----
