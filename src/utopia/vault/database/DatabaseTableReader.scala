@@ -25,7 +25,7 @@ object DatabaseTableReader
     {
         // Reads the column data from the database
         connection.dbName = databaseName
-        val columnData = connection.executeQuery("DESCRIBE " + tableName)
+        val columnData = connection.executeQuery(s"DESCRIBE `$tableName`")
         
         val columns = columnData.map( data => 
         {

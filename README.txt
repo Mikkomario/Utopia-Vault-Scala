@@ -124,6 +124,9 @@ v1.4 (beta)  ----------------------------------
         ConnectionPool now has default parameters. Also, java.time.Duration was changed to
         scala.concurrent.duration.Duration in ConnectionPool.
 
+        Tables object was converted to a class. Uses a ConnectionPool for reading class data instead of using an
+        individual DB connection.
+
 
     Fixes
     -----

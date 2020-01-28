@@ -5,7 +5,7 @@ import utopia.vault.database.Tables
 /**
  * This is a collection of tables used in the tests
  */
-object TestTables
+object TestTables extends Tables(TestConnectionPool)(TestThreadPool.executionContext)
 {
     // ATTRIBUTES   -----------------
     
@@ -14,9 +14,9 @@ object TestTables
     
     // COMPUTED ---------------------
     
-    def person = Tables(dbName, "person")
+    def person = apply(dbName, "person")
     
-    def strength = Tables(dbName, "strength")
+    def strength = apply(dbName, "strength")
     
-    def indexTest = Tables(dbName, "index_test")
+    def indexTest = apply(dbName, "index_test")
 }
