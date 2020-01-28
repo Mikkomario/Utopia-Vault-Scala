@@ -136,6 +136,9 @@ v1.4 (beta)  ----------------------------------
 
         Insert couldn't previously insert empty rows to a database. This is now possible.
 
+        DatabaseTableReader will now work with all table names, including those like "order"
+        (Added `` around requested table name)
+
 
 v1.3  ---------------------------------------
 
