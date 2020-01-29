@@ -129,6 +129,9 @@ v1.4 (beta)  ----------------------------------
 
         MultiLinkedStorableFactory now accepts any FromRowFactory as the child factory
 
+        FromRowFactory now returns Try instead of Option. Added parseIfPresent method in cases where one needs to first
+        check whether table data exists in specified row.
+
 
     Fixes
     -----

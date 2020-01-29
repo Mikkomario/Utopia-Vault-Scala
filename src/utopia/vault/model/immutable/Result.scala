@@ -115,8 +115,7 @@ case class Result(rows: Vector[Row] = Vector(), generatedKeys: Vector[Value] = V
      * @tparam A Type of parse result per row
      * @return All successfully parsed models
      */
-    def parse[A](factory: FromRowFactory[A]) = rows.filter { _.containsDataForTable(factory.table) }
-        .flatMap { row => factory(row) }
+    def parse[A](factory: FromRowFactory[A]) = rows.flatMap(factory.parseIfPresent)
     
     /**
      * Parses data from up to one row
@@ -124,8 +123,7 @@ case class Result(rows: Vector[Row] = Vector(), generatedKeys: Vector[Value] = V
      * @tparam A Type of parse result
      * @return Parsed result or None if parsing failed or no data was available
      */
-    def parseSingle[A](factory: FromRowFactory[A]) = rows.view.filter {
-        _.containsDataForTable(factory.table) }.findMap(factory.apply)
+    def parseSingle[A](factory: FromRowFactory[A]) = rows.findMap(factory.parseIfPresent)
     
     /**
      * Retrieves row data concerning a certain table

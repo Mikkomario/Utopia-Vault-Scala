@@ -5,6 +5,9 @@ import utopia.flow.datastructure.immutable.Value
 import utopia.vault.database.Connection
 import utopia.vault.model.immutable.{Column, Result, Row}
 import utopia.vault.sql.{Condition, Limit, OrderBy, SelectAll, SqlSegment, Where}
+import utopia.vault.util.ErrorHandling
+
+import scala.util.{Failure, Success, Try}
 
 /**
   * These factories are used for converting database row data into objects. These factories are able to parse an object
@@ -19,17 +22,37 @@ trait FromRowFactory[+A] extends FromResultFactory[A]
 	/**
 	  * Converts a row into an object
 	  * @param row Row to be converted
-	  * @return Parsed object. None if no object could be parsed.
+	  * @return Parsed object. Failure if no object could be parsed.
 	  */
-	def apply(row: Row): Option[A]
+	def apply(row: Row): Try[A]
 	
 	
 	// IMPLEMENTED	----------------
 	
-	override def apply(result: Result): Vector[A] = result.rows.flatMap { r => apply(r) }
+	override def apply(result: Result): Vector[A] = result.rows.flatMap(parseIfPresent)
 	
 	
 	// OTHER	--------------------
+	
+	/**
+	 * Parses data from a row, provided that the row contains data for the primary table
+	 * @param row Parsed row
+	 * @return parsed data. None if row didn't contain data for the primary table
+	 */
+	def parseIfPresent(row: Row): Option[A] =
+	{
+		if (row.containsDataForTable(table))
+		{
+			apply(row) match
+			{
+				case Success(parsed) => Some(parsed)
+				// Lets ErrorHandling handle the possible errors
+				case Failure(error) => ErrorHandling.modelParsePrinciple.handle(error); None
+			}
+		}
+		else
+			None
+	}
 	
 	/**
 	  * Retrieves an object's data from the database and parses it to a proper instance
@@ -50,7 +73,7 @@ trait FromRowFactory[+A] extends FromResultFactory[A]
 	  */
 	override def get(where: Condition)(implicit connection: Connection) =
 	{
-		connection(SelectAll(target) + Where(where) + Limit(1)).rows.headOption.flatMap(apply)
+		connection(SelectAll(target) + Where(where) + Limit(1)).rows.headOption.flatMap(parseIfPresent)
 	}
 	
 	/**
@@ -141,7 +164,7 @@ trait FromRowFactory[+A] extends FromResultFactory[A]
 	 * @param connection DB Connection
 	 */
 	def foreach(where: Condition)(operation: A => Unit)(implicit connection: Connection) =
-		connection.foreach(SelectAll(target) + Where(where)) { apply(_).foreach(operation) }
+		connection.foreach(SelectAll(target) + Where(where)) { parseIfPresent(_).foreach(operation) }
 	
 	/**
 	 * Folds entities into a single value
@@ -153,7 +176,7 @@ trait FromRowFactory[+A] extends FromResultFactory[A]
 	 * @return result once all entities have been folded
 	 */
 	def fold[B](where: Condition)(start: B)(f: (B, A) => B)(implicit connection: Connection) =
-		connection.fold(SelectAll(target) + Where(where))(start) { (v, row) => apply(row).map { f(v, _) }.getOrElse(v) }
+		connection.fold(SelectAll(target) + Where(where))(start) { (v, row) => parseIfPresent(row).map { f(v, _) }.getOrElse(v) }
 	
 	/**
 	 * Maps entities, then reduces mapped values
@@ -165,7 +188,7 @@ trait FromRowFactory[+A] extends FromResultFactory[A]
 	 * @return Reduce result. None if no entities where found
 	 */
 	def mapReduce[B](where: Condition)(map: A => B)(reduce: (B, B) => B)(implicit connection: Connection) =
-		connection.flatMapReduce(SelectAll(target) + Where(where)) { row => apply(row).map(map) }(reduce)
+		connection.flatMapReduce(SelectAll(target) + Where(where)) { row => parseIfPresent(row).map(map) }(reduce)
 	
 	private def getWithOrder(orderBy: SqlSegment, where: Option[Condition] = None)(implicit connection: Connection) =
 	{
@@ -173,7 +196,7 @@ trait FromRowFactory[+A] extends FromResultFactory[A]
 		val end = orderBy + Limit(1)
 		val statement = where.map { beginning + Where(_) + end }.getOrElse { beginning + end }
 		
-		connection(statement).rows.headOption.flatMap(apply)
+		connection(statement).rows.headOption.flatMap(parseIfPresent)
 	}
 	
 	private def findColumn(propertyName: String) = table.find(propertyName).orElse {

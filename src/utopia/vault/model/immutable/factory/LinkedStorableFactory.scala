@@ -31,13 +31,7 @@ trait LinkedStorableFactory[+Parent, Child] extends FromRowFactory[Parent]
 	
 	// IMPLEMENTED	-----------------
 	
-	override def apply(row: Row) = childFactory(row).flatMap { c =>
-		apply(row(table), c) match
-		{
-			case Success(parent) => Some(parent)
-			case Failure(error) => ErrorHandling.modelParsePrinciple.handle(error); None
-		}
-	}
+	override def apply(row: Row) = childFactory(row).flatMap { c => apply(row(table), c) }
 	
 	override def joinedTables = childFactory.tables
 }

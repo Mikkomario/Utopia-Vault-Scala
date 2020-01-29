@@ -1,4 +1,6 @@
 package utopia.vault.model.immutable.factory
+
+import utopia.flow.util.CollectionExtensions._
 import utopia.flow.datastructure.immutable.{Constant, Model, Value}
 import utopia.vault.model.immutable.Result
 import utopia.vault.util.ErrorHandling
@@ -39,8 +41,7 @@ trait MultiLinkedStorableFactory[+Parent, Child] extends FromResultFactory[Paren
 		result.grouped(table, childFactory.table).toVector.flatMap { case (id, data) =>
 			val (myRow, childRows) = data
 			val model = myRow(table)
-			val children = childRows.flatMap { row => childFactory(row) }
-			apply(id, model, children) match
+			childRows.tryMap { row => childFactory(row) }.flatMap { children => apply(id, model, children) } match
 			{
 				case Success(parent) => Some(parent)
 				case Failure(error) => ErrorHandling.modelParsePrinciple.handle(error); None
