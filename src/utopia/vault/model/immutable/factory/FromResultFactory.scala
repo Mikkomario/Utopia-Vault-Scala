@@ -3,7 +3,7 @@ package utopia.vault.model.immutable.factory
 import utopia.flow.datastructure.immutable.Value
 import utopia.vault.database.Connection
 import utopia.vault.model.immutable.{Result, Row, Table}
-import utopia.vault.sql.{Condition, Exists, JoinType, SelectAll, SqlTarget, Where}
+import utopia.vault.sql.{Condition, Exists, JoinType, OrderBy, SelectAll, SqlTarget, Where}
 
 /**
   * These factories are used for constructing object data from database results
@@ -50,11 +50,14 @@ trait FromResultFactory[+A]
 	/**
 	  * Finds possibly multiple instances from the database
 	  * @param where the condition with which the instances are filtered
+	 *  @param order Ordering applied to the query (optional, None by default)
 	  * @return Parsed instance data
 	  */
-	def getMany(where: Condition)(implicit connection: Connection) =
+	def getMany(where: Condition, order: Option[OrderBy] = None)(implicit connection: Connection) =
 	{
-		apply(connection(SelectAll(target) + Where(where)))
+		val baseStatement = SelectAll(target) + Where(where)
+		val finalStatement = order.map { baseStatement + _ }.getOrElse(baseStatement)
+		apply(connection(finalStatement))
 	}
 	
 	/**
@@ -94,11 +97,10 @@ trait FromResultFactory[+A]
 	 * Retrieves an object's data from the database and parses it to a proper instance
 	 * @param where The condition with which the row is found from the database (will be limited to
 	 * the first result row)
+	 * @param order Ordering applied (optional, None by default)
 	 * @return database data parsed into an instance. None if no data was found with the provided
 	 * condition
 	 */
-	def get(where: Condition)(implicit connection: Connection) =
-	{
-		apply(connection(SelectAll(target) + Where(where))).headOption
-	}
+	def get(where: Condition, order: Option[OrderBy] = None)(implicit connection: Connection) =
+		getMany(where, order).headOption
 }

@@ -4,7 +4,7 @@ import utopia.flow.util.CollectionExtensions._
 import utopia.flow.datastructure.immutable.Value
 import utopia.vault.database.Connection
 import utopia.vault.model.immutable.{Column, Result, Row}
-import utopia.vault.sql.{Condition, Limit, OrderBy, SelectAll, SqlSegment, Where}
+import utopia.vault.sql.{Condition, Limit, OrderBy, SelectAll, Where}
 import utopia.vault.util.ErrorHandling
 
 import scala.util.{Failure, Success, Try}
@@ -71,9 +71,11 @@ trait FromRowFactory[+A] extends FromResultFactory[A]
 	  * @return database data parsed into an instance. None if no data was found with the provided
 	  * condition
 	  */
-	override def get(where: Condition)(implicit connection: Connection) =
+	override def get(where: Condition, order: Option[OrderBy] = None)(implicit connection: Connection) =
 	{
-		connection(SelectAll(target) + Where(where) + Limit(1)).rows.headOption.flatMap(parseIfPresent)
+		val baseStatement = SelectAll(target) + Where(where)
+		val finalStatement = order.map { baseStatement + _ }.getOrElse(baseStatement) + Limit(1)
+		connection(finalStatement).rows.headOption.flatMap(parseIfPresent)
 	}
 	
 	/**
@@ -190,13 +192,13 @@ trait FromRowFactory[+A] extends FromResultFactory[A]
 	def mapReduce[B](where: Condition)(map: A => B)(reduce: (B, B) => B)(implicit connection: Connection) =
 		connection.flatMapReduce(SelectAll(target) + Where(where)) { row => parseIfPresent(row).map(map) }(reduce)
 	
-	private def getWithOrder(orderBy: SqlSegment, where: Option[Condition] = None)(implicit connection: Connection) =
+	private def getWithOrder(orderBy: OrderBy, where: Option[Condition] = None)(implicit connection: Connection) =
 	{
-		val beginning = SelectAll(target)
-		val end = orderBy + Limit(1)
-		val statement = where.map { beginning + Where(_) + end }.getOrElse { beginning + end }
-		
-		connection(statement).rows.headOption.flatMap(parseIfPresent)
+		where match
+		{
+			case Some(condition) => get(condition, Some(orderBy))
+			case None => connection(SelectAll(target) + orderBy + Limit(1)).rows.headOption.flatMap(parseIfPresent)
+		}
 	}
 	
 	private def findColumn(propertyName: String) = table.find(propertyName).orElse {

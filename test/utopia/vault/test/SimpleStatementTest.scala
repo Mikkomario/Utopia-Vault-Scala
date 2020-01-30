@@ -48,7 +48,7 @@ object SimpleStatementTest extends App
         assert(connection(Select(table, "age")).rows.head.toModel("age") == 22.toValue)
         
         Insert(table, Model(Vector("name" -> "Last", "age" -> 2, "isAdmin" -> true)))
-        assert(connection(SelectAll(table) + OrderBy(table("age")) + Limit(1)).rows.head.toModel("name") == "Last".toValue)
+        assert(connection(SelectAll(table) + OrderBy.ascending(table("age")) + Limit(1)).rows.head.toModel("name") == "Last".toValue)
         
         val result2 = connection(Select(table, "isAdmin")).rowModels
         assert(result2.nonEmpty)
