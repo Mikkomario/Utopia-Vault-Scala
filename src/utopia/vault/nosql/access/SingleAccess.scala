@@ -24,7 +24,7 @@ trait SingleAccess[+A, +Repr] extends FilterableAccess[Option[A], Repr]
 	 */
 	def top(orderColumn: Column, orderDirection: OrderDirection, additionalCondition: Option[Condition])
 		   (implicit connection: Connection) = read(mergeCondition(additionalCondition),
-		Some(OrderBy(orderColumn, orderDirection)), Some(1))
+		Some(OrderBy(orderColumn, orderDirection)))
 	
 	/**
 	 * The "top" value based on specified ordering
@@ -116,5 +116,5 @@ trait SingleAccess[+A, +Repr] extends FilterableAccess[Option[A], Repr]
 	 * @return The item found using specified condition. None if no item was found.
 	 */
 	def find(condition: Condition, ordering: Option[OrderBy] = None)(implicit connection: Connection): Option[A] =
-		read(Some(mergeCondition(condition)), ordering, Some(1))
+		read(Some(mergeCondition(condition)), ordering)
 }

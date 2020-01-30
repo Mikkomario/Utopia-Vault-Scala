@@ -1,9 +1,9 @@
-package utopia.vault.model.immutable.access
+package utopia.vault.database
 
 import utopia.flow.caching.multi.{Cache, CacheLike, ExpiringCache, TryCache}
-import utopia.flow.util.TimeExtensions._
 import utopia.flow.util.CollectionExtensions._
-import utopia.vault.database.ConnectionPool
+import utopia.flow.util.TimeExtensions._
+import utopia.vault.nosql.access.SingleModelAccess
 import utopia.vault.sql.Condition
 
 import scala.concurrent.ExecutionContext
@@ -24,9 +24,9 @@ import scala.util.Try
  * @param keyToCondition A function for transforming provided keys to database search conditions
  * @param exc Execution context the connection pool uses (implicit)
  */
-class DatabaseCache[I, A, Key](connectionPool: ConnectionPool, accessor: SingleAccess[I, A],
-							   maxCacheDuration: Duration = Duration.Inf, maxFailureCacheDuration: Duration = Duration.Inf)
-							  (keyToCondition: Key => Condition)(implicit exc: ExecutionContext) extends CacheLike[Key, Try[A]]
+class DatabaseCache[A, Key](connectionPool: ConnectionPool, accessor: SingleModelAccess[A],
+							maxCacheDuration: Duration = Duration.Inf, maxFailureCacheDuration: Duration = Duration.Inf)
+						   (keyToCondition: Key => Condition)(implicit exc: ExecutionContext) extends CacheLike[Key, Try[A]]
 {
 	// ATTRIBUTES	-----------------------
 	

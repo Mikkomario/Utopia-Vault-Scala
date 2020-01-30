@@ -1,6 +1,5 @@
 package utopia.vault.nosql.access
 
-import utopia.vault.database.Connection
 import utopia.vault.sql.Condition
 
 /**

@@ -6,7 +6,7 @@ import utopia.flow.datastructure.immutable
 import utopia.flow.datastructure.immutable.Constant
 import utopia.flow.generic.ValueConversions._
 import utopia.vault.model.immutable.StorableWithFactory
-import utopia.vault.model.immutable.factory.StorableFactoryWithValidation
+import utopia.vault.nosql.factory.StorableFactoryWithValidation
 
 object Person extends StorableFactoryWithValidation[Person]
 {

@@ -1,4 +1,4 @@
-package utopia.vault.model.immutable.factory
+package utopia.vault.nosql.factory
 
 import utopia.flow.util.CollectionExtensions._
 import utopia.flow.datastructure.immutable.Value
@@ -158,6 +158,14 @@ trait FromRowFactory[+A] extends FromResultFactory[A]
 	  */
 	def getMin(orderProperty: String, where: Condition)(implicit connection: Connection): Option[A] =
 		findColumn(orderProperty).flatMap { getMin(_, where) }
+	
+	/**
+	 * Finds an item from the target without any ordering or conditions
+	 * @param connection Database connection (implicit)
+	 * @return The first item found
+	 */
+	def getAny()(implicit connection: Connection) = connection(SelectAll(target) + Limit(1))
+		.rows.headOption.flatMap(parseIfPresent)
 	
 	/**
 	 * Performs an operation on each of the targeted entities

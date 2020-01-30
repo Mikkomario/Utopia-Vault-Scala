@@ -1,7 +1,5 @@
 package utopia.vault.database
 
-import utopia.vault.model.mutable.References
-
 import scala.collection.immutable.HashMap
 import scala.concurrent.ExecutionContext
 

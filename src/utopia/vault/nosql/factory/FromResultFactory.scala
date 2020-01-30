@@ -1,4 +1,4 @@
-package utopia.vault.model.immutable.factory
+package utopia.vault.nosql.factory
 
 import utopia.flow.datastructure.immutable.Value
 import utopia.vault.database.Connection
@@ -63,9 +63,11 @@ trait FromResultFactory[+A]
 	/**
 	  * Finds every single instance of this type from the database. This method should only be
 	  * used in case of somewhat small tables.
+	 *  @param order Order applied to the search (optional)
 	  * @see #getMany(Condition)
 	  */
-	def getAll()(implicit connection: Connection) = apply(connection(SelectAll(target)))
+	def getAll(order: Option[OrderBy] = None)(implicit connection: Connection) =
+		apply(connection(SelectAll(target) + order))
 	
 	/**
 	  * Checks whether an object exists for the specified query

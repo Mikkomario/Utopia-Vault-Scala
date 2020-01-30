@@ -28,13 +28,10 @@ trait Access[+A]
 	 * Performs the actual data read + possible wrapping
 	 * @param condition Final search condition used when reading data (None if no condition should be applied)
 	 * @param order The ordering applied to the data read (None if no ordering)
-	 * @param limit The maximum number of items that should be returned (None if unlimited)
 	 * @param connection Database connection used (implicit)
 	 * @return Read data
 	 */
-	// TODO: Remove limit parameter?
-	protected def read(condition: Option[Condition], order: Option[OrderBy] = None, limit: Option[Int] = None)
-					  (implicit connection: Connection): A
+	protected def read(condition: Option[Condition], order: Option[OrderBy] = None)(implicit connection: Connection): A
 	
 	/**
 	 * Merges an additional condition with the existing global condition

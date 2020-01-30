@@ -1,4 +1,4 @@
-package utopia.vault.model.immutable.factory
+package utopia.vault.nosql.factory
 
 import utopia.flow.util.CollectionExtensions._
 import utopia.flow.datastructure.immutable.{Constant, Model, Value}

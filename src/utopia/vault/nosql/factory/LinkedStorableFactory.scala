@@ -1,4 +1,4 @@
-package utopia.vault.model.immutable.factory
+package utopia.vault.nosql.factory
 import utopia.flow.datastructure.immutable.{Constant, Model}
 import utopia.vault.model.immutable.Row
 import utopia.vault.util.ErrorHandling

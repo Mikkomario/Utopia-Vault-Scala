@@ -117,6 +117,10 @@ v1.4 (beta)  ----------------------------------
     Updates & Changes
     -----------------
 
+        Package structure updated
+
+        A new set of access classes was created and the existing set of classes was deprecated for removal
+
         Update no longer returns an option
 
         ConnectionPool now properly closes connections on jvm exit
@@ -199,7 +203,7 @@ v1.3  ---------------------------------------
 
         .in(...) (when creating conditions) will now accept any traversable group and not just seqs
 
-        FromResultFactory, FromRowFactory and StorableFactory were moved to utopia.vault.model.immutable.factory
+        FromResultFactory, FromRowFactory and StorableFactory were moved to utopia.vault.nosql.factory
 
 
     Fixes

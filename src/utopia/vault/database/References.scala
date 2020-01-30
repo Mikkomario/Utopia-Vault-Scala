@@ -1,4 +1,4 @@
-package utopia.vault.model.mutable
+package utopia.vault.database
 
 import utopia.flow.generic.EnvironmentNotSetupException
 import utopia.vault.model.immutable.{Column, Reference, ReferencePoint, Table}

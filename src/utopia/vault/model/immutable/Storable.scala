@@ -5,7 +5,7 @@ import utopia.flow.datastructure.template
 import utopia.flow.datastructure.template.Property
 import utopia.flow.generic.{DeclarationConstantGenerator, ModelConvertible}
 import utopia.vault.database.{Connection, DBException}
-import utopia.vault.model.immutable.factory.{FromRowFactory, StorableFactory}
+import utopia.vault.nosql.factory.{FromRowFactory, StorableFactory}
 import utopia.vault.sql.{Delete, Insert, SqlSegment, Update, Where}
 
 object Storable

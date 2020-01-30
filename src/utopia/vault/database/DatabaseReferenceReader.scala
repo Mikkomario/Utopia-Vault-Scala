@@ -9,7 +9,6 @@ import utopia.vault.sql.ConditionElement
 import utopia.flow.datastructure.template.Model
 import utopia.flow.datastructure.template.Property
 import utopia.vault.model.immutable.{Column, Reference, Table}
-import utopia.vault.model.mutable.References
 
 /**
  * This object can be used for reading and setting up table references by reading them directly 

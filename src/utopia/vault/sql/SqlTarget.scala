@@ -1,8 +1,8 @@
 package utopia.vault.sql
 
 import utopia.flow.util.CollectionExtensions._
+import utopia.vault.database.References
 import utopia.vault.model.immutable.{Column, Table}
-import utopia.vault.model.mutable.References
 import utopia.vault.sql.JoinType._
 
 /**
