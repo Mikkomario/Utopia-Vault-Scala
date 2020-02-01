@@ -113,7 +113,7 @@ case class Condition(private val segment: SqlSegment)
         else 
         {
             val noParentheses = SqlSegment.combine(segment +: others.map { _.segment },
-                { case (first, second) => s"$first + $separator + $second }" })
+                { case (first, second) => s"$first $separator $second" })
             Condition(noParentheses.copy(sql = "(" + noParentheses.sql + ")"))
         }
     }
