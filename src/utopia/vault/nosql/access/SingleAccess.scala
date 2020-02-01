@@ -15,6 +15,31 @@ trait SingleAccess[+A, +Repr] extends FilterableAccess[Option[A], Repr]
 	// OTHER	---------------------
 	
 	/**
+	  * @param ordering Ordering used
+	  * @param additionalCondition An additional search confition used (optional)
+	  * @param connection Implicit database connection
+	  * @return The first item in specified ordering that satisfies the used search condition
+	  */
+	def first(ordering: OrderBy, additionalCondition: Option[Condition])(implicit connection: Connection) =
+		read(mergeCondition(additionalCondition), Some(ordering))
+	
+	/**
+	  * @param ordering Ordering used
+	  * @param connection Implicit database connection
+	  * @return The first item in specified ordering
+	  */
+	def first(ordering: OrderBy)(implicit connection: Connection): Option[A] = first(ordering, None)
+	
+	/**
+	  * @param ordering Ordering used
+	  * @param condition An additional search confition used
+	  * @param connection Implicit database connection
+	  * @return The first item in specified ordering that satisfies the used search condition
+	  */
+	def first(ordering: OrderBy, condition: Condition)(implicit connection: Connection): Option[A] =
+		first(ordering, Some(condition))
+	
+	/**
 	 * The "top" value based on specified ordering
 	 * @param orderColumn Ordering column
 	 * @param orderDirection Ordering direction
@@ -23,8 +48,7 @@ trait SingleAccess[+A, +Repr] extends FilterableAccess[Option[A], Repr]
 	 * @return The "top" (first result) item based on provided ordering and search condition.
 	 */
 	def top(orderColumn: Column, orderDirection: OrderDirection, additionalCondition: Option[Condition])
-		   (implicit connection: Connection) = read(mergeCondition(additionalCondition),
-		Some(OrderBy(orderColumn, orderDirection)))
+		   (implicit connection: Connection) = first(OrderBy(orderColumn, orderDirection), additionalCondition)
 	
 	/**
 	 * The "top" value based on specified ordering

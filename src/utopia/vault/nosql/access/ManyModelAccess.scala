@@ -1,4 +1,6 @@
 package utopia.vault.nosql.access
+
+import scala.language.implicitConversions
 import utopia.vault.database.Connection
 import utopia.vault.nosql.factory.FromResultFactory
 import utopia.vault.nosql.access.ManyModelAccess.FactoryWrapper
@@ -23,6 +25,18 @@ trait ManyModelAccess[+A] extends ManyAccess[A, ManyModelAccess[A]] with ModelAc
 
 object ManyModelAccess
 {
+	// IMPLICIT	--------------------------
+	
+	/**
+	  * Auto-accesses the contents of a model access point
+	  * @param accessor Accessor being accessed
+	  * @param connection DB Connection (implicit)
+	  * @tparam A Type of accessed model
+	  * @return All models that can be accessed through the specified access point
+	  */
+	def autoAccess[A](accessor: ManyModelAccess[A])(implicit connection: Connection): Vector[A] = accessor.all
+	
+	
 	// OTHER	--------------------------
 	
 	/**

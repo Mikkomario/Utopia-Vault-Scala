@@ -1,5 +1,6 @@
 package utopia.vault.nosql.access
 
+import scala.language.implicitConversions
 import utopia.vault.database.Connection
 import utopia.vault.sql.Condition
 
@@ -31,4 +32,21 @@ trait UniqueAccess[+A] extends Access[Option[A]]
 	 * @return The unique item accessed through this access point. None if no item was found.
 	 */
 	def get(implicit connection: Connection) = read(globalCondition)
+}
+
+object UniqueAccess
+{
+	object SingleIdModelAccess
+	{
+		// IMPLICITS	---------------------------
+		
+		/**
+		  * Auto-accesses specified accessor's unique result
+		  * @param accessor An accessor
+		  * @param connection DB Connection (implicit)
+		  * @tparam A Type of accessed item
+		  * @return Accessor's unique result from DB. None if no result was found.
+		  */
+		def autoAccess[A](accessor: SingleIdModelAccess[A])(implicit connection: Connection): Option[A] = accessor.get
+	}
 }

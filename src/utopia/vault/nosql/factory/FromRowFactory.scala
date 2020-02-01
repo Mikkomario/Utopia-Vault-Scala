@@ -31,6 +31,30 @@ trait FromRowFactory[+A] extends FromResultFactory[A]
 	
 	override def apply(result: Result): Vector[A] = result.rows.flatMap(parseIfPresent)
 	
+	/**
+	  * Retrieves an object's data from the database and parses it to a proper instance
+	  * @param index the index / primary key with which the data is read
+	  * @return database data parsed into an instance. None if there was no data available.
+	  */
+	override def get(index: Value)(implicit connection: Connection): Option[A] =
+	{
+		table.primaryColumn.flatMap { column => get(column <=> index) }
+	}
+	
+	/**
+	  * Retrieves an object's data from the database and parses it to a proper instance
+	  * @param where The condition with which the row is found from the database (will be limited to
+	  * the first result row)
+	  * @return database data parsed into an instance. None if no data was found with the provided
+	  * condition
+	  */
+	override def get(where: Condition, order: Option[OrderBy] = None)(implicit connection: Connection) =
+	{
+		val baseStatement = SelectAll(target) + Where(where)
+		val finalStatement = order.map { baseStatement + _ }.getOrElse(baseStatement) + Limit(1)
+		connection(finalStatement).rows.headOption.flatMap(parseIfPresent)
+	}
+	
 	
 	// OTHER	--------------------
 	
@@ -55,27 +79,17 @@ trait FromRowFactory[+A] extends FromResultFactory[A]
 	}
 	
 	/**
-	  * Retrieves an object's data from the database and parses it to a proper instance
-	  * @param index the index / primary key with which the data is read
-	  * @return database data parsed into an instance. None if there was no data available.
+	  * Takes a number of items with this factory
+	  * @param maxNumberOfItems Maximum number of items returned
+	  * @param order Ordering used
+	  * @param condition A filter condition (None if not filtered, default)
+	  * @param connection DB Connection (implicit)
+	  * @return
 	  */
-	override def get(index: Value)(implicit connection: Connection): Option[A] =
+	def take(maxNumberOfItems: Int, order: OrderBy, condition: Option[Condition] = None)(implicit connection: Connection) =
 	{
-		table.primaryColumn.flatMap { column => get(column <=> index) }
-	}
-	
-	/**
-	  * Retrieves an object's data from the database and parses it to a proper instance
-	  * @param where The condition with which the row is found from the database (will be limited to
-	  * the first result row)
-	  * @return database data parsed into an instance. None if no data was found with the provided
-	  * condition
-	  */
-	override def get(where: Condition, order: Option[OrderBy] = None)(implicit connection: Connection) =
-	{
-		val baseStatement = SelectAll(target) + Where(where)
-		val finalStatement = order.map { baseStatement + _ }.getOrElse(baseStatement) + Limit(1)
-		connection(finalStatement).rows.headOption.flatMap(parseIfPresent)
+		connection(SelectAll(target) + condition.map { Where(_) } + order +
+			Limit(maxNumberOfItems)).rows.flatMap(parseIfPresent)
 	}
 	
 	/**

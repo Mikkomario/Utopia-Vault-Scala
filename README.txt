@@ -115,6 +115,8 @@ v1.4 (beta)  ----------------------------------
 
         Storable instances can now be converted to a wider range of conditions using toConditionWithOperator(...)
 
+        Added RowFactoryWithTimestamps trait for all row factories that have a creation time column
+
 
     Updates & Changes
     -----------------
