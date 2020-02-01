@@ -1,5 +1,7 @@
 package utopia.vault.sql
 
+import utopia.vault.model.enumeration.ComparisonOperator
+
 /**
  * ConditionElements are elements used in logical conditions. Usually two or more elements are 
  * compared in some way
@@ -69,6 +71,14 @@ trait ConditionElement
         
         Condition(toSqlSegment + "IN" + inSegment)
     }
+    
+    /**
+      * Creates a simple condition based on two condition elements. This element is used as the first operand.
+      * @param operator A comparison operator used
+      * @param other Another condition element
+      * @return A condition that compares these two elements using specified operator
+      */
+    def makeCondition(operator: ComparisonOperator, other: ConditionElement): Condition = makeCondition(operator.toSql, other)
     
     private def makeCondition(operator: String, other: ConditionElement) = Condition(toSqlSegment + operator + other.toSqlSegment)
 }

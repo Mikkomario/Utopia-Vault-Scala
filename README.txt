@@ -113,6 +113,8 @@ v1.4 (beta)  ----------------------------------
 
         DatabaseCache added. Allows one to temporarily or permanently cache results of simple queries.
 
+        Storable instances can now be converted to a wider range of conditions using toConditionWithOperator(...)
+
 
     Updates & Changes
     -----------------
