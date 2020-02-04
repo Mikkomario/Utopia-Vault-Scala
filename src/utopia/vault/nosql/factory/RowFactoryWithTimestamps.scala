@@ -89,6 +89,13 @@ trait RowFactoryWithTimestamps[+A] extends FromRowFactory[A]
 		if (isInclusive) LargerOrEqual else Larger)
 	
 	/**
+	  * @param start Minimum creation time
+	  * @param end Maximum creation time
+	  * @return A condition that accepts items that were created between 'start' and 'end'
+	  */
+	def createdBetweenCondition(start: Instant, end: Instant) = creationTimeColumn.isBetween(start, end)
+	
+	/**
 	  * @param threshold Time threshold
 	  * @param maxNumberOfItems Maximum number of items to return
 	  * @param isInclusive Whether the threshold should be included in return values (default = false)
