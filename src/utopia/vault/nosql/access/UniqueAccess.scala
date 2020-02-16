@@ -2,7 +2,7 @@ package utopia.vault.nosql.access
 
 import scala.language.implicitConversions
 import utopia.vault.database.Connection
-import utopia.vault.sql.Condition
+import utopia.vault.sql.{Condition, Limit, Select, SqlTarget, Where}
 
 /**
  * A common trait for access points that provide access to an individual unique item. Eg. in searches based on a
@@ -19,6 +19,11 @@ trait UniqueAccess[+A] extends Access[Option[A]]
 	 */
 	def condition: Condition
 	
+	/**
+	 * @return The whole range of selection & condition targets used in this access
+	 */
+	def target: SqlTarget
+	
 	
 	// IMPLEMENTED	-----------------
 	
@@ -32,6 +37,12 @@ trait UniqueAccess[+A] extends Access[Option[A]]
 	 * @return The unique item accessed through this access point. None if no item was found.
 	 */
 	def get(implicit connection: Connection) = read(globalCondition)
+	
+	/**
+	 * @param connection DB Connection (implicit)
+	 * @return Whether there exists an item accessible from this access point
+	 */
+	def exists(implicit connection: Connection) = connection(Select.nothing(target) + Where(condition) + Limit(1)).nonEmpty
 }
 
 object UniqueAccess

@@ -16,6 +16,8 @@ class SingleIdModelAccess[+A](val id: Value, val factory: FromResultFactory[A]) 
 	
 	override def table = factory.table
 	
+	override def target = factory.target
+	
 	override protected def read(condition: Option[Condition], order: Option[OrderBy])(
 		implicit connection: Connection) = factory.get(condition.getOrElse(this.condition), order)
 }
