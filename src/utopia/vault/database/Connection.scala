@@ -301,7 +301,7 @@ class Connection(initialDBName: Option[String] = None) extends AutoCloseable
                 
                 // Instantiates the connection
                 _connection = Some(DriverManager.getConnection(
-                        Connection.settings.connectionTarget + dbName.get, 
+                        Connection.settings.connectionTarget + dbName.get + Connection.settings.charsetString,
                         Connection.settings.user, Connection.settings.password))
             }
             catch 
