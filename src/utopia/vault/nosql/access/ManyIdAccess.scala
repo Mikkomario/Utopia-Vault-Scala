@@ -15,7 +15,7 @@ trait ManyIdAccess[+ID] extends IdAccess[ID, Vector[ID]] with ManyAccess[ID, Man
 	override protected def read(condition: Option[Condition], order: Option[OrderBy])(implicit connection: Connection) =
 	{
 		val statement = Select.index(target, table) + condition.map { Where(_) } + order
-		connection(statement).rowValues.flatMap(valueToId)
+		connection(statement).rowValues.flatMap(valueToId).distinct
 	}
 	
 	override def filter(additionalCondition: Condition): ManyIdAccess[ID] = new Filtered(additionalCondition)
