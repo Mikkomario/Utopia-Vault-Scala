@@ -73,6 +73,14 @@ trait ConditionElement
     }
     
     /**
+      * @param elements Values accepted for this element
+      * @param transform An implicit transformation between provided values and condition elements
+      * @tparam V Type of value
+      * @return A condition that accepts any of the provided value in this condition element
+      */
+    def in[V](elements: Traversable[V])(implicit transform: V => ConditionElement): Condition = in(elements.map(transform))
+    
+    /**
       * Creates a simple condition based on two condition elements. This element is used as the first operand.
       * @param operator A comparison operator used
       * @param other Another condition element

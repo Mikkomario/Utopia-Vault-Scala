@@ -1,5 +1,6 @@
 package utopia.vault.nosql.factory
 
+import utopia.vault.sql.Extensions._
 import utopia.flow.datastructure.immutable.Value
 import utopia.vault.database.Connection
 import utopia.vault.model.immutable.{Result, Row, Table}
@@ -61,6 +62,22 @@ trait FromResultFactory[+A]
 	}
 	
 	/**
+	  * Finds the instances with the specified ids
+	  * @param ids Ids of the targeted instances
+	  * @param order Ordering used (optional, None by default)
+	  * @param connection DB Connection (implicit)
+	  * @return All items with specified row ids
+	  */
+	def withIds(ids: Traversable[Value], order: Option[OrderBy] = None)(implicit connection: Connection) =
+	{
+		table.primaryColumn match
+		{
+			case Some(idColumn) => getMany(idColumn.in(ids), order)
+			case None => Vector()
+		}
+	}
+	
+	/**
 	  * Finds every single instance of this type from the database. This method should only be
 	  * used in case of somewhat small tables.
 	 *  @param order Order applied to the search (optional)
@@ -91,9 +108,7 @@ trait FromResultFactory[+A]
 	 * @return database data parsed into an instance. None if there was no data available.
 	 */
 	def get(index: Value)(implicit connection: Connection): Option[A] =
-	{
 		table.primaryColumn.flatMap { column => get(column <=> index) }
-	}
 	
 	/**
 	 * Retrieves an object's data from the database and parses it to a proper instance

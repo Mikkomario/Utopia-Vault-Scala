@@ -47,17 +47,14 @@ trait UniqueAccess[+A] extends Access[Option[A]]
 
 object UniqueAccess
 {
-	object SingleIdModelAccess
-	{
-		// IMPLICITS	---------------------------
-		
-		/**
-		  * Auto-accesses specified accessor's unique result
-		  * @param accessor An accessor
-		  * @param connection DB Connection (implicit)
-		  * @tparam A Type of accessed item
-		  * @return Accessor's unique result from DB. None if no result was found.
-		  */
-		def autoAccess[A](accessor: SingleIdModelAccess[A])(implicit connection: Connection): Option[A] = accessor.get
-	}
+	// IMPLICITS	---------------------------
+	
+	/**
+	  * Auto-accesses specified accessor's unique result
+	  * @param accessor An accessor
+	  * @param connection DB Connection (implicit)
+	  * @tparam A Type of accessed item
+	  * @return Accessor's unique result from DB. None if no result was found.
+	  */
+	def autoAccess[A](accessor: UniqueAccess[A])(implicit connection: Connection): Option[A] = accessor.get
 }

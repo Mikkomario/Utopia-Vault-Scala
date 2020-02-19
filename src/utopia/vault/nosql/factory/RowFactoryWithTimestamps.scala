@@ -58,6 +58,20 @@ trait RowFactoryWithTimestamps[+A] extends FromRowFactory[A]
 	// OTHER	-------------------------
 	
 	/**
+	  * @param where A search condition
+	  * @param connection DB Connection (implicit)
+	  * @return Latest item in database that satisfies the specified condition
+	  */
+	def findLatest(where: Condition)(implicit connection: Connection) = getMax(creationTimeColumn, where)
+	
+	/**
+	  * @param where A search condition
+	  * @param connection DB Connection (implicit)
+	  * @return Earliest item in database that satisfies the specified condition
+	  */
+	def findEarliest(where: Condition)(implicit connection: Connection) = getMin(creationTimeColumn, where)
+	
+	/**
 	  * Takes latest n items from the database
 	  * @param maxNumberOfItems Maximum number of items to return
 	  * @param connection DB Connection (implicit)
