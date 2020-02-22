@@ -42,7 +42,20 @@ trait UniqueAccess[+A] extends Access[Option[A]]
 	 * @param connection DB Connection (implicit)
 	 * @return Whether there exists an item accessible from this access point
 	 */
-	def exists(implicit connection: Connection) = connection(Select.nothing(target) + Where(condition) + Limit(1)).nonEmpty
+	def isDefined(implicit connection: Connection) = connection(Select.nothing(target) + Where(condition) + Limit(1)).nonEmpty
+	
+	/**
+	  * @param connection DB Connection (implicit)
+	  * @return Whether there doesn't exist a single row accessible from this access point
+	  */
+	def isEmpty(implicit connection: Connection) = !isDefined
+	
+	/**
+	  * @param connection DB Connection (implicit)
+	  * @return Whether the item accessible from this accessor satisfies the specified condition
+	  */
+	def exists(additionalCondition: Condition)(implicit connection: Connection) = connection(
+		Select.nothing(target) + Where(mergeCondition(additionalCondition)) + Limit(1)).nonEmpty
 }
 
 object UniqueAccess
