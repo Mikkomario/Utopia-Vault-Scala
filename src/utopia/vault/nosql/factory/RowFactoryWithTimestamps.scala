@@ -80,6 +80,16 @@ trait RowFactoryWithTimestamps[+A] extends FromRowFactory[A]
 	def takeLatest(maxNumberOfItems: Int)(implicit connection: Connection) = take(maxNumberOfItems, defaultOrdering)
 	
 	/**
+	  * Finds a specific number of latest items that satisfy specified search condition
+	  * @param condition A search condition
+	  * @param maxNumberOfItems Maximum number of items to return
+	  * @param connection DB Connection
+	  * @return Latest 'maxNumberOfItems' items that satisfy specified condition
+	  */
+	def takeLatestWhere(condition: Condition, maxNumberOfItems: Int)(implicit connection: Connection) =
+		take(maxNumberOfItems, defaultOrdering, Some(condition))
+	
+	/**
 	  * @param threshold Time threshold
 	  * @param operator An operator used for comparing row creation times with specified threshold
 	  * @return A condition that accepts rows based on specified threshold and operator
@@ -113,19 +123,29 @@ trait RowFactoryWithTimestamps[+A] extends FromRowFactory[A]
 	  * @param threshold Time threshold
 	  * @param maxNumberOfItems Maximum number of items to return
 	  * @param isInclusive Whether the threshold should be included in return values (default = false)
+	  * @param additionalCondition Additional search condition applied (default = None)
 	  * @return Up to 'maxNumberOfItems' items that were created before the specified time threshold
 	  */
-	def createdBefore(threshold: Instant, maxNumberOfItems: Int, isInclusive: Boolean = false)(implicit connection: Connection) =
-		take(maxNumberOfItems, defaultOrdering, Some(createdBeforeCondition(threshold, isInclusive)))
+	def createdBefore(threshold: Instant, maxNumberOfItems: Int, isInclusive: Boolean = false,
+					  additionalCondition: Option[Condition] = None)(implicit connection: Connection) =
+	{
+		val condition = createdBeforeCondition(threshold, isInclusive) && additionalCondition
+		take(maxNumberOfItems, defaultOrdering, Some(condition))
+	}
 	
 	/**
 	  * @param threshold Time threshold
 	  * @param isInclusive Whether the threshold should be included in return values (default = false)
+	  * @param additionalCondition Additional search condition applied (default = None)
 	  * @param connection DB Connection (implicit)
 	  * @return All items that were created after the specified time threshold
 	  */
-	def createdAfter(threshold: Instant, isInclusive: Boolean = false)(implicit connection: Connection) =
-		getMany(createdAfterCondition(threshold, isInclusive))
+	def createdAfter(threshold: Instant, isInclusive: Boolean = false, additionalCondition: Option[Condition] = None)
+					(implicit connection: Connection) =
+	{
+		val condition = createdAfterCondition(threshold, isInclusive) && additionalCondition
+		getMany(condition)
+	}
 	
 	/**
 	  * @param threshold A time threshold

@@ -59,6 +59,12 @@ case class Condition(private val segment: SqlSegment)
     def &&(first: Condition, second: Condition, more: Condition*): Condition = this && (Vector(first, second) ++ more)
     
     /**
+      * @param other Another condition
+      * @return A combination (using AND) of these conditions, wrapped in parenthesis '()'
+      */
+    def &&(other: Option[Condition]): Condition = other.map { this && _ }.getOrElse(this)
+    
+    /**
      * Combines the conditions together using a logical OR. All of the conditions are wrapped in 
      * single parentheses '()' and performed together, from left to right.
      */
@@ -75,6 +81,12 @@ case class Condition(private val segment: SqlSegment)
      * single parentheses '()' and performed together, from left to right.
      */
     def ||(first: Condition, second: Condition, more: Condition*): Condition = this || (Vector(first, second) ++ more)
+    
+    /**
+      * @param other Another condition
+      * @return A combination of these conditions (using OR) wrapped in parenthesis '()'
+      */
+    def ||(other: Option[Condition]): Condition = other.map { this || _ }.getOrElse(this)
     
     /**
      * Applies a logical NOT operator on this condition, reversing any logical outcome

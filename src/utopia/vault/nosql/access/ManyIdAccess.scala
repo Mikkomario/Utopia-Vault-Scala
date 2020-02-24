@@ -1,6 +1,7 @@
 package utopia.vault.nosql.access
 import utopia.flow.datastructure.immutable.Value
 import utopia.vault.database.Connection
+import utopia.vault.nosql.factory.FromResultFactory
 import utopia.vault.sql.{Condition, OrderBy, Select, Where}
 
 /**
@@ -32,5 +33,34 @@ trait ManyIdAccess[+ID] extends IdAccess[ID, Vector[ID]] with ManyAccess[ID, Man
 		override def table = ManyIdAccess.this.table
 		
 		override def globalCondition = Some(ManyIdAccess.this.mergeCondition(condition))
+	}
+}
+
+object ManyIdAccess
+{
+	// OTHER	--------------------------
+	
+	/**
+	  * Wraps a factory into an id access point
+	  * @param factory Factory to wrap
+	  * @param valueToId Function for converting values to ids
+	  * @tparam ID Target id type
+	  * @return An access point to ids accessible from that factory
+	  */
+	def wrap[ID](factory: FromResultFactory[_])(valueToId: Value => Option[ID]): ManyIdAccess[ID] =
+		new FactoryIdAccess[ID](factory, valueToId)
+	
+	
+	// NESTED	--------------------------
+	
+	private class FactoryIdAccess[+ID](factory: FromResultFactory[_], valToId: Value => Option[ID]) extends ManyIdAccess[ID]
+	{
+		override def target = factory.target
+		
+		override def valueToId(value: Value) = valToId(value)
+		
+		override def table = factory.table
+		
+		override def globalCondition = None
 	}
 }
