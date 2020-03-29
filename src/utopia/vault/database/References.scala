@@ -1,4 +1,4 @@
-package utopia.vault.model.mutable
+package utopia.vault.database
 
 import utopia.flow.generic.EnvironmentNotSetupException
 import utopia.vault.model.immutable.{Column, Reference, ReferencePoint, Table}
@@ -198,6 +198,12 @@ object References
      * Finds all tables that contain references to the specified table
      */
     def tablesReferencing(table: Table) = to(table).map(_.from.table)
+    
+    /**
+     * Clears all reference data concerning a single database
+     * @param databaseName Name of the database whose references should be cleared
+     */
+    def clear(databaseName: String) = referenceData -= databaseName
     
     private def checkIsSetup(databaseName: String) =
     {

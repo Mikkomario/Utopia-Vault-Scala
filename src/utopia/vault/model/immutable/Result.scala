@@ -2,6 +2,7 @@ package utopia.vault.model.immutable
 
 import utopia.flow.util.CollectionExtensions._
 import utopia.flow.datastructure.immutable.Value
+import utopia.vault.nosql.factory.FromRowFactory
 
 object Result
 {
@@ -30,6 +31,18 @@ case class Result(rows: Vector[Row] = Vector(), generatedKeys: Vector[Value] = V
      * each row contains data from a single table only
      */
     def rowModels = rows.map { _.toModel }
+    
+    /**
+     * @return All rows converted into values. Should only be used for results where each row only contains a single
+     *         value
+     */
+    def rowValues = rows.map { _.value }
+    
+    /**
+     * @return All rows converted into integer values (empty rows excluded). Should only be used for results where each
+     *         row consists of a single integer value.
+     */
+    def rowIntValues = rowValues.flatMap { _.int }
     
     /**
      * The data of the first result row in model format. This should be used only when no joins 
@@ -97,6 +110,22 @@ case class Result(rows: Vector[Row] = Vector(), generatedKeys: Vector[Value] = V
     // OTHER METHODS    ------------------
     
     /**
+     * Parses data from each available row
+     * @param factory Factory used for parsing data
+     * @tparam A Type of parse result per row
+     * @return All successfully parsed models
+     */
+    def parse[A](factory: FromRowFactory[A]) = rows.flatMap(factory.parseIfPresent)
+    
+    /**
+     * Parses data from up to one row
+     * @param factory Factory used for parsing data
+     * @tparam A Type of parse result
+     * @return Parsed result or None if parsing failed or no data was available
+     */
+    def parseSingle[A](factory: FromRowFactory[A]) = rows.findMap(factory.parseIfPresent)
+    
+    /**
      * Retrieves row data concerning a certain table
      * @param table The table whose data is returned
      */
@@ -142,5 +171,16 @@ case class Result(rows: Vector[Row] = Vector(), generatedKeys: Vector[Value] = V
         rows.filter { _.containsDataForTable(primaryTable) }.groupBy { _.indexForTable(primaryTable) }
             .mapValues { rows => rows.head -> rows.filter { _.containsDataForTable(secondaryTable) }
                 .distinctBy { _.indexForTable(secondaryTable) } }
+    }
+    
+    /**
+     * Divides this result into multiple sub-results based on a table id
+     * @param primaryTable The table based on which the this result is split
+     * @return Sub-results found. Please note that this won't include any results / rows without data from the primary table.
+     */
+    def split(primaryTable: Table) =
+    {
+        val rowsPerId = rows.filter { _.containsDataForTable(primaryTable) }.groupBy { _.indexForTable(primaryTable) }
+        rowsPerId.values.map { rows => copy(rows = rows) }.toVector
     }
 }

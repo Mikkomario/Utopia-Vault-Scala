@@ -15,5 +15,5 @@ object SelectAll
      * targeted rows. This statement can then be followed by a join- or where clause and possibly 
      * a limit
      */
-    def apply(target: SqlTarget) = SqlSegment(s"SELECT * FROM", Vector(), None, HashSet(), true) + target.toSqlSegment
+    def apply(target: SqlTarget) = SqlSegment(s"SELECT * FROM", Vector(), None, HashSet(), isSelect = true) + target.toSqlSegment
 }

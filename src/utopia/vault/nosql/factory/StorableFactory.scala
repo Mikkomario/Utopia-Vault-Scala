@@ -1,10 +1,8 @@
-package utopia.vault.model.immutable.factory
+package utopia.vault.nosql.factory
 
-import utopia.flow.util.CollectionExtensions._
 import utopia.flow.datastructure.template.{Model, Property}
 import utopia.flow.generic.FromModelFactory
 import utopia.vault.model.immutable.{Row, Storable, Table}
-import utopia.vault.util.ErrorHandling
 
 import scala.util.Success
 
@@ -31,12 +29,7 @@ trait StorableFactory[+A] extends FromRowFactory[A] with FromModelFactory[A]
     override val joinedTables = Vector()
     
     // Handles parsing errors
-    override def apply(row: Row) =
-    {
-        val result = apply(row(table))
-        result.failure.foreach { e => ErrorHandling.modelParsePrinciple.handle(e) }
-        result.toOption
-    }
+    override def apply(row: Row) = apply(row(table))
 }
 
 private class ImmutableStorableFactory(override val table: Table) extends StorableFactory[Storable]

@@ -26,7 +26,7 @@ case class Row(columnData: Map[Table, Model[Constant]])
     /**
      * Whether this row is empty and contains no column value data at all
      */
-    def isEmpty = columnData.values.forall { _.isEmpty }
+    def isEmpty = columnData.values.forall { _.hasOnlyEmptyValues }
     
     /**
      * The indices for each of the contained table
@@ -43,7 +43,7 @@ case class Row(columnData: Map[Table, Model[Constant]])
     /**
       * @return The first value found from this row. Should only be used when just a single value is requested
       */
-    def value = columnData.values.find { !_.isEmpty }.flatMap {
+    def value = columnData.values.find { _.hasNonEmptyValues }.flatMap {
         _.attributesWithValue.headOption.map { _.value } } getOrElse Value.empty
     
     
@@ -87,5 +87,5 @@ case class Row(columnData: Map[Table, Model[Constant]])
       * @param table Targeted table
       * @return Whether this row contains any data for that table
       */
-    def containsDataForTable(table: Table) = columnData.get(table).exists { !_.isEmpty }
+    def containsDataForTable(table: Table) = columnData.get(table).exists { _.hasNonEmptyValues }
 }

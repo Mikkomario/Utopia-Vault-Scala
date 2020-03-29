@@ -2,8 +2,6 @@ package utopia.vault.sql
 
 import utopia.vault.model.immutable.{Column, Table}
 
-import scala.collection.immutable.HashSet
-
 /**
  * This object is used for generating select sql segments. If you wish to select all columns from a 
  * table, it is better to use SelectAll.
@@ -38,6 +36,14 @@ object Select
     def apply(table: Table, firstName: String, moreNames: String*): SqlSegment = 
             apply(table, table(firstName +: moreNames))
     
+    /**
+     * Creates an sql segment that selects all columns of a single table from a larger selection target
+     * @param target Selection target
+     * @param selectedTable Table whose columns should be included in the final result
+     * @return A new select segment
+     */
+    def apply(target: SqlTarget, selectedTable: Table): SqlSegment = apply(target, selectedTable.columns)
+    
     
     // OTHER METHODS    -------------
     
@@ -47,7 +53,21 @@ object Select
     def index(table: Table) = apply(table, table.primaryColumn.toSeq)
     
     /**
+     * @param target Selection target
+     * @param table Table whose indices are selected
+     * @return an sql segment that selects the primary key of a single table
+     */
+    def index(target: SqlTarget, table: Table) = apply(target, table.primaryColumn.toSeq)
+    
+    /**
      * Creates an sql segment that selects nothing from a table
      */
     def nothing(target: SqlTarget) = apply(target, Vector())
+    
+    /**
+     * @param target Selection target
+     * @param tables The tables from which data is read
+     * @return A select segment that targets 'target' and selects data from 'tables'
+     */
+    def tables(target: SqlTarget, tables: Seq[Table]) = apply(target, tables.flatMap { _.columns })
 }

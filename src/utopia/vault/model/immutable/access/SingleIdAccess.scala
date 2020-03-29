@@ -1,8 +1,7 @@
 package utopia.vault.model.immutable.access
 
-import utopia.flow.datastructure.immutable.Value
 import utopia.vault.database.Connection
-import utopia.vault.model.immutable.{Column, Table}
+import utopia.vault.model.immutable.Column
 import utopia.vault.sql.{Condition, MaxBy, MinBy, Select, Where}
 
 /**
@@ -10,6 +9,7 @@ import utopia.vault.sql.{Condition, MaxBy, MinBy, Select, Where}
  * @author Mikko Hilpinen
  * @since 30.7.2019, v1.3+
  */
+@deprecated("Replaced with utopia.vault.nosql.access.SingleModelAccess", "v1.4")
 trait SingleIdAccess[+I] extends IdAccess[I]
 {
 	// OPERATORS	--------------------
@@ -33,6 +33,23 @@ trait SingleIdAccess[+I] extends IdAccess[I]
 	// OTHER	------------------------
 	
 	/**
+	 * Finds the index of a 'maximum' row
+	 * @param orderColumn Column that determines row order
+	 * @param connection DB connection (implicit)
+	 * @return The index of the maximum row, based on specified ordering
+	 */
+	def max(orderColumn: Column)(implicit connection: Connection) = connection(Select.index(table) +
+		MaxBy(orderColumn)).rows.headOption.map { r => valueToId(r.index) }
+	
+	/**
+	 * Finds the index of a 'maximum' row
+	 * @param orderPropertyName Name of property that determines row order
+	 * @param connection DB connection (implicit)
+	 * @return The index of the maximum row, based on specified ordering
+	 */
+	def max(orderPropertyName: String)(implicit connection: Connection): Option[I] = max(table(orderPropertyName))
+	
+	/**
 	 * Finds index of a 'maximum' row
 	 * @param condition Search condition
 	 * @param orderColumn Column that determines ordering
@@ -51,6 +68,23 @@ trait SingleIdAccess[+I] extends IdAccess[I]
 	 */
 	def max(condition: Condition, orderProperty: String)(implicit connection: Connection): Option[I] =
 		max(condition, table(orderProperty))
+	
+	/**
+	 * Finds the index of a 'minimum' row
+	 * @param orderColumn Column that determines row order
+	 * @param connection DB connection (implicit)
+	 * @return The index of the minimum row, based on specified ordering
+	 */
+	def min(orderColumn: Column)(implicit connection: Connection) = connection(Select.index(table) +
+		MinBy(orderColumn)).rows.headOption.map { r => valueToId(r.index) }
+	
+	/**
+	 * Finds the index of a 'minimum' row
+	 * @param orderPropertyName Name of property that determines row order
+	 * @param connection DB connection (implicit)
+	 * @return The index of the minimum row, based on specified ordering
+	 */
+	def min(orderPropertyName: String)(implicit connection: Connection): Option[I] = min(table(orderPropertyName))
 	
 	/**
 	 * Finds index of a 'minimum' row

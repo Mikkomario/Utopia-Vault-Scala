@@ -11,6 +11,7 @@ import utopia.vault.sql.{Condition, ConditionElement}
  * @tparam I Type of used index
  * @tparam A Type of read model
  */
+@deprecated("Replaced with utopia.vault.nosql.access.ManyModelAccess", "v1.4")
 trait ManyAccess[-I, +A] extends Access[I, A]
 {
 	// COMPUTED	-----------------------
@@ -22,7 +23,7 @@ trait ManyAccess[-I, +A] extends Access[I, A]
 	def all(implicit connection: Connection) = factory.getAll()
 	
 	
-	// OPERATORS	-------------------
+	// OTHER	-----------------------
 	
 	/**
 	 * Finds multiple items based on a condition
@@ -32,8 +33,12 @@ trait ManyAccess[-I, +A] extends Access[I, A]
 	 */
 	protected def find(condition: Condition)(implicit connection: Connection) = factory.getMany(condition)
 	
-	
-	// OTHER	-----------------------
+	/**
+	 * Provides access into a limited group of items based on a search condition
+	 * @param condition A search condition
+	 * @return Access to items within that search condition
+	 */
+	protected def subGroup(condition: Condition) = ConditionalManyAccess[A](condition, factory)
 	
 	/**
 	 * Finds models for multiple ids

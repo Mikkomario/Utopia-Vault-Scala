@@ -1,17 +1,40 @@
 package utopia.vault.database
 
 import scala.collection.immutable.HashMap
+import scala.concurrent.ExecutionContext
 
 /**
   * Keeps track & setups of all database tables and their references by reading data directly from the database.
   * @author Mikko Hilpinen
   * @since 13.7.2019, v1.3+
   */
-object Tables
+class Tables(connectionPool: ConnectionPool)(implicit exc: ExecutionContext)
 {
 	// ATTRIBUTES	---------------------
 	
 	private var dbs = HashMap[String, TablesReader]()
+	private var _columnNameConversion: String => String = DatabaseTableReader.underlineToCamelCase
+	
+	
+	// COMPUTED	-------------------------
+	
+	/**
+	 * @return The method used when converting column names in the database to column attribute names in code (by default converts
+	 *         from underscore style to camel case style, eg. "column_name" to "columnName")
+	 */
+	def columnNameConversion = _columnNameConversion
+	/**
+	 * Specifies a new name conversion style for tables read from the DB
+	 * @param newConversionMethod A new method for column name conversion. Takes the database-originated column name
+	 *                            as parameter and returns the column attribute name used in the code.
+	 */
+	def columnNameConversion_=(newConversionMethod: String => String) =
+	{
+		// Has to clear all existing data to use the new method
+		_columnNameConversion = newConversionMethod
+		dbs.keys.foreach(References.clear)
+		dbs = HashMap()
+	}
 	
 	
 	// OPERATORS	---------------------
@@ -47,42 +70,45 @@ object Tables
 			db
 		}
 	}
-}
-
-private class TablesReader(val dbName: String)
-{
-	// ATTRIBUTES	-------------------
 	
-	val tables =
+	
+	// NESTED	----------------------
+	
+	private class TablesReader(val dbName: String)
 	{
-		Connection.doTransaction { implicit connection =>
-			
-			connection.dbName = dbName
-			
-			// First finds out table names using "show tables"
-			val tableNames = connection.executeQuery("show tables").flatMap { _.values.headOption }
-			
-			// Reads data for each table
-			val tables = tableNames.map { DatabaseTableReader(dbName, _) }
-			
-			// Sets up references between the tables
-			DatabaseReferenceReader.setupReferences(tables.toSet)
-			
-			tables.map { t => t.name.toLowerCase -> t }.toMap
+		// ATTRIBUTES	-------------------
+		
+		val tables =
+		{
+			connectionPool { implicit connection =>
+				
+				connection.dbName = dbName
+				
+				// First finds out table names using "show tables"
+				val tableNames = connection.executeQuery("show tables").flatMap { _.values.headOption }
+				
+				// Reads data for each table
+				val tables = tableNames.map { DatabaseTableReader(dbName, _, columnNameConversion) }
+				
+				// Sets up references between the tables
+				DatabaseReferenceReader.setupReferences(tables.toSet)
+				
+				tables.map { t => t.name.toLowerCase -> t }.toMap
+			}
+		}
+		
+		
+		// OPERATORS	-------------------
+		
+		def apply(tableName: String) =
+		{
+			if (tables.contains(tableName))
+				tables(tableName)
+			else
+				throw new NoSuchTableException(dbName, tableName)
 		}
 	}
 	
-	
-	// OPERATORS	-------------------
-	
-	def apply(tableName: String) =
-	{
-		if (tables.contains(tableName))
-			tables(tableName)
-		else
-			throw new NoSuchTableException(dbName, tableName)
-	}
+	private class NoSuchTableException(dbName: String, tableName: String) extends RuntimeException(
+		s"Database $dbName doesn't contain a table named $tableName")
 }
-
-private class NoSuchTableException(dbName: String, tableName: String) extends RuntimeException(
-	s"Database $dbName doesn't contain a table named $tableName")

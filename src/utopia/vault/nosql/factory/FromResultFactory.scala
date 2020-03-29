@@ -1,9 +1,10 @@
-package utopia.vault.model.immutable.factory
+package utopia.vault.nosql.factory
 
+import utopia.vault.sql.Extensions._
 import utopia.flow.datastructure.immutable.Value
 import utopia.vault.database.Connection
-import utopia.vault.model.immutable.{Result, Table}
-import utopia.vault.sql.{Condition, Exists, JoinType, SelectAll, SqlTarget, Where}
+import utopia.vault.model.immutable.{Result, Row, Table}
+import utopia.vault.sql.{Condition, Exists, JoinType, OrderBy, SelectAll, SqlTarget, Where}
 
 /**
   * These factories are used for constructing object data from database results
@@ -50,19 +51,40 @@ trait FromResultFactory[+A]
 	/**
 	  * Finds possibly multiple instances from the database
 	  * @param where the condition with which the instances are filtered
+	 *  @param order Ordering applied to the query (optional, None by default)
 	  * @return Parsed instance data
 	  */
-	def getMany(where: Condition)(implicit connection: Connection) =
+	def getMany(where: Condition, order: Option[OrderBy] = None)(implicit connection: Connection) =
 	{
-		apply(connection(SelectAll(target) + Where(where)))
+		val baseStatement = SelectAll(target) + Where(where)
+		val finalStatement = order.map { baseStatement + _ }.getOrElse(baseStatement)
+		apply(connection(finalStatement))
+	}
+	
+	/**
+	  * Finds the instances with the specified ids
+	  * @param ids Ids of the targeted instances
+	  * @param order Ordering used (optional, None by default)
+	  * @param connection DB Connection (implicit)
+	  * @return All items with specified row ids
+	  */
+	def withIds(ids: Traversable[Value], order: Option[OrderBy] = None)(implicit connection: Connection) =
+	{
+		table.primaryColumn match
+		{
+			case Some(idColumn) => getMany(idColumn.in(ids), order)
+			case None => Vector()
+		}
 	}
 	
 	/**
 	  * Finds every single instance of this type from the database. This method should only be
 	  * used in case of somewhat small tables.
+	 *  @param order Order applied to the search (optional)
 	  * @see #getMany(Condition)
 	  */
-	def getAll()(implicit connection: Connection) = apply(connection(SelectAll(target)))
+	def getAll(order: Option[OrderBy] = None)(implicit connection: Connection) =
+		apply(connection(SelectAll(target) + order))
 	
 	/**
 	  * Checks whether an object exists for the specified query
@@ -86,19 +108,16 @@ trait FromResultFactory[+A]
 	 * @return database data parsed into an instance. None if there was no data available.
 	 */
 	def get(index: Value)(implicit connection: Connection): Option[A] =
-	{
 		table.primaryColumn.flatMap { column => get(column <=> index) }
-	}
 	
 	/**
 	 * Retrieves an object's data from the database and parses it to a proper instance
 	 * @param where The condition with which the row is found from the database (will be limited to
 	 * the first result row)
+	 * @param order Ordering applied (optional, None by default)
 	 * @return database data parsed into an instance. None if no data was found with the provided
 	 * condition
 	 */
-	def get(where: Condition)(implicit connection: Connection) =
-	{
-		apply(connection(SelectAll(target) + Where(where))).headOption
-	}
+	def get(where: Condition, order: Option[OrderBy] = None)(implicit connection: Connection) =
+		getMany(where, order).headOption
 }

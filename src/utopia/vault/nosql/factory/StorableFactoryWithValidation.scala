@@ -1,4 +1,4 @@
-package utopia.vault.model.immutable.factory
+package utopia.vault.nosql.factory
 
 import utopia.flow.generic.FromModelFactoryWithSchema
 

@@ -1,5 +1,6 @@
 package utopia.vault.sql
 
+import utopia.vault.model.enumeration.BasicCombineOperator
 import utopia.vault.model.immutable.Storable
 
 object Where
@@ -43,7 +44,7 @@ case class Condition(private val segment: SqlSegment)
      * Combines the conditions together using a logical AND. All of the conditions are wrapped in 
      * single parentheses '()' and performed together, from left to right.
      */
-    def &&(others: Seq[Condition]) = combine(others, " AND ")
+    def &&(others: Seq[Condition]) = combine(others, "AND")
     
     /**
      * Combines this and another condition together using a logical AND. The conditions are wrapped in 
@@ -58,10 +59,16 @@ case class Condition(private val segment: SqlSegment)
     def &&(first: Condition, second: Condition, more: Condition*): Condition = this && (Vector(first, second) ++ more)
     
     /**
+      * @param other Another condition
+      * @return A combination (using AND) of these conditions, wrapped in parenthesis '()'
+      */
+    def &&(other: Option[Condition]): Condition = other.map { this && _ }.getOrElse(this)
+    
+    /**
      * Combines the conditions together using a logical OR. All of the conditions are wrapped in 
      * single parentheses '()' and performed together, from left to right.
      */
-    def ||(others: Seq[Condition]) = combine(others, " OR ")
+    def ||(others: Seq[Condition]) = combine(others, "OR")
     
     /**
      * Combines this and another condition together using a logical OR. The conditions are wrapped in 
@@ -76,6 +83,12 @@ case class Condition(private val segment: SqlSegment)
     def ||(first: Condition, second: Condition, more: Condition*): Condition = this || (Vector(first, second) ++ more)
     
     /**
+      * @param other Another condition
+      * @return A combination of these conditions (using OR) wrapped in parenthesis '()'
+      */
+    def ||(other: Option[Condition]): Condition = other.map { this || _ }.getOrElse(this)
+    
+    /**
      * Applies a logical NOT operator on this condition, reversing any logical outcome
      */
     def unary_! = Condition(segment.copy(sql = s"NOT (${ segment.sql })"))
@@ -87,7 +100,23 @@ case class Condition(private val segment: SqlSegment)
      * Combines this and another condition together using a logical XOR. The logical value is true 
      * when both of the conditions have different values
      */
-    def xor(other: Condition) = combine(Vector(other), " XOR ")
+    def xor(other: Condition) = combine(Vector(other), "XOR")
+    
+    /**
+      * Combines this condition with other conditions using specified operator
+      * @param others Other conditions
+      * @param operator An operator used for combining these two conditions
+      * @return A combination of these conditions
+      */
+    def combineWith(others: Seq[Condition], operator: BasicCombineOperator) = combine(others, operator.toSql)
+    
+    /**
+      * Combines these two conditions with each other using specified operator
+      * @param other Another condition
+      * @param operator Operator used when combining these conditions
+      * @return A combination of these two conditions
+      */
+    def combineWith(other: Condition, operator: BasicCombineOperator): Condition = combineWith(Vector(other), operator)
     
     private def combine(others: Seq[Condition], separator: String) = 
     {
@@ -95,7 +124,8 @@ case class Condition(private val segment: SqlSegment)
             this
         else 
         {
-            val noParentheses = SqlSegment.combine(segment +: others.map { _.segment }, { _ + separator + _ })
+            val noParentheses = SqlSegment.combine(segment +: others.map { _.segment },
+                { case (first, second) => s"$first $separator $second" })
             Condition(noParentheses.copy(sql = "(" + noParentheses.sql + ")"))
         }
     }

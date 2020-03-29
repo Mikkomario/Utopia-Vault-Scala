@@ -2,7 +2,7 @@ package utopia.vault.model.immutable.access
 
 import utopia.flow.datastructure.immutable.Value
 import utopia.vault.database.Connection
-import utopia.vault.model.immutable.factory.FromResultFactory
+import utopia.vault.nosql.factory.FromResultFactory
 import utopia.vault.sql.{Delete, Where}
 
 /**
@@ -13,31 +13,10 @@ import utopia.vault.sql.{Delete, Where}
  * @param value Value of this id
  * @param factory Factory used for reading model data from table
  */
-class ItemAccess[+A](value: Value, factory: FromResultFactory[A])
+@deprecated("Replaced with utopia.vault.nosql.access.SingleIdModelAccess", "v1.4")
+class ItemAccess[+A](value: Value, override val factory: FromResultFactory[A]) extends ConditionalSingleAccess[A]
 {
-	/**
-	 * @return A condition based on this id
-	 */
-	def toCondition = factory.table.primaryColumn.get <=> value
+	// ATTRIBUTES	-------------------
 	
-	/**
-	 * Checks whether this index is valid (exists in database)
-	 * @param connection Database connection (implicit)
-	 * @return Whether this id exists in the database
-	 */
-	def exists(implicit connection: Connection) = factory.table.containsIndex(value)
-	
-	/**
-	 * Reads model data from table
-	 * @param connection Database connection (implicit)
-	 * @return Model read for this id
-	 */
-	def get(implicit connection: Connection) = factory.get(value)
-	
-	/**
-	 * Deletes this id from database
-	 * @param connection Database connection (implicit)
-	 * @return Whether any rows were deleted
-	 */
-	def delete(implicit connection: Connection) = connection(Delete(factory.table) + Where(toCondition)).updatedRows
+	override val condition = factory.table.primaryColumn.get <=> value
 }

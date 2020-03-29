@@ -2,6 +2,7 @@ package utopia.vault.model.immutable
 
 import utopia.flow.datastructure.immutable.{PropertyDeclaration, Value}
 import utopia.flow.generic.DataType
+import utopia.vault.model.enumeration.ComparisonOperator
 import utopia.vault.sql.{Condition, ConditionElement, SqlSegment}
 
 /**

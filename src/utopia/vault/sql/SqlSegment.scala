@@ -77,9 +77,17 @@ case class SqlSegment(sql: String, values: Seq[Value] = Vector(), databaseName: 
      * Combines two sql segments to create a single, larger segment. A whitespace character is 
      * added between the two sql segments.
      */
-    def +(other: SqlSegment) = SqlSegment(sql + " " + other.sql, values ++ other.values, 
-            databaseName orElse other.databaseName, targetTables ++ other.targetTables, 
-            isSelect || other.isSelect, generatesKeys || other.generatesKeys)
+    def +(other: SqlSegment) =
+    {
+        if (other.isEmpty)
+            this
+        else if (isEmpty)
+            other
+        else
+            SqlSegment(sql + " " + other.sql, values ++ other.values,
+                databaseName orElse other.databaseName, targetTables ++ other.targetTables,
+                isSelect || other.isSelect, generatesKeys || other.generatesKeys)
+    }
     
     /**
      * Appends this sql segment with an sql string. 
@@ -87,6 +95,22 @@ case class SqlSegment(sql: String, values: Seq[Value] = Vector(), databaseName: 
      * between the two sql segments.
      */
     def +(sql: String) = copy(sql = this.sql + " " + sql)
+    
+    /**
+     * Combines these two segments, but if the other segment is empty, skips it
+     * @param other Another sql segment which may also be empty
+     * @return A combination of these two sql segments
+     */
+    def +(other: Option[SqlSegment]): SqlSegment = other.map { this + _ }.getOrElse(this)
+    
+    /**
+     * Combines these two segments, but if the other segment is empty, skips it
+     * @param other Another segment (converted implicitly)
+     * @param convertToSegment An implicit conversion to segment
+     * @tparam S Type of converted item
+     * @return A combination of these two sql segments
+     */
+    def +[S](other: Option[S])(implicit convertToSegment: S => SqlSegment): SqlSegment = this + other.map(convertToSegment)
     
     /**
      * Prepends this sql segment with an sql string. The new string will be added to the beginning 

@@ -25,7 +25,7 @@ object DatabaseTableReader
     {
         // Reads the column data from the database
         connection.dbName = databaseName
-        val columnData = connection.executeQuery("DESCRIBE " + tableName)
+        val columnData = connection.executeQuery(s"DESCRIBE `$tableName`")
         
         val columns = columnData.map( data => 
         {
@@ -48,7 +48,7 @@ object DatabaseTableReader
     
     // Converts underscrore naming style strings to camelcase naming style strings
     // Eg. day_of_birth => dayOfBirth
-    private def underlineToCamelCase(original: String) = 
+    def underlineToCamelCase(original: String) =
     {
         // whitespaces are considered equal to underscrores, in case someone would use them
         val splits = original.split(" ").flatMap { _.split("_") }

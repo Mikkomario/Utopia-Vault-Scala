@@ -1,12 +1,15 @@
 package utopia.vault.model.immutable
 
+import utopia.vault.sql.Extensions._
 import utopia.flow.datastructure.immutable.{Model, Value}
 import utopia.flow.datastructure.template
 import utopia.flow.datastructure.template.Property
 import utopia.flow.generic.{DeclarationConstantGenerator, ModelConvertible}
 import utopia.vault.database.{Connection, DBException}
-import utopia.vault.model.immutable.factory.{FromRowFactory, StorableFactory}
-import utopia.vault.sql.{Delete, Insert, SqlSegment, Update, Where}
+import utopia.vault.model.enumeration.BasicCombineOperator.And
+import utopia.vault.model.enumeration.{BasicCombineOperator, ComparisonOperator}
+import utopia.vault.nosql.factory.{FromRowFactory, StorableFactory}
+import utopia.vault.sql.{Condition, Delete, Insert, SqlSegment, Update, Where}
 
 object Storable
 {
@@ -68,19 +71,7 @@ trait Storable extends ModelConvertible
       * @return A condition based on this storable instance. All DEFINED properties are included in the condition.
       * @throws NoSuchElementException If this instance didn't have a single defined property
       */
-    def toCondition =
-    {
-        val model = toModel
-        val columns = table.columns
-        val conditions = columns.flatMap
-        {
-            c =>
-                val value = model(c.name)
-                if (value.isEmpty) None else Some(c <=> value)
-        }
-    
-        conditions.head && conditions.drop(1)
-    }
+    def toCondition = makeCondition { _ <=> _ }
     
     
     // IMPLEMENTED  ----------------------------------
@@ -89,6 +80,16 @@ trait Storable extends ModelConvertible
     
     
     // OTHER METHODS    ------------------------------
+    
+    /**
+      * Creates a condition based on this storable instance. All DEFINED (= non-empty) properties are included in the
+      * resulting condition.
+      * @param comparisonOperator Operator used when comparing the items
+      * @param combineOperator Operator used when combining individual conditions (Default = And = &&)
+      * @return A condition based on this storable instance and specified operators
+      */
+    def toConditionWithOperator(comparisonOperator: ComparisonOperator, combineOperator: BasicCombineOperator = And) =
+        makeCondition({ _.makeCondition(comparisonOperator, _) }, combineOperator)
     
     /**
      * Converts this storable instance's properties into a condition. The condition checks that 
@@ -142,7 +143,7 @@ trait Storable extends ModelConvertible
      */
     def update(writeNulls: Boolean = false)(implicit connection: Connection) = 
     {
-        val update = indexCondition.flatMap { cond => toUpdateStatement(writeNulls).map { _ + Where(cond) } }
+        val update = indexCondition.map { cond => toUpdateStatement(writeNulls) + Where(cond) }
         
         update.exists
         {
@@ -182,7 +183,7 @@ trait Storable extends ModelConvertible
      */
     def updateProperties(propertyNames: Traversable[String])(implicit connection: Connection) = 
     {
-        val update = indexCondition.flatMap { cond => updateStatementForProperties(propertyNames).map { _ + Where(cond) } }
+        val update = indexCondition.map { cond => updateStatementForProperties(propertyNames) + Where(cond) }
         update.foreach
         {
             statement =>
@@ -219,7 +220,7 @@ trait Storable extends ModelConvertible
     /**
      * Creates an update statement that updates only the specified properties
      */
-    def updateStatementForProperties(name1: String, more: String*): Option[SqlSegment] = 
+    def updateStatementForProperties(name1: String, more: String*): SqlSegment =
             updateStatementForProperties(Vector(name1) ++ more)
     
     /**
@@ -282,6 +283,17 @@ trait Storable extends ModelConvertible
       * @return Objects from the database matching this condition
       */
     def searchMany[B](factory: FromRowFactory[B])(implicit connection: Connection) = factory.getMany(toCondition)
+    
+    // NB: Throws if there were no specified attributes
+    private def makeCondition(makePart: (Column, Value) => Condition, combineOperator: BasicCombineOperator = And) =
+    {
+        val model = toModel
+        // Converts each defined (non-empty) attribute + column to a condition
+        val conditions = table.columns.flatMap { c => model.findExisting(c.name).map { _.value }.filter {
+            _.isDefined }.map { makePart(c, _) } }
+        // Merges the specified conditions using AND
+        conditions.head.combineWith(conditions.drop(1), combineOperator)
+    }
 }
 
 private class StorableWrapper(override val table: Table, val model: template.Model[Property]) extends StorableWithFactory[Storable]

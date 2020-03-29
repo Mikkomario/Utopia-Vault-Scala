@@ -1,7 +1,7 @@
 package utopia.vault.model.immutable.access
 
 import utopia.flow.datastructure.immutable.Value
-import utopia.vault.model.immutable.factory.FromResultFactory
+import utopia.vault.nosql.factory.FromResultFactory
 
 /**
  * Used for interacting with items in one or more tables
@@ -10,6 +10,7 @@ import utopia.vault.model.immutable.factory.FromResultFactory
  * @tparam I Type of used index
  * @tparam A Type of read model
  */
+@deprecated("Replaced with utopia.vault.nosql.access.ModelAccess", "v1.4")
 trait Access[-I, +A]
 {
 	// ABSTRACT	-----------------------

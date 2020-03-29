@@ -2,7 +2,7 @@ package utopia.vault.model.immutable
 
 import utopia.flow.datastructure.immutable.{ModelDeclaration, Value}
 import utopia.vault.database.Connection
-import utopia.vault.model.immutable.factory.StorableFactory
+import utopia.vault.nosql.factory.StorableFactory
 import utopia.vault.sql.JoinType.JoinType
 import utopia.vault.sql.{Condition, Exists, Limit, Select, SqlSegment, SqlTarget, Where}
 

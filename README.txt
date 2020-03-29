@@ -43,9 +43,7 @@ Main Features
         together without specifying any columns or conditions. Vault will fill in all the blanks for you.
         - If you wish to manually specify joined columns, that is also possible
 
-    Storable, Readable and Access traits for object-oriented database interactions
-        - This includes Storable, StorableWithFactory, Readable, FromResultFactory, FromRowFactory, StorableFactory,
-        SingleAccess, ManyAccess, SingleAccessWithIds and ManyAccessWithIds
+    Storable, Readable, Factory and Access traits for object-oriented database interactions
         - Storable trait allows you to push (update or insert) model data to database with minimum syntax
         - Readable trait allows you to pull (read) up to date data from database to your model
         - Mutable DBModel class implements both of these traits
@@ -79,6 +77,86 @@ Available Extensions
     utopia.vault.sql.Extensions
         - Allows you to use values (or value convertible items) as condition elements
         - Usually works in combination with utopia.flow.generic.ValueConversions
+
+
+v1.4  ----------------------------------
+
+    New Features
+    ------------
+
+        LinkedStorableFactory and MultiLinkedStorableFactory added as utility options for converting DB data from
+        two tables into a single model. Cases where you need to link more than 2 tables should still be handled using
+        FromRowFactory or FromResultFactory.
+
+        Result now contains split(Table) method to be used when working with joined tables and FromResultFactories.
+
+        Result also contains parse and parseSingle methods for easier access with factories
+
+        Result also contains rowValues and rowIntValues methods for easier data access for single value selections
+
+        New max and min methods in SingleIdAccess
+
+        ConditionalAccess, ConditionalSingleAccess and ConditionalManyAccess traits/classes allow access to database
+        rows based on a search conditions and can be used to provide sub groups under accesses
+
+        Added support for offset in sql statements (used for skipping n rows from the beginning of results)
+
+        Added foreach, fold, mapReduce and flatMapReduce functions to command to support very large queries. These
+        queries will be split in parts when used. The size of each split may be specified in ConnectionSettings.
+        Default split size is 10000 rows.
+
+        foreach, fold and mapReduce also added to FromRowFactory
+
+        Column name conversion method can now be changed in Tables -object.
+
+        Select.tables added
+
+        DatabaseCache added. Allows one to temporarily or permanently cache results of simple queries.
+
+        Storable instances can now be converted to a wider range of conditions using toConditionWithOperator(...)
+
+        Added RowFactoryWithTimestamps trait for all row factories that have a creation time column
+
+
+    Updates & Changes
+    -----------------
+
+        Package structure updated
+
+        A new set of access classes was created and the existing set of classes was deprecated for removal
+
+        Update no longer returns an option
+
+        ConnectionPool now properly closes connections on jvm exit
+
+        ConnectionPool now has default parameters. Also, java.time.Duration was changed to
+        scala.concurrent.duration.Duration in ConnectionPool.
+
+        Tables object was converted to a class. Uses a ConnectionPool for reading class data instead of using an
+        individual DB connection.
+
+        MultiLinkedStorableFactory now accepts any FromRowFactory as the child factory
+
+        FromRowFactory now returns Try instead of Option. Added parseIfPresent method in cases where one needs to first
+        check whether table data exists in specified row.
+
+
+    Fixes
+    -----
+
+        Result.grouped(...) didn't work correctly when secondary table had empty rows. Now empty rows are no longer
+        included in the resulting map.
+
+        Insert couldn't previously insert empty rows to a database. This is now possible.
+
+        DatabaseTableReader will now work with all table names, including those like "order"
+        (Added `` around requested table name)
+
+
+    Required Libraries
+        ------------------
+            - Utopia Flow 1.6.1+
+            - MariaDB or MySQL client
 
 
 v1.3  ---------------------------------------
@@ -135,7 +213,7 @@ v1.3  ---------------------------------------
 
         .in(...) (when creating conditions) will now accept any traversable group and not just seqs
 
-        FromResultFactory, FromRowFactory and StorableFactory were moved to utopia.vault.model.immutable.factory
+        FromResultFactory, FromRowFactory and StorableFactory were moved to utopia.vault.nosql.factory
 
 
     Fixes

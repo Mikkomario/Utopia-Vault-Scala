@@ -30,20 +30,21 @@ object Insert
         val insertedPropertyNames = rows.flatMap { _.attributesWithValue.map { _.name } }.toSet.filter {
             table.find(_).exists { !_.usesAutoIncrement } }.toVector
         
-        if (insertedPropertyNames.nonEmpty)
+        val columnNames = insertedPropertyNames.map { table(_).sqlColumnName }.mkString(", ")
+        val singleRowValuesSql =
         {
-            val columnNames = insertedPropertyNames.map { table(_).sqlColumnName }.mkString(", ")
-            val singleValueSql = "(?" + ", ?" * (insertedPropertyNames.size - 1) + ")"
-            val valuesSql = singleValueSql + (", " + singleValueSql) * (rows.size - 1)
-            val values = rows.flatMap { model => insertedPropertyNames.map { model(_) } }
-            
-            val segment = SqlSegment(s"INSERT INTO ${table.sqlName} ($columnNames) VALUES $valuesSql", values,
-                Some(table.databaseName), HashSet(table), generatesKeys = table.usesAutoIncrement)
-            
-            connection(segment)
+            if (insertedPropertyNames.nonEmpty)
+                "(?" + ", ?" * (insertedPropertyNames.size - 1) + ")"
+            else
+                "()"
         }
-        else
-            Result.empty
+        val valuesSql = singleRowValuesSql + (", " + singleRowValuesSql) * (rows.size - 1)
+        val values = rows.flatMap { model => insertedPropertyNames.map { model(_) } }
+        
+        val segment = SqlSegment(s"INSERT INTO ${table.sqlName} ($columnNames) VALUES $valuesSql", values,
+            Some(table.databaseName), HashSet(table), generatesKeys = table.usesAutoIncrement)
+        
+        connection(segment)
     }
     
     /**
