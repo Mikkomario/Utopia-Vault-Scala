@@ -79,7 +79,7 @@ Available Extensions
         - Usually works in combination with utopia.flow.generic.ValueConversions
 
 
-v1.4 (beta)  ----------------------------------
+v1.4  ----------------------------------
 
     New Features
     ------------
@@ -103,9 +103,9 @@ v1.4 (beta)  ----------------------------------
 
         Added foreach, fold, mapReduce and flatMapReduce functions to command to support very large queries. These
         queries will be split in parts when used. The size of each split may be specified in ConnectionSettings.
-        Default split size is 1000 rows.
+        Default split size is 10000 rows.
 
-        foreach, fold and mapReduce also added to StorableFactory
+        foreach, fold and mapReduce also added to FromRowFactory
 
         Column name conversion method can now be changed in Tables -object.
 
@@ -151,6 +151,12 @@ v1.4 (beta)  ----------------------------------
 
         DatabaseTableReader will now work with all table names, including those like "order"
         (Added `` around requested table name)
+
+
+    Required Libraries
+        ------------------
+            - Utopia Flow 1.6.1+
+            - MariaDB or MySQL client
 
 
 v1.3  ---------------------------------------
